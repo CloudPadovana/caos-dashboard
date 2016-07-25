@@ -1,0 +1,70 @@
+doctype html
+html(lang='en')
+head
+  base(href="/")
+  meta(charset='utf-8')
+  meta(
+    name='viewport'
+    content='initial-scale=1.0, user-scalable=no, width=device-width, maximum-scale=1.0, user-scalable=no')
+  title CAOS - Cloud Accounting for Open Stack
+
+  script(src='js/vendor/shim.min.js')
+  script(src='js/vendor/zone.js')
+  script(src='js/vendor/Reflect.js')
+  script(src='js/vendor/system.js')
+
+  script(src='js/env.js')
+  script(src='js/bundle.js')
+
+  link(rel='stylesheet' href='css/vendor.css')
+  link(rel='stylesheet' href='css/glyphicons.css')
+  link(rel='stylesheet' href='css/style.css')
+
+body
+  block content
+
+  script.
+    var map = {
+      'rxjs': 'npm:rxjs',
+      'ng2-bootstrap': 'npm:ng2-bootstrap',
+      'ng2-popover': 'npm:ng2-popover',
+      'moment': 'npm:moment',
+      'd3': 'npm:d3',
+      'nvd3': 'npm:nvd3',
+      'ng2-nvd3': 'npm:ng2-nvd3',
+    };
+    var angular_pkgs = [
+      'common',
+      'compiler',
+      'core',
+      'forms',
+      'http',
+      'platform-browser',
+      'platform-browser-dynamic',
+      'router'
+    ];
+
+    angular_pkgs.forEach(function(pkgName) {
+      map['@angular/' + pkgName] = 'npm:@angular/' + pkgName + '/bundles/' + pkgName + '.umd.js';
+    });
+
+    System.config({
+      map: map,
+      packages: {
+        caos: {},
+        rxjs: { defaultExtension: 'js' },
+        moment: { main: 'min/moment-with-locales.js', defaultExtension: 'js' },
+        d3: { main: 'd3.js', defaultExtension: 'js' },
+        nvd3: {
+          main: 'build/nv.d3.js',
+          defaultExtension: 'js',
+          meta: { deps: 'd3' }
+        },
+        'ng2-nvd3': { main: 'build/lib/ng2-nvd3.js', defaultExtension: 'js' },
+        'ng2-bootstrap': { defaultExtension: 'js' },
+        'ng2-popover': { main: 'index.js', defaultExtension: 'js' },
+      }
+    });
+
+    System.import('caos/bootstrap')
+      .catch(function(err) { console.error(err); });

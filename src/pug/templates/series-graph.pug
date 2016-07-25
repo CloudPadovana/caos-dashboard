@@ -1,0 +1,24 @@
+.card
+  h4.card-header {{ title }}
+
+  div
+    nvd3([options]="options", [data]="data")
+
+  .card-block([ngSwitch]="period.value")
+    div(*ngSwitchCase="86400")
+      button.btn.btn-primary(type="button", (click)="tableCollapsed = !tableCollapsed")
+        | Show tabular data
+
+      table.table(style="table-layout: fixed;", [collapse]="tableCollapsed")
+        thead
+          tr
+            th(style="width: 40%;") From
+            th(style="width: 40%;") To
+            th(style="width: 20%;") Value
+        tbody
+          tr(*ngFor="let s of in_range_samples()")
+            td {{ s.start_date | date: 'y-MM-dd HH:mm Z' }}
+            td {{ s.end_date | date: 'y-MM-dd HH:mm Z' }}
+            td {{ s.value | number: '3.2-2' }}
+
+    p(*ngSwitchDefault) Tabular data available in daily view
