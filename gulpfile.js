@@ -6,6 +6,7 @@ const concat = require('gulp-concat');
 const debug = require('gulp-debug');
 const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
+const inject = require('gulp-inject-string');
 const plumber = require('gulp-plumber');
 const pug = require('gulp-pug');
 const rename = require('gulp-rename');
@@ -57,6 +58,9 @@ gulp.task('build:js:app', function() {
   return gulp.src(['typings/index.d.ts',
                    APP_SRC_DIR + '/**/*.ts'
                   ])
+    .pipe(gulpif(flags.production,
+                 inject.replace('// INJECT PRODUCTION CODE',
+                                "import { enableProdMode } from '@angular/core'; enableProdMode();")))
     .pipe(sourcemaps.init({loadMaps: true}))
   // .pipe(plumber())
     .pipe(ts(ts_project, {}, ts.reporter.fullReporter()))
