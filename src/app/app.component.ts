@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'caos-app',
-  templateUrl: 'templates/caos.html'
+  selector: 'app',
+  templateUrl: 'app.component.html'
 })
 export class AppComponent { }

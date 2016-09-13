@@ -30,7 +30,7 @@ const PRESET_RANGES: PresetRange[] = [
 
 @Component({
   selector: 'range',
-  templateUrl: 'templates/range.html'
+  templateUrl: 'range.component.html'
 })
 export class RangeComponent implements OnInit {
   @Output() range_selected = new EventEmitter();

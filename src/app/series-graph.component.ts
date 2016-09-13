@@ -8,7 +8,7 @@ import { nvD3 } from 'ng2-nvd3';
 
 @Component({
   selector: 'series-graph',
-  templateUrl: 'templates/series-graph.html'
+  templateUrl: 'series-graph.component.html'
 })
 export class SeriesGraphComponent implements AfterViewInit {
   @Input() metric: string;

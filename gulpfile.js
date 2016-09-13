@@ -237,6 +237,17 @@ gulp.task('watch:assets', ['build:assets'], function() {
   });
 });
 
+gulp.task('build:html:components', function() {
+  return gulp.src(APP_SRC_DIR + '/**/*.pug', { base: APP_SRC_DIR })
+    .pipe(pug({
+      doctype: 'html',
+      pretty: !flags.production
+    }))
+    .on('error', gutil.log)
+    .pipe(debug({title: "Stream contents:", minimal: true}))
+    .pipe(gulp.dest(OUTPUT_DIR));
+});
+
 gulp.task('build:html', function() {
   return gulp.src(PUG_DIR + '/**/[^_]*.pug')
     .pipe(pug({
@@ -246,6 +257,14 @@ gulp.task('build:html', function() {
     .on('error', gutil.log)
     .pipe(debug({title: "Stream contents:", minimal: true}))
     .pipe(gulp.dest(OUTPUT_DIR));
+});
+
+gulp.task('watch:html:components', ['build:html:components'], function() {
+  var watcher = gulp.watch(APP_SRC_DIR + '/**/*.pug', ['build:html:components']);
+
+  watcher.on('change', function (event) {
+    console.log('Event ' + event.type + ' on path: ' + event.path);
+  });
 });
 
 gulp.task('watch:html', ['build:html'], function() {
@@ -261,6 +280,7 @@ gulp.task('build', [
   'build:assets',
   'build:css',
   'build:html',
+  'build:html:components',
   'build:js',
 ]);
 
@@ -268,6 +288,7 @@ gulp.task('watch', [
   'watch:assets',
   'watch:css',
   'watch:html',
+  'watch:html:components',
   'watch:js'
 ], function() {
   var watcher = gulp.watch('gulpfile.js', ['build']);

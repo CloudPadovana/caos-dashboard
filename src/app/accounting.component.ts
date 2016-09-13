@@ -8,7 +8,7 @@ import * as moment from 'moment';
 @Component({
   selector: 'accounting',
   providers: [ ApiService ],
-  templateUrl: 'templates/accounting.html'
+  templateUrl: 'accounting.component.html'
 })
 export class AccountingComponent implements OnInit {
   project: Project;
