@@ -3,8 +3,10 @@ import { Http, Response, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/share';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/of';
+
 import * as d3 from 'd3';
 import moment from 'moment';
 
@@ -46,6 +48,7 @@ const DATE_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
 @Injectable()
 export class ApiService {
   private _projects: Project[];
+  private _projects_observable: Observable<Project[]>;
 
   constructor(private _http: Http) { }
 
@@ -55,11 +58,24 @@ export class ApiService {
 
   projects(): Observable<Project[]> {
     if (this._projects) {
+      // if `this._projects` is available just return it as an
+      // `Observable`
       return Observable.of(this._projects);
+    } else if (this._projects_observable) {
+      // if `this._projects_observable` is set then the request is in
+      // progress return the `Observable` for the ongoing request
+      return this._projects_observable;
     } else {
-      return this._http.get(`${SETTINGS.CAOS_API_URL}/projects`)
-        .map((r: Response) => this.parse_projects(r))
+      // create the request, store the `Observable` for subsequent subscribers
+      this._projects_observable = this._http.get(`${SETTINGS.CAOS_API_URL}/projects`)
+        .map((r: Response) => {
+          // when the cached data is available we don't need the `Observable` reference anymore
+          this._projects_observable = null;
+          this._projects = this.parse_projects(r);
+          return this._projects;})
+        .share() // make it shared so more than one subscriber can get the result
         .catch(this.handle_error);
+      return this._projects_observable;
     }
   }
 
@@ -120,17 +136,14 @@ export class ApiService {
   }
 
   private parse_projects(response: Response): Project[] {
-    let projects = response.json().data.map(this.parse_project);
-    this._projects = projects;
-    return projects;
+    return response.json().data.map(this.parse_project);
   }
 
   private parse_project(data: any): Project {
-    let project = <Project>({
+    return <Project>({
       id: data.id,
       name: data.name
     });
-    return project;
   }
 
   private handle_error(err: any) {
