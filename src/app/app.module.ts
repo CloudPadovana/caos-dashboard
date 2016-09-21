@@ -18,6 +18,8 @@ import { CAOS_ROUTING } from './app.routing';
 import { AppComponent } from './app.component';
 import { ApiService } from './api.service';
 import { ProjectSelectorComponent } from './project-selector.component';
+import { GranularitySelectorComponent } from './granularity-selector.component';
+
 import { SeriesGraphComponent } from './series-graph.component';
 import { RangeComponent } from './range.component';
 
@@ -28,6 +30,7 @@ import { AccountingComponent } from './accounting.component';
   declarations: [
     AppComponent,
     ProjectSelectorComponent,
+    GranularitySelectorComponent,
     RangeComponent,
     HomeComponent,
     AccountingComponent,
