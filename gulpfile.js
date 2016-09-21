@@ -184,7 +184,7 @@ gulp.task('build:css:vendor', function() {
 });
 
 gulp.task('watch:css', ['build:css'], function() {
-  var css = VENDOR_CSS;
+  var css = VENDOR_CSS.slice(0);
   css.push(STYLE_DIR + '/**/*.scss');
 
   var watcher = gulp.watch(css, ['build:css']);
@@ -302,7 +302,7 @@ gulp.task('dev', ['watch', 'server']);
 
 gulp.task('default', ['build']);
 
-gulp.task('server', function () {
+gulp.task('server', ['build'], function () {
   gulp.src(OUTPUT_DIR)
     .pipe(server({
       host: '0.0.0.0',
@@ -311,7 +311,7 @@ gulp.task('server', function () {
       fallback: 'index.html',
       open: true,
       livereload: {
-        enabled: true,
+        enable: true,
         port: 35729}
     }));
 });
