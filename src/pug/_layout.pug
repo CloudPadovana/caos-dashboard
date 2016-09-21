@@ -9,14 +9,11 @@ head
   title CAOS - Cloud Accounting for Open Stack
 
   script(src='js/vendor/shim.min.js')
-  script(src='js/vendor/zone.js')
-  script(src='js/vendor/Reflect.js')
+  script(src='js/vendor/zone.min.js')
   script(src='js/vendor/system.js')
-
   script(src='js/env.js')
   script(src='js/bundle.js')
 
-  link(rel='stylesheet' href='css/vendor.css')
   link(rel='stylesheet' href='css/style.css')
 
 body
@@ -25,6 +22,7 @@ body
   script.
     var map = {
       'rxjs': 'npm:rxjs',
+      'reflect-metadata': 'npm:reflect-metadata',
       'ng2-bootstrap': 'npm:ng2-bootstrap',
       'ng2-popover': 'npm:ng2-popover',
       'moment': 'npm:moment',
@@ -52,6 +50,7 @@ body
       packages: {
         caos: {},
         rxjs: { defaultExtension: 'js' },
+        'reflect-metadata': { main: 'Reflect.js', defaultExtension: 'js' },
         moment: { main: 'min/moment-with-locales.js', defaultExtension: 'js' },
         d3: { main: 'd3.js', defaultExtension: 'js' },
         nvd3: {

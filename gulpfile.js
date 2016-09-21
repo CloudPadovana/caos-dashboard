@@ -1,7 +1,6 @@
 const gulp = require('gulp');
 
 const _ = require('lodash');
-const cleanCSS = require('gulp-clean-css');
 const concat = require('gulp-concat');
 const debug = require('gulp-debug');
 const gulpif = require('gulp-if');
@@ -26,7 +25,6 @@ const STYLE_DIR = SRC_DIR + '/style';
 
 const OUTPUT_DIR = './output/';
 const OUTPUT_JS_DIR = OUTPUT_DIR + 'js/';
-const OUTPUT_JS_VENDOR_DIR = OUTPUT_JS_DIR + 'vendor/';
 const OUTPUT_CSS_DIR = OUTPUT_DIR + 'css/';
 
 const DIST_DIR = 'dist';
@@ -46,14 +44,24 @@ var ts_project = ts.createProject('tsconfig.json', {
 });
 var js_builder = new system_builder('.', './systemjs.config.js');
 
-gulp.task('build:js:app', function() {
+gulp.task('build:js', function() {
   if (flags.production) {
     var js_builder_opts = { sourceMaps: false, lowResSourceMaps: false, minify: true };
   } else {
-    var js_builder_opts = { sourceMaps: true, lowResSourceMaps: true, minify: false };
+    var js_builder_opts = { sourceMaps: true,
+                            lowResSourceMaps: true,
+                            minify: false,
+                            mangle: false,
+                            globalDefs: { DEBUG: true }
+                          };
   }
 
   js_builder.invalidate('caos/*');
+
+  var js_entrypoints = [
+    'reflect-metadata/Reflect',
+    'caos/bootstrap'
+  ].join(' + ');
 
   return gulp.src(['typings/index.d.ts',
                    APP_SRC_DIR + '/**/*.ts'
@@ -73,7 +81,7 @@ gulp.task('build:js:app', function() {
     .pipe(gulpif(!flags.production, sourcemaps.write('.')))
     .pipe(gulp.dest(DIST_DIR))
     .on('end', function () {
-      js_builder.bundle('caos/bootstrap',
+      js_builder.bundle(js_entrypoints,
                         OUTPUT_JS_DIR + 'bundle.js',
                         js_builder_opts)
         .then(function() {
@@ -86,9 +94,9 @@ gulp.task('build:js:app', function() {
     });
 });
 
-gulp.task('watch:js:app', ['build:js:app'], function() {
+gulp.task('watch:js', ['build:js'], function() {
   var watcher = gulp.watch(['./systemjs.config.js',
-                            APP_SRC_DIR + '/**/*.ts'], ['build:js:app']);
+                            APP_SRC_DIR + '/**/*.ts'], ['build:js']);
 
   watcher.on('change', function (event) {
     console.log('Event ' + event.type + ' on path: ' + event.path);
@@ -96,98 +104,30 @@ gulp.task('watch:js:app', ['build:js:app'], function() {
 
 });
 
-const VENDOR_JS = {
-  'shim.min.js':     'node_modules/core-js/client/shim.min.js',
-  'zone.js': 'node_modules/zone.js/dist/zone.js',
-  'Reflect.js':     'node_modules/reflect-metadata/Reflect.js',
-  'system.js':     'node_modules/systemjs/dist/system.js'
-};
-
-const VENDOR_JS_DEV = {
-  'shim.min.js.map': 'node_modules/core-js/client/shim.min.js.map',
-  'Reflect.js.map': 'node_modules/reflect-metadata/Reflect.js.map',
-  'system.js.map': 'node_modules/systemjs/dist/system.js.map'
-};
-
-gulp.task('build:js:vendor', function() {
-  var FILES = VENDOR_JS;
-
-  if (!flags.production) {
-    FILES = _(FILES).extend(VENDOR_JS_DEV);
+gulp.task('build:css', function() {
+  if (flags.production) {
+    var sass_opts = {
+      includePaths: ['./node_modules' ],
+      outputStyle: 'compressed'
+    };
+  } else {
+    var sass_opts = {
+      includePaths: ['./node_modules' ],
+      outputStyle: 'nested'
+    };
   }
 
-  _(FILES).forEach(function(value, key) {
-    console.log('Processing ' + value + ' to ' + OUTPUT_JS_VENDOR_DIR + key);
-
-    gulp.src(value)
-      .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(gulpif(flags.production, uglify()))
-      .on('error', gutil.log)
-      .pipe(gulpif(!flags.productions,sourcemaps.write('.')))
-      .pipe(rename(key))
-      .pipe(gulp.dest(OUTPUT_JS_VENDOR_DIR));
-  });
-
-});
-
-gulp.task('build:js', [
-  'build:js:app',
-  'build:js:vendor'
-]);
-
-gulp.task('watch:js', [
-  'watch:js:app',
-  'watch:js:vendor'
-]);
-
-gulp.task('watch:js:vendor', ['build:js:vendor'], function() {
-  var vendor = [];
-
-  _(VENDOR_JS).forEach(function(value, key) {
-    vendor.push(value);
-  });
-
-  var watcher = gulp.watch(vendor, ['build:js:vendor']);
-
-  watcher.on('change', function (event) {
-    console.log('Event ' + event.type + ' on path: ' + event.path);
-  });
-});
-
-gulp.task('build:css', ['build:css:vendor'], function() {
   return gulp.src(STYLE_DIR + '/style.scss')
     .pipe(sourcemaps.init())
-    .pipe(sass({
-      includePaths: ['./node_modules' ],
-    })
+    .pipe(sass(sass_opts)
           .on('error', sass.logError))
     .pipe(gulpif(!flags.production, sourcemaps.write('.')))
     .pipe(gulp.dest(OUTPUT_CSS_DIR))
     .on('error', gutil.log);
 });
 
-const VENDOR_CSS = [
-  'node_modules/bootstrap/dist/css/bootstrap.css',
-  'node_modules/font-awesome/css/font-awesome.css',
-  'node_modules/ng2-select/components/css/ng2-select.css',
-  'node_modules/nvd3/build/nv.d3.css'
-];
-
-gulp.task('build:css:vendor', function() {
-  return gulp.src(VENDOR_CSS)
-    .pipe(sourcemaps.init())
-    .pipe(cleanCSS({debug: true}))
-    .pipe(concat('vendor.css'))
-    .pipe(gulpif(!flags.production, sourcemaps.write('.')))
-    .pipe(gulp.dest(OUTPUT_CSS_DIR))
-    .on('error', gutil.log);
-});
-
 gulp.task('watch:css', ['build:css'], function() {
-  var css = VENDOR_CSS.slice(0);
-  css.push(STYLE_DIR + '/**/*.scss');
-
-  var watcher = gulp.watch(css, ['build:css']);
+  var watcher = gulp.watch(STYLE_DIR + '/**/*.scss', ['build:css']);
 
   watcher.on('change', function (event) {
     console.log('Event ' + event.type + ' on path: ' + event.path);
@@ -201,8 +141,13 @@ const ASSETS = {
   js: [
     SRC_DIR + '/env.js',
   ],
-  css: [
-  ]
+  'js/vendor': [
+    'node_modules/core-js/client/shim.min.js',
+    gulpif(!flags.production, 'node_modules/core-js/client/shim.min.js.map'),
+    'node_modules/zone.js/dist/zone.min.js',
+    'node_modules/systemjs/dist/system.js',
+    gulpif(!flags.production, 'node_modules/systemjs/dist/system.js.map')
+  ],
 };
 
 gulp.task('build:assets', function() {

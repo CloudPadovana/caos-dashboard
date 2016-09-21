@@ -18,13 +18,13 @@ const GRANULARITIES: Granularity[] = [
 
 @Component({
   selector: 'granularity-selector',
-  templateUrl: 'granularity-selector.component.html'
+  templateUrl: 'components/granularity-selector.component.html'
 })
 export class GranularitySelectorComponent implements OnInit {
   _selection: Granularity;
   readonly granularities = GRANULARITIES;
 
-  @Output() selection_changed = new EventEmitter();
+  @Output() selection_changed = new EventEmitter<number>();
 
   constructor() { }
 

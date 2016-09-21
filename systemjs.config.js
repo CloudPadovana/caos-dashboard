@@ -9,6 +9,7 @@
   var map = {
     'caos/': './dist/',
     'rxjs': './node_modules/rxjs',
+    'reflect-metadata': './node_modules/reflect-metadata',
     'ng2-bootstrap': './node_modules/ng2-bootstrap',
     'ng2-popover': './node_modules/ng2-popover',
     'moment': './node_modules/moment',
@@ -21,6 +22,11 @@
   var packages = {
     'caos': {
       main: 'bootstrap.js',
+      defaultExtension: 'js'
+    },
+
+    'reflect-metadata': {
+      main: 'Reflect.js',
       defaultExtension: 'js'
     },
 

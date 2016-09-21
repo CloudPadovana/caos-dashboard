@@ -17,11 +17,6 @@ export interface Project {
   name: string;
 }
 
-export interface Period {
-  name: string;
-  value: number;
-}
-
 export interface Series {
   id: number;
   metric: string;
@@ -38,10 +33,22 @@ export interface Sample {
   end_date: Date;
 }
 
-const PERIODS: Period[] = [
-  { name: "hourly", value: 3600},
-  { name: "daily", value: 86400},
-];
+export interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+export interface Aggregate {
+  timestamp: Date;
+  project_id: string;
+  avg: number;
+  count: number;
+  min: number;
+  max: number;
+  std: number;
+  variance: number;
+  sum: number;
+}
 
 const DATE_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
 
@@ -51,10 +58,6 @@ export class ApiService {
   private _projects_observable: Observable<Project[]>;
 
   constructor(private _http: Http) { }
-
-  periods(): Period[] {
-    return PERIODS;
-  }
 
   projects(): Observable<Project[]> {
     if (this._projects) {
@@ -71,7 +74,7 @@ export class ApiService {
         .map((r: Response) => {
           // when the cached data is available we don't need the `Observable` reference anymore
           this._projects_observable = null;
-          this._projects = this.parse_projects(r);
+          this._projects = this.parse_projects(r.json().data);
           return this._projects;})
         .share() // make it shared so more than one subscriber can get the result
         .catch(this.handle_error);
@@ -79,23 +82,40 @@ export class ApiService {
     }
   }
 
-  private series(project: Project, period: Period, metric: string): Observable<Series[]> {
-    let params: URLSearchParams = new URLSearchParams();
-    params.set('project_id', project.id);
-    params.set('period', period.value.toString());
-    params.set('metric_name', metric);
-
-    return this._http.get(`${SETTINGS.CAOS_API_URL}/series`, { search: params })
-      .map((r: Response) => this.parse_series(r))
+  project(id: string): Observable<Project> {
+    return this._http.get(`${SETTINGS.CAOS_API_URL}/projects/${id}`)
+      .map((r: Response) => this.parse_project(r.json().data))
       .catch(this.handle_error);
   }
 
-  private parse_series(response: Response): Series[] {
-    return response.json().data.map(this.parse_one_series);
+  private parse_projects(data: any): Project[] {
+    return data.map(this.parse_project);
+  }
+
+  private parse_project(data: any): Project {
+    return <Project>({
+      id: data.id,
+      name: data.name
+    });
+  }
+
+  private series(project: Project, period: number, metric: string): Observable<Series[]> {
+    let params: URLSearchParams = new URLSearchParams();
+    params.set('project_id', project.id);
+    params.set('period', period.toString());
+    params.set('metric_name', metric);
+
+    return this._http.get(`${SETTINGS.CAOS_API_URL}/series`, { search: params })
+      .map((r: Response) => this.parse_series(r.json().data))
+      .catch(this.handle_error);
+  }
+
+  private parse_series(data: any): Series[] {
+    return data.map(this.parse_one_series);
   }
 
   private parse_one_series(data: any): Series {
-    let series = <Series>({
+    return <Series>({
       id: Number(data.id),
       project_id: data.project_id,
       metric: data.metric_name,
@@ -103,17 +123,20 @@ export class ApiService {
       ttl: Number(data.ttl),
       last_timestamp: data.last_timestamp
     });
-    return series;
   }
 
-  samples(project: Project, period: Period, metric: string): Observable<Sample[]> {
+  samples(project: Project, period: number, metric: string, daterange: DateRange): Observable<Sample[]> {
     let series = this.series(project, period, metric);
+
+    let params: URLSearchParams = new URLSearchParams();
+    params.set('from', DATE_FORMAT(daterange.start));
+    params.set('to', DATE_FORMAT(daterange.end));
 
     return series.flatMap(
       (s: Series[]) => {
         let id = s[0].id;
-        return this._http.get(`${SETTINGS.CAOS_API_URL}/series/${id}/samples`)
-          .map((r: Response) => this.parse_samples(r, period.value))
+        return this._http.get(`${SETTINGS.CAOS_API_URL}/series/${id}/samples`, { search: params })
+          .map((r: Response) => this.parse_samples(r, period))
           .catch(this.handle_error);
       });
   }
@@ -135,28 +158,65 @@ export class ApiService {
     return sample;
   }
 
-  private parse_projects(response: Response): Project[] {
-    return response.json().data.map(this.parse_project);
+
+  private _aggregate(projects: Project[], period: number, metric: string, daterange: DateRange, granularity: number): Observable<Response> {
+    let params: URLSearchParams = new URLSearchParams();
+    params.set('metric', metric);
+    params.set('period', `${period}`);
+    params.set('from', DATE_FORMAT(daterange.start));
+    params.set('to', DATE_FORMAT(daterange.end));
+    for(let p of projects) {
+      params.append('projects[]', p.id);
+    }
+    params.set('granularity', `${granularity}`);
+
+    let query = this._http.get(`${SETTINGS.CAOS_API_URL}/aggregate`, { search: params });
+    return query;
   }
 
-  private parse_project(data: any): Project {
-    return <Project>({
-      id: data.id,
-      name: data.name
+  aggregate_for_one_project(project: Project, period: number, metric: string, daterange: DateRange, granularity: number): Observable<Aggregate[]> {
+    return this._aggregate([project], period, metric, daterange, granularity)
+      .map((r: Response) => this.parse_aggregate_for_one_project(r.json().data[project.id]))
+      .catch(this.handle_error);
+  }
+
+  aggregate(projects: Project[], period: number, metric: string, daterange: DateRange, granularity: number): Observable<{ [id: string] : Aggregate[] }> {
+    return this._aggregate(projects, period, metric, daterange, granularity)
+      .map((r: Response) => this.parse_aggregates(r.json().data))
+      .catch(this.handle_error);
+  }
+
+  private parse_aggregates(data: any): { [id: string] : Aggregate[] } {
+    let ret: { [id: string] : Aggregate[] } = {};
+    for(let k in data) {
+      ret[k] = data[k].map((d: any) => this.parse_one_aggregate(d));
+    }
+    return ret;
+  }
+
+  private parse_aggregate_for_one_project(data: any): Aggregate[] {
+    return data.map((d: any) => this.parse_one_aggregate(d));
+  }
+
+  private parse_one_aggregate(data: any): Aggregate {
+    return <Aggregate>({
+      timestamp: DATE_FORMAT.parse(data.timestamp),
+      project_id: data.project_id,
+      avg: data.avg,
+      count: data.count,
+      min: data.min,
+      max: data.max,
+      std: data.std,
+      variance: data.var,
+      sum: data.sum
     });
   }
 
-  private handle_error(err: any) {
-    console.log('error:', err);  // debug
-    if(err instanceof Response) {
-      //return Observable.throw(err.json().error || 'backend server error');
-      // if you're using lite-server, use the following line
-      // instead of the line above:
-      //return Observable.throw(err.text() || 'backend server error');
+  private handle_error(error: any) {
+    if(error instanceof Response) {
+      return Observable.throw(error.json().error || 'backend server error');
     }
-    //return Observable.throw(err || 'backend server error');
-    //let errMsg = error.message ? error.message : (error.status ? `${error.status} - ${error.statusText}` : 'Server error');
-    //console.log(error);
-    return Observable.throw("errMsg");
+    let msg = error.message ? error.message : (error.status ? `${error.status} - ${error.statusText}` : 'Server error');
+    return Observable.throw(msg);
   }
 }

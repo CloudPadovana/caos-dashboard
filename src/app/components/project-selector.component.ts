@@ -1,11 +1,11 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
-import { ApiService, Project } from './api.service';
+import { ApiService, Project } from '../api.service';
 
 
 @Component({
   selector: 'project-selector',
-  templateUrl: 'project-selector.component.html'
+  templateUrl: 'components/project-selector.component.html'
 })
 export class ProjectSelectorComponent implements OnInit {
   projects: Project[] = [];

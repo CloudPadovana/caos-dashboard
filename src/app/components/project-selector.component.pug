@@ -27,6 +27,7 @@
               | {{ p.name }}
 
     .col-md-9
+      p No project selected
       span.project-tag(*ngFor="let p of selected_projects")
         | {{ p.name }}
         button.close.btn-xs(type="button", (click)="toggle_selected(p)")

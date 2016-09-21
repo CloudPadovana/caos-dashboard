@@ -1,0 +1,11 @@
+h4 Overview of CPU Time
+
+.container-fluid
+  .row
+    .col-md-4(*ngFor="let p of projects")
+      .card
+        .card-header
+          h4.card-title {{p.name}}
+          a.card-link([routerLink]="p.id") Details
+        .card-block
+          series-graph([metric]="'cpu'", [project]="p", [period]="3600", [daterange]="daterange")

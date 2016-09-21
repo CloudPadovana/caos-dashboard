@@ -1,0 +1,23 @@
+.topnav {
+  border-radius: 0;
+  background-color: $topnav-background-color;
+  padding: 6px;
+
+  .text-center {
+    text-align: center;
+    padding-left: 0;
+    cursor: pointer;
+  }
+
+  .top-right-nav {
+    .dropdown-menu {
+      top: 40px;
+      right: -5px;
+      left: auto;
+      hr {
+        margin-top: 1px;
+        margin-bottom: 4px;
+      }
+    }
+  }
+}
