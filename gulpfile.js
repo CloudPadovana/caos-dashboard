@@ -197,17 +197,11 @@ gulp.task('watch:css', ['build:css'], function() {
 const ASSETS = {
   fonts: [
     'node_modules/font-awesome/fonts/**/*',
-    ASSETS_DIR + '/glyphicons-halflings-regular.eot',
-    ASSETS_DIR + '/glyphicons-halflings-regular.ttf',
-    ASSETS_DIR + '/glyphicons-halflings-regular.woff2',
-    ASSETS_DIR + '/glyphicons-halflings-regular.svg',
-    ASSETS_DIR + '/glyphicons-halflings-regular.woff'
   ],
   js: [
     SRC_DIR + '/env.js',
   ],
   css: [
-    ASSETS_DIR + '/glyphicons.css'
   ]
 };
 
