@@ -10,6 +10,7 @@ import { nvD3 } from 'ng2-nvd3';
 
 import { DateRangeSelectorComponent } from './daterange-selector.component';
 import { GranularitySelectorComponent } from './granularity-selector.component';
+import { MetricSelectorComponent } from './metric-selector.component';
 import { ProjectSelectorComponent } from './project-selector.component';
 import { SeriesGraphComponent } from './series-graph.component';
 import { AggregateGraphComponent } from './aggregate-graph.component';
@@ -20,6 +21,7 @@ import { AggregateGraphComponent } from './aggregate-graph.component';
     nvD3,
     DateRangeSelectorComponent,
     GranularitySelectorComponent,
+    MetricSelectorComponent,
     SeriesGraphComponent,
     AggregateGraphComponent,
     ProjectSelectorComponent,
@@ -40,6 +42,7 @@ import { AggregateGraphComponent } from './aggregate-graph.component';
     nvD3,
     DateRangeSelectorComponent,
     GranularitySelectorComponent,
+    MetricSelectorComponent,
     SeriesGraphComponent,
     AggregateGraphComponent,
     ProjectSelectorComponent,

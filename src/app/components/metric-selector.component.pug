@@ -1,0 +1,5 @@
+.form-inline.form-group
+  label(for="metric_button_group") Metric:
+  .btn-group#metric_button_group
+    button.btn.btn-secondary.btn-xs(type="button", *ngFor="let m of metrics", [class.active]="is_selected(m)", (click)="metric_selected(m)")
+      | {{ m.name }}

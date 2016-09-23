@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 
 import * as moment from 'moment';
 
-import { ApiService, Project, DateRange } from '../api.service';
+import { ApiService, Project, Metric, DateRange } from '../api.service';
 
 
 @Component({
@@ -11,6 +11,7 @@ import { ApiService, Project, DateRange } from '../api.service';
 })
 export class AccountingDetailsComponent implements OnInit {
   project: Project;
+  metric: Metric;
   daterange: DateRange;
 
   constructor(private _route: ActivatedRoute,

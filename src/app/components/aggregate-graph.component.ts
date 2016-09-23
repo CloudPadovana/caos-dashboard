@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, Input, ViewChild } from '@angular/core';
-import { ApiService, Project, Aggregate, DateRange } from '../api.service';
+import { ApiService, Project, Metric, Aggregate, DateRange } from '../api.service';
 
 import * as d3 from 'd3';
 import 'nvd3';
@@ -25,14 +25,14 @@ export class AggregateGraphComponent implements AfterViewInit {
     return this._project;
   }
 
-  _metric: string;
+  _metric: Metric;
   @Input()
-  set metric(m: string) {
+  set metric(m: Metric) {
     this._metric = m;
     this.update_samples();
   }
 
-  get metric(): string {
+  get metric(): Metric {
     return this._metric;
   }
 

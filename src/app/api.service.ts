@@ -17,6 +17,11 @@ export interface Project {
   name: string;
 }
 
+export interface Metric {
+  name: string;
+  type: string;
+}
+
 export interface Series {
   id: number;
   metric: string;
@@ -56,6 +61,9 @@ const DATE_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
 export class ApiService {
   private _projects: Project[];
   private _projects_observable: Observable<Project[]>;
+
+  private _metrics: Metric[];
+  private _metrics_observable: Observable<Metric[]>;
 
   constructor(private _http: Http) { }
 
@@ -99,11 +107,39 @@ export class ApiService {
     });
   }
 
-  private series(project: Project, period: number, metric: string): Observable<Series[]> {
+  metrics(): Observable<Metric[]> {
+    if (this._metrics) {
+      return Observable.of(this._metrics);
+    } else if (this._metrics_observable) {
+      return this._metrics_observable;
+    } else {
+      this._metrics_observable = this._http.get(`${SETTINGS.CAOS_API_URL}/metrics`)
+        .map((r: Response) => {
+          this._metrics_observable = null;
+          this._metrics = this.parse_metrics(r.json().data);
+          return this._metrics;})
+        .share()
+        .catch(this.handle_error);
+      return this._metrics_observable;
+    }
+  }
+
+  private parse_metrics(data: any): Metric[] {
+    return data.map(this.parse_metric);
+  }
+
+  private parse_metric(data: any): Metric {
+    return <Metric>({
+      name: data.name,
+      type: data.type
+    });
+  }
+
+  private series(project: Project, period: number, metric: Metric): Observable<Series[]> {
     let params: URLSearchParams = new URLSearchParams();
     params.set('project_id', project.id);
     params.set('period', period.toString());
-    params.set('metric_name', metric);
+    params.set('metric_name', metric.name);
 
     return this._http.get(`${SETTINGS.CAOS_API_URL}/series`, { search: params })
       .map((r: Response) => this.parse_series(r.json().data))
@@ -125,7 +161,7 @@ export class ApiService {
     });
   }
 
-  samples(project: Project, period: number, metric: string, daterange: DateRange): Observable<Sample[]> {
+  samples(project: Project, period: number, metric: Metric, daterange: DateRange): Observable<Sample[]> {
     let series = this.series(project, period, metric);
 
     let params: URLSearchParams = new URLSearchParams();
@@ -159,9 +195,9 @@ export class ApiService {
   }
 
 
-  private _aggregate(projects: Project[], period: number, metric: string, daterange: DateRange, granularity: number): Observable<Response> {
+  private _aggregate(projects: Project[], period: number, metric: Metric, daterange: DateRange, granularity: number): Observable<Response> {
     let params: URLSearchParams = new URLSearchParams();
-    params.set('metric', metric);
+    params.set('metric', metric.name);
     params.set('period', `${period}`);
     params.set('from', DATE_FORMAT(daterange.start));
     params.set('to', DATE_FORMAT(daterange.end));
@@ -174,13 +210,13 @@ export class ApiService {
     return query;
   }
 
-  aggregate_for_one_project(project: Project, period: number, metric: string, daterange: DateRange, granularity: number): Observable<Aggregate[]> {
+  aggregate_for_one_project(project: Project, period: number, metric: Metric, daterange: DateRange, granularity: number): Observable<Aggregate[]> {
     return this._aggregate([project], period, metric, daterange, granularity)
       .map((r: Response) => this.parse_aggregate_for_one_project(r.json().data[project.id]))
       .catch(this.handle_error);
   }
 
-  aggregate(projects: Project[], period: number, metric: string, daterange: DateRange, granularity: number): Observable<{ [id: string] : Aggregate[] }> {
+  aggregate(projects: Project[], period: number, metric: Metric, daterange: DateRange, granularity: number): Observable<{ [id: string] : Aggregate[] }> {
     return this._aggregate(projects, period, metric, daterange, granularity)
       .map((r: Response) => this.parse_aggregates(r.json().data))
       .catch(this.handle_error);
