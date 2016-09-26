@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, Input, ViewChild } from '@angular/core';
+import { Component, OnChanges, AfterViewInit, Input, ViewChild } from '@angular/core';
 import { ApiService, Project, Metric, Sample, DateRange } from '../api.service';
 
 import * as d3 from 'd3';
@@ -13,55 +13,20 @@ import { nvD3 } from 'ng2-nvd3';
 </div>
 `
 })
-export class SeriesGraphComponent implements AfterViewInit {
-  _project: Project;
-  @Input()
-  set project(p: Project) {
-    this._project = p;
-    this.update_samples();
-  }
-
-  get project(): Project {
-    return this._project;
-  }
-
-  _metric: Metric;
-  @Input()
-  set metric(m: Metric) {
-    this._metric = m;
-    this.update_samples();
-  }
-
-  get metric(): Metric {
-    return this._metric;
-  }
-
-  _period: number;
-  @Input()
-  set period(p: number) {
-    this._period = p;
-    this.update_samples();
-  }
-
-  get period(): number {
-    return this._period;
-  }
-
-  _daterange: DateRange;
-  @Input()
-  set daterange(r: DateRange) {
-    this._daterange = r;
-    this.update_samples();
-  }
-
-  get daterange(): DateRange {
-    return this._daterange;
-  }
+export class SeriesGraphComponent implements AfterViewInit, OnChanges {
+  @Input() project: Project;
+  @Input() metric: Metric;
+  @Input() period: number;
+  @Input() daterange: DateRange;
 
   constructor(private _api: ApiService) {}
 
   @ViewChild(nvD3)
   nvD3: nvD3;
+
+  ngOnChanges() {
+    this.update_samples();
+  }
 
   private update_chart(): void {
     if (!this.nvD3) { return };
@@ -97,25 +62,40 @@ export class SeriesGraphComponent implements AfterViewInit {
     chart: {
       type: 'lineChart',
       showLegend: false,
-      height: 250,
+      margin: {
+        top: 20,
+        right: 50,
+        bottom: 50,
+        left: 50
+      },
       x: function(d: Sample) { return d.timestamp; },
       y: function(d: Sample) { return d.value/3600; },
       useInteractiveGuideline: true,
       interpolate: 'step',
       xAxis: {
-        axisLabel: 'Date',
+        // axisLabel: 'Date',
         tickFormat: function(d: any) {
-          return d3.time.format('%d %b %H:%M')(new Date(d));
+          return d3.time.format('%a %d')(new Date(d));
         },
       },
       xScale: d3.time.scale(),
       yAxis: {
-        axisLabel: 'Usage [hours]',
+        // axisLabel: 'Usage [hours]',
         tickFormat: function(d: any) {
           return d3.format('.02f')(d);
         },
         axisLabelDistance: -10
       },
+      interactiveLayer: {
+        tooltip: {
+          valueFormatter: function(d: any) {
+            return d3.format('.02f')(d) + ' hours';
+          },
+          headerFormatter: function (d: any) {
+            return d3.time.format("%a %b %d %H:%M %Y")(new Date(d));
+          }
+        }
+      }
     }
   };
 }

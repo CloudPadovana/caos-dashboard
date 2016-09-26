@@ -1,11 +1,16 @@
-h4 Overview of CPU Time
+h4 Overview over last 7 days #[small (sorted by total usage)]
+
+metric-selector((selection_changed)="metric_selected($event)", label="Metric:")
 
 .container-fluid
-  .row
-    .col-md-4(*ngFor="let p of projects")
+  .row(*ngFor="let r of gridded_projects")
+    .col-md-4(*ngFor="let p of r")
       .card
         .card-header
-          h4.card-title {{p.name}}
-          a.card-link([routerLink]="p.id") Details
-        .card-block
-          series-graph([metric]="'cpu'", [project]="p", [period]="3600", [daterange]="daterange")
+          h6.card-title
+            | {{ p.name }}
+            small.pull-right
+              | Total: {{ aggregates[p.id].sum/3600 | number: '1.2-2' }} hours
+              a.card-link.pull-right([routerLink]="p.id") (Details)
+        .card-block(style="padding: 0;")
+          series-graph([metric]="metric", [project]="p", [period]="3600", [daterange]="daterange")
