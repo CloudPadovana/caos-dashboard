@@ -1,26 +1,33 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-import { ApiService, Metric } from '../api.service';
+interface Metric {
+  label: string;
+  name: string;
+}
+
+const METRICS: Metric[] = [
+    <Metric>({label: "CPU Usage",
+              name: "cpu"}),
+    <Metric>({label: "Wall Clock Time",
+              name: "wallclocktime"}),
+]
 
 @Component({
   selector: 'metric-selector',
   templateUrl: 'components/metric-selector.component.html'
 })
 export class MetricSelectorComponent implements OnInit {
-  metrics: Metric[] = [];
+  @Input() label: string;
 
+  readonly metrics: Metric[] = METRICS;
   _selection: Metric;
 
   @Output() selection_changed = new EventEmitter<Metric>();
 
-  constructor(private _api: ApiService) { }
+  constructor() { }
 
   ngOnInit() {
-    this._api.metrics().subscribe(
-      (metrics: Metric[]) => {
-        this.metrics = metrics;
-        this.metric_selected(metrics[0]);
-      })
+    this.metric_selected(this.metrics[0]);
   }
 
   metric_selected(m: Metric): void {
