@@ -4,14 +4,16 @@ h4 Details of {{ project?.name }}
   .row
     .col-sm-5
       granularity-selector((selection_changed)="granularity=$event")
+      metric-selector((selection_changed)="metric=$event")
+
     .col-sm-7
       daterange-selector((selection_changed)="daterange=$event")
   .row
-    project-selector(multi="false", selection_changed)="project=$event")
+    //project-selector(multi="false", selection_changed)="project=$event")
 
   .row
-    aggregate-graph(metric="cpu", [project]="project", [granularity]="granularity", [daterange]="daterange", period=3600)
+    aggregate-graph([metric]="metric", [project]="project", [granularity]="granularity", [daterange]="daterange", period=3600)
 
-    
-    .col-md-6
-      //series-graph(title="Wall Clock Time", metric="wallclocktime", [projects]="projects", [granularity]="granularity_seconds", [range]="range")
+  .row
+    //aggregate-table([metric]="metric", [project]="project", [granularity]="granularity", [daterange]="daterange", period=3600)
+

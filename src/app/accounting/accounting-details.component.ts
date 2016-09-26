@@ -22,10 +22,5 @@ export class AccountingDetailsComponent implements OnInit {
       let id = params['id'];
       this._api.project(id).subscribe((p: Project) => this.project = p);
     });
-      
-
-    // this._api.projects().subscribe(
-    //   (projects: Project[]) =>
-    //     this.projects = projects);
   }
 }

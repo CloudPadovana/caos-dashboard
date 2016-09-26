@@ -1,0 +1,18 @@
+div
+  nvd3([options]="options", [data]="data")
+
+  p Total value from {{ daterange?.start | date: 'y-MM-dd' }} to {{ daterange?.end | date: 'y-MM-dd' }} is: #[strong {{ values_sum/3600 | number: '1.2-2'}}] hours.
+
+table.table.table-bordered
+  thead
+    th(style="width: 10%;") #
+    th(style="width: 40%;") From
+    th(style="width: 40%;") To
+    th(style="width: 20%;") Value [hours]
+  tbody
+    tr(*ngFor="let s of values; let i = index")
+      th(scope="row") {{ i }}
+      td {{ s.start_date | date: 'y-MM-dd HH:mm Z' }}
+      td {{ s.end_date | date: 'y-MM-dd HH:mm Z' }}
+      td {{ s.sum/3600 | number: '1.2-2' }}
+
