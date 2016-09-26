@@ -12,6 +12,7 @@ $topnav-background-color: #222;
   margin: 50px 0 0 225px;
   padding: 10px;
   position: relative;
+  z-index: 1;
 }
 
 /* #toggle-sidebar { */
@@ -75,7 +76,7 @@ daterange-selector {
     }
   }
 
-  .popover, popover-content {
+  .popover, .popover-content {
     z-index: $zindex-popover;
   }
 }

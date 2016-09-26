@@ -8,16 +8,18 @@
   .form-group
     label(for="daterange_start_group") From:
     .btn-group#daterange_start_group
+      popover-content(#popoverstart, placement="bottom", [closeOnClickOutside]="true", (click)="$event.stopPropagation();")
+        datepicker([(ngModel)]="daterange_start", [showWeeks]="false", [startingDay]="1")
       button.btn.btn-secondary.btn-xs(type="button", [popover]="popoverstart")
         | {{ daterange_start | date: 'dd/MM/y' }}
         i.fa.fa-fw.fa-calendar
-        popover-content(#popoverstart, placement="bottom", [closeOnClickOutside]="true", (click)="$event.stopPropagation();")
-          datepicker([(ngModel)]="daterange_start", [showWeeks]="false", [startingDay]="1")
+
 
     label(for="daterange_end_group") To:
     .btn-group#daterange_end_group
+      popover-content(#popoverend, placement="bottom", [closeOnClickOutside]="true", (click)="$event.stopPropagation();")
+        datepicker([(ngModel)]="daterange_end", [showWeeks]="false", [startingDay]="1")
       button.btn.btn-secondary.btn-xs(type="button", [popover]="popoverend")
         | {{ daterange_end | date: 'dd/MM/y' }}
         i.fa.fa-fw.fa-calendar
-        popover-content(#popoverend, placement="bottom", [closeOnClickOutside]="true", (click)="$event.stopPropagation();")
-          datepicker([(ngModel)]="daterange_end", [showWeeks]="false", [startingDay]="1")
+
