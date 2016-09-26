@@ -53,6 +53,8 @@ export interface Aggregate {
   std: number;
   variance: number;
   sum: number;
+  start_date: Date;
+  end_date: Date;
 }
 
 const DATE_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
@@ -212,29 +214,32 @@ export class ApiService {
 
   aggregate_for_one_project(project: Project, period: number, metric: Metric, daterange: DateRange, granularity: number): Observable<Aggregate[]> {
     return this._aggregate([project], period, metric, daterange, granularity)
-      .map((r: Response) => this.parse_aggregate_for_one_project(r.json().data[project.id]))
+      .map((r: Response) => this.parse_aggregate_for_one_project(r.json().data[project.id], granularity))
       .catch(this.handle_error);
   }
 
   aggregate(projects: Project[], period: number, metric: Metric, daterange: DateRange, granularity: number): Observable<{ [id: string] : Aggregate[] }> {
     return this._aggregate(projects, period, metric, daterange, granularity)
-      .map((r: Response) => this.parse_aggregates(r.json().data))
+      .map((r: Response) => this.parse_aggregates(r.json().data, granularity))
       .catch(this.handle_error);
   }
 
-  private parse_aggregates(data: any): { [id: string] : Aggregate[] } {
+  private parse_aggregates(data: any, granularity: number): { [id: string] : Aggregate[] } {
     let ret: { [id: string] : Aggregate[] } = {};
     for(let k in data) {
-      ret[k] = data[k].map((d: any) => this.parse_one_aggregate(d));
+      ret[k] = data[k].map((d: any) => this.parse_one_aggregate(d, granularity));
     }
     return ret;
   }
 
-  private parse_aggregate_for_one_project(data: any): Aggregate[] {
-    return data.map((d: any) => this.parse_one_aggregate(d));
+  private parse_aggregate_for_one_project(data: any, granularity: number): Aggregate[] {
+    return data.map((d: any) => this.parse_one_aggregate(d, granularity));
   }
 
-  private parse_one_aggregate(data: any): Aggregate {
+  private parse_one_aggregate(data: any, granularity: number): Aggregate {
+    let end_date = DATE_FORMAT.parse(data.timestamp);
+    let start_date = moment(end_date).subtract(granularity, 'seconds').toDate();
+
     return <Aggregate>({
       timestamp: DATE_FORMAT.parse(data.timestamp),
       project_id: data.project_id,
@@ -244,7 +249,9 @@ export class ApiService {
       max: data.max,
       std: data.std,
       variance: data.var,
-      sum: data.sum
+      sum: data.sum,
+      start_date: start_date,
+      end_date: end_date
     });
   }
 
