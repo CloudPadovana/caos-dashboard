@@ -1,12 +1,6 @@
 .form-inline
   .form-group
-    label(for="daterange_preset_button_group") Last:
-    .btn-group#daterange_preset_button_group
-      button.btn.btn-secondary.btn-xs(type="button", *ngFor="let r of presets", [class.active]="is_selected(r)", (click)="preset_clicked(r)")
-        | {{ r.label }}
-
-  .form-group
-    label(for="daterange_start_group") From:
+    label(for="daterange_start_group") From
     .btn-group#daterange_start_group
       popover-content(#popoverstart, placement="bottom", [closeOnClickOutside]="true", (click)="$event.stopPropagation();")
         datepicker([(ngModel)]="daterange_start", [showWeeks]="false", [startingDay]="1")
@@ -15,11 +9,17 @@
         i.fa.fa-fw.fa-calendar
 
 
-    label(for="daterange_end_group") To:
+    label(for="daterange_end_group") to
     .btn-group#daterange_end_group
       popover-content(#popoverend, placement="bottom", [closeOnClickOutside]="true", (click)="$event.stopPropagation();")
         datepicker([(ngModel)]="daterange_end", [showWeeks]="false", [startingDay]="1")
       button.btn.btn-secondary.btn-xs(type="button", [popover]="popoverend")
         | {{ daterange_end | date: 'dd/MM/y' }}
         i.fa.fa-fw.fa-calendar
+
+  .form-group
+    label(for="daterange_preset_button_group") or past
+    .btn-group#daterange_preset_button_group
+      button.btn.btn-secondary.btn-xs(type="button", *ngFor="let r of presets", [class.active]="is_selected(r)", (click)="preset_clicked(r)")
+        | {{ r.label }}
 

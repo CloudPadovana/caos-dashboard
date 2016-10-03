@@ -1,5 +1,5 @@
 .form-inline.form-group
-  label(for="granularity_button_group") Granularity:
+  label(for="granularity_button_group", *ngIf="label") {{ label }}
   .btn-group#granularity_button_group
     button.btn.btn-secondary.btn-xs(type="button", *ngFor="let g of granularities", [class.active]="is_selected(g)", (click)="granularity_selected(g)")
       | {{ g.label }}

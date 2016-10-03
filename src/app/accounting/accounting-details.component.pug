@@ -2,18 +2,14 @@ h4 Details of {{ project?.name }}
 
 .container-fluid
   .row
-    .col-sm-5
-      granularity-selector((selection_changed)="granularity=$event")
-      metric-selector((selection_changed)="metric=$event")
+    .form-inline
+      metric-selector((selection_changed)="metric=$event", label="Metric:")
+      granularity-selector((selection_changed)="granularity=$event", label="Granularity:")
 
-    .col-sm-7
-      daterange-selector((selection_changed)="daterange=$event")
+  .row
+    daterange-selector((selection_changed)="daterange=$event")
   .row
     //project-selector(multi="false", selection_changed)="project=$event")
 
   .row
-
-  .row
     aggregate-graph([metric]="metric", [project]="project", [granularity]="granularity", [daterange]="daterange", [period]="3600", [show_table]="true")
-    //aggregate-table([metric]="metric", [project]="project", [granularity]="granularity", [daterange]="daterange", period=3600)
-

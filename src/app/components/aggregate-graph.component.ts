@@ -47,12 +47,12 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
       let d1 = moment(this.daterange.start);
       let dt = moment(this.daterange.end).diff(d1, 'days');
       let fmt = "";
-      if(dt > 90) {
+      if (dt > 90) {
         fmt = '%d %b';
       } else if (dt > 7) {
         fmt = '%b %d %H:%M';
       } else {
-        fmt = '%b %d %H:%M';
+        fmt = '%b %d';
       }
 
       this.nvD3.chart.xAxis.tickFormat(function(d: any) {
@@ -112,7 +112,13 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
       type: 'lineChart',
       showLegend: false,
       height: 250,
-      x: function(d: Aggregate) { return d.timestamp; },
+      margin: {
+        top: 20,
+        right: 50,
+        bottom: 50,
+        left: 50
+      },
+      x: function(d: Aggregate) { return d.start; },
       y: function(d: Aggregate) { return d.sum/3600; },
       useInteractiveGuideline: true,
       interpolate: 'step',
@@ -137,7 +143,6 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
           }
         }
       }
-
     }
   };
 }

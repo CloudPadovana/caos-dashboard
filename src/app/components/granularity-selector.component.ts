@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import * as moment from 'moment';
 
@@ -21,6 +21,8 @@ const GRANULARITIES: Granularity[] = [
   templateUrl: 'components/granularity-selector.component.html'
 })
 export class GranularitySelectorComponent implements OnInit {
+  @Input() label: string;
+
   _selection: Granularity;
   readonly granularities = GRANULARITIES;
 
