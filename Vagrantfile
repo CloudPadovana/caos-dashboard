@@ -5,7 +5,7 @@
 #
 # Filename: Vagrantfile
 # Created: 2016-07-25T09:10:57+0200
-# Time-stamp: <2016-09-09T15:02:35cest>
+# Time-stamp: <2016-10-03T10:57:53cest>
 # Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
 #
 # Copyright © 2016 by Fabrizio Chiarello
@@ -48,7 +48,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # WebSocket for live reload
   config.vm.network :forwarded_port, guest: 35729, host: 35729
 
-  config.vm.hostname = "vagrant.local"
+  config.vm.hostname = "frontend.caos.vagrant.localhost"
 
   $script = <<SCRIPT
 sed -i 's/AcceptEnv/# AcceptEnv/' /etc/ssh/sshd_config
