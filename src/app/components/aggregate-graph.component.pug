@@ -3,7 +3,7 @@ div
 
   p Total value from {{ daterange?.start | date: 'y-MM-dd' }} to {{ daterange?.end | date: 'y-MM-dd' }} is: #[strong {{ values_sum/3600 | number: '1.2-2'}}] hours.
 
-table.table.table-bordered
+table.table.table-bordered(*ngIf="show_table")
   thead
     th(style="width: 10%;") #
     th(style="width: 40%;") From

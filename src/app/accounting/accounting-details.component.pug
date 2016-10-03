@@ -12,8 +12,8 @@ h4 Details of {{ project?.name }}
     //project-selector(multi="false", selection_changed)="project=$event")
 
   .row
-    aggregate-graph([metric]="metric", [project]="project", [granularity]="granularity", [daterange]="daterange", period=3600)
 
   .row
+    aggregate-graph([metric]="metric", [project]="project", [granularity]="granularity", [daterange]="daterange", [period]="3600", [show_table]="true")
     //aggregate-table([metric]="metric", [project]="project", [granularity]="granularity", [daterange]="daterange", period=3600)
 

@@ -16,6 +16,8 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
   @Input() period: number;
   @Input() daterange: DateRange;
   @Input() granularity: number;
+  @Input() show_table: boolean = false;
+  @Input() overall: boolean = false;
 
   constructor(private _api: ApiService) {}
 
@@ -23,7 +25,16 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
   nvD3: nvD3;
 
   ngOnChanges() {
-    this.update_samples();
+    if (!this.metric) { return };
+    if (!this.period) { return };
+    if (!this.daterange) { return };
+    if (!this.granularity) { return };
+
+    if (this.project) {
+      this.update_samples_for_one_project();
+    } else if (this.overall) {
+      this.update_samples_for_all_projects();
+    };
   }
 
   private update_chart(): void {
@@ -61,19 +72,28 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
     return this.values.map((a: Aggregate) => a.sum).reduce((acc, cur) => acc + cur, 0);
   }
 
-  private update_samples(): void {
-    if (!this.project) { return };
-    if (!this.metric) { return };
-    if (!this.period) { return };
-    if (!this.daterange) { return };
-    if (!this.granularity) { return };
-
+  private update_samples_for_one_project(): void {
     this._api.aggregate_for_one_project(this.project, this.period, this.metric, this.daterange, this.granularity)
       .subscribe((a: Aggregate[]) => {
         this.values = a;
         this.data = [{
           values: a,
           key: this.project.name
+        }];
+
+        setTimeout(() => {
+          this.update_chart();
+        }, 50);
+      });
+  }
+
+  private update_samples_for_all_projects(): void {
+    this._api.aggregate_for_all_projects(this.period, this.metric, this.daterange, this.granularity)
+      .subscribe((a: Aggregate[]) => {
+        this.values = a;
+        this.data = [{
+          values: a,
+          key: "Overall"
         }];
 
         setTimeout(() => {
