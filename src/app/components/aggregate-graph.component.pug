@@ -12,7 +12,7 @@ table.table.table-bordered
   tbody
     tr(*ngFor="let s of values; let i = index")
       th(scope="row") {{ i }}
-      td {{ s.start_date | date: 'y-MM-dd HH:mm Z' }}
-      td {{ s.end_date | date: 'y-MM-dd HH:mm Z' }}
+      td {{ s.start | date: 'y-MM-dd HH:mm Z' }}
+      td {{ s.end | date: 'y-MM-dd HH:mm Z' }}
       td {{ s.sum/3600 | number: '1.2-2' }}
 

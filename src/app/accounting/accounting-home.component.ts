@@ -48,17 +48,18 @@ export class AccountingHomeComponent implements OnInit {
   }
 
   private sort_projects(aggregate: { [id: string] : Aggregate[] }) {
-    let tmp: Aggregate[] = [];
+    this.sorted_projects = [];
+
+    let tmp: Array<[Aggregate, string]> = [];
     for(let a in aggregate){
-      tmp.push(aggregate[a][0]);
+      tmp.push([aggregate[a][0], a]);
     }
 
-    this.sorted_projects = [];
     tmp
-      .sort((a1: Aggregate, a2: Aggregate) => -(a1.sum - a2.sum ))
-      .map((a: Aggregate) => {
-        let p = this.projects.find((p: Project) => p.id == a.project_id);
-        this.aggregates[p.id] = a;
+      .sort((a1: [Aggregate, string], a2: [Aggregate, string]) => -(a1[0].sum - a2[0].sum ))
+      .map((a: [Aggregate, string]) => {
+        let p = this.projects.find((p: Project) => p.id == a[1]);
+        this.aggregates[p.id] = a[0];
         this.sorted_projects.push(p);
       });
   }
