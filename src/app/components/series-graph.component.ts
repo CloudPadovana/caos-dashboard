@@ -82,14 +82,14 @@ export class SeriesGraphComponent implements AfterViewInit, OnChanges {
       yAxis: {
         // axisLabel: 'Usage [hours]',
         tickFormat: function(d: any) {
-          return d3.format('.02f')(d);
+          return d3.format('.02s')(d);
         },
         axisLabelDistance: -10
       },
       interactiveLayer: {
         tooltip: {
           valueFormatter: function(d: any) {
-            return d3.format('.02f')(d) + ' hours';
+            return d3.format('.02s')(d) + ' hours';
           },
           headerFormatter: function (d: any) {
             return d3.time.format("%a %b %d %H:%M %Y")(new Date(d));
