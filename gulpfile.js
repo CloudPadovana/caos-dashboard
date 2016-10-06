@@ -251,6 +251,12 @@ gulp.task('server', ['build'], function () {
       open: true,
       livereload: {
         enable: true,
-        port: 35729}
-    }));
+        port: 35729},
+      proxies: [{
+        source: '/api',
+        target: 'http://10.0.2.2:4000/api',
+        options: {
+          headers: {
+            'Access-Control-Allow-Origin': '*'}}
+      }]}));
 });
