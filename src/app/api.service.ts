@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, URLSearchParams } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, RequestOptionsArgs, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -11,6 +11,12 @@ import * as d3 from 'd3';
 import moment from 'moment';
 
 import { SETTINGS } from './settings';
+
+export interface Status {
+  auth: boolean;
+  status: string;
+  version: string;
+}
 
 export interface Project {
   id: string;
@@ -61,13 +67,52 @@ const DATE_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
 
 @Injectable()
 export class ApiService {
+  private _token: string;
+
   private _projects: Project[];
   private _projects_observable: Observable<Project[]>;
 
   private _metrics: Metric[];
   private _metrics_observable: Observable<Metric[]>;
 
-  constructor(private _http: Http) { }
+  constructor(private __http: Http) { }
+
+  private _httpget(url: string, options?: RequestOptionsArgs): Observable<Response> {
+    if (this._token) {
+      let headers = new Headers({ 'Authorization': `Bearer ${this._token}` });
+      let opts = new RequestOptions({ headers: headers });
+      options = opts.merge(options);
+    }
+    return this.__http.get(url, options);
+  }
+
+  status(): Observable<Status> {
+    return this._httpget(`${SETTINGS.CAOS_API_URL}/status`)
+      .map((r: Response) => this.parse_status(r.json().data))
+      .catch(this.handle_error);
+  }
+
+  private parse_status(data: any): Status {
+    return <Status>({
+      version: data.version,
+      status: data.status,
+      auth: (data.auth == "yes")
+    });
+  }
+
+  token(username: string, password: string): Observable<string> {
+    let params: URLSearchParams = new URLSearchParams();
+    params.set('username', username);
+    params.set('password', password);
+
+    return this._httpget(`${SETTINGS.CAOS_API_URL}/token`, { search: params })
+      .map((r: Response) => r.json().data.token)
+      .catch(this.handle_error);
+  }
+
+  set_token(token: string) {
+    this._token = token;
+  }
 
   projects(): Observable<Project[]> {
     if (this._projects) {
@@ -80,7 +125,7 @@ export class ApiService {
       return this._projects_observable;
     } else {
       // create the request, store the `Observable` for subsequent subscribers
-      this._projects_observable = this._http.get(`${SETTINGS.CAOS_API_URL}/projects`)
+      this._projects_observable = this._httpget(`${SETTINGS.CAOS_API_URL}/projects`)
         .map((r: Response) => {
           // when the cached data is available we don't need the `Observable` reference anymore
           this._projects_observable = null;
@@ -93,7 +138,7 @@ export class ApiService {
   }
 
   project(id: string): Observable<Project> {
-    return this._http.get(`${SETTINGS.CAOS_API_URL}/projects/${id}`)
+    return this._httpget(`${SETTINGS.CAOS_API_URL}/projects/${id}`)
       .map((r: Response) => this.parse_project(r.json().data))
       .catch(this.handle_error);
   }
@@ -115,7 +160,7 @@ export class ApiService {
     } else if (this._metrics_observable) {
       return this._metrics_observable;
     } else {
-      this._metrics_observable = this._http.get(`${SETTINGS.CAOS_API_URL}/metrics`)
+      this._metrics_observable = this._httpget(`${SETTINGS.CAOS_API_URL}/metrics`)
         .map((r: Response) => {
           this._metrics_observable = null;
           this._metrics = this.parse_metrics(r.json().data);
@@ -143,7 +188,7 @@ export class ApiService {
     params.set('period', period.toString());
     params.set('metric_name', metric.name);
 
-    return this._http.get(`${SETTINGS.CAOS_API_URL}/series`, { search: params })
+    return this._httpget(`${SETTINGS.CAOS_API_URL}/series`, { search: params })
       .map((r: Response) => this.parse_series(r.json().data))
       .catch(this.handle_error);
   }
@@ -173,7 +218,7 @@ export class ApiService {
     return series.flatMap(
       (s: Series[]) => {
         let id = s[0].id;
-        return this._http.get(`${SETTINGS.CAOS_API_URL}/series/${id}/samples`, { search: params })
+        return this._httpget(`${SETTINGS.CAOS_API_URL}/series/${id}/samples`, { search: params })
           .map((r: Response) => this.parse_samples(r, period))
           .catch(this.handle_error);
       });
@@ -208,7 +253,7 @@ export class ApiService {
     }
     params.set('granularity', `${granularity}`);
 
-    let query = this._http.get(`${SETTINGS.CAOS_API_URL}/aggregate`, { search: params });
+    let query = this._httpget(`${SETTINGS.CAOS_API_URL}/aggregate`, { search: params });
     return query;
   }
 

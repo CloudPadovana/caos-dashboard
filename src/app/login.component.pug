@@ -1,0 +1,17 @@
+.login-page
+  .row
+    .col-lg-4.col-lg-offset-4
+      h1 CAOS
+
+      .alert.alert-danger(role="alert", *ngIf="error_message") {{ error_message }}
+
+      form(role="form", (ngSubmit)="login()")
+        .form-content
+          .form-group
+            input.form-control.input-underline.input-lg(type="text", placeholder="Username", name="username", [(ngModel)]="username")
+
+          .form-group
+            input.form-control.input-underline.input-lg(type="password", placeholder="Password", name="password", [(ngModel)]="password")
+
+
+        button.btn(type="submit") Log in
