@@ -1,17 +1,28 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { HomeComponent }  from './home.component';
 
+import { DashboardComponent } from './dashboard.component';
+import { AccountingComponent }  from './accounting/accounting.component';
+import { AccountingHomeComponent }  from './accounting/accounting-home.component';
+import { AccountingDetailsComponent }  from './accounting/accounting-details.component';
 
 const CAOS_ROUTES: Routes = [
-  { path: '',
-    redirectTo: '/home',
-    pathMatch: 'full' },
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
 
-  { path: 'home',
-    component: HomeComponent },
+  { path: 'dashboard', component: DashboardComponent,
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'accounting' },
 
+      { path: 'accounting', component: AccountingComponent,
+        children: [
+          { path: '', pathMatch: 'full', component: AccountingHomeComponent },
+
+          { path: ':id', component: AccountingDetailsComponent },
+        ]
+      },
+    ]
+  },
 ];
 
 export const CAOS_ROUTING_PROVIDERS: any[] = [];

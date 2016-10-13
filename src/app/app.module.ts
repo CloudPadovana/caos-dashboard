@@ -6,14 +6,15 @@ import { CAOS_ROUTING, CAOS_ROUTING_PROVIDERS } from './app.routing';
 
 import { AppComponent } from './app.component';
 import { ApiService } from './api.service';
+import { DashboardComponent } from './dashboard.component';
+
 import { ComponentsModule } from './components/components.module';
-import { HomeComponent } from './home.component';
 import { AccountingModule } from './accounting/accounting.module';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,
