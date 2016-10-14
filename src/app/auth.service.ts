@@ -34,4 +34,10 @@ export class AuthService {
         return this.status();
       });
   }
+
+  logout() {
+    sessionStorage.removeItem('token');
+    this._token = null;
+    this._api.set_token(null);
+  }
 }

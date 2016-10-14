@@ -2,8 +2,12 @@ nav.navbar.navbar-dark.bg-inverse.navbar-fixed-top.topnav
   .collapse.navbar-toggleable-xs.clearfix.text-center
     a.navbar-brand(routerLink="/") Home
 
-    // ul.nav.navbar-nav.top-nav.navbar-right.pull-xs-right.top-right-nav
-    //   li
+    ul.nav.navbar-nav.pull-right
+      li.nav-item
+        a.nav-link((click)="logout()")
+          i.fa.fa-fw.fa-power-off
+          | Log out
+
 
 nav.sidebar
   ul.list-group
