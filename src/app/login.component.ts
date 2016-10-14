@@ -22,12 +22,11 @@ export class LoginComponent {
         (status: boolean) => {
           if(status) {
             this._router.navigate(['/']);
-          } else {
-            this.error_message = 'Failed to login';
           }
         },
 
-        (e: any) => { this.error_message = 'Failed to login';}
+        (e: string) => {
+          this.error_message = `Login failed with error: ${e}`;}
       );
   }
 }

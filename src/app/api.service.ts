@@ -304,10 +304,14 @@ export class ApiService {
   }
 
   private handle_error(error: any) {
+    let msg: string;
+
     if(error instanceof Response) {
-      return Observable.throw(error.json().error || 'backend server error');
+      msg = `${error.status}: ${error.statusText}`
+    } else {
+      msg = error.message ? error.message : (error.status ? `${error.status} - ${error.statusText}` : 'Server error');
     }
-    let msg = error.message ? error.message : (error.status ? `${error.status} - ${error.statusText}` : 'Server error');
+
     return Observable.throw(msg);
   }
 }

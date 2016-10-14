@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
 
 import { ApiService, Status } from './api.service';
 
@@ -28,6 +27,7 @@ export class AuthService {
 
   login(username: string, password: string): Observable<boolean> {
     let token = this._api.token(username, password);
+
     return token.flatMap(
       (token: string) => {
         this.set_token(token);
