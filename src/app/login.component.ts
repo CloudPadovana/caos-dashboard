@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { ApiService } from './api.service';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'login',
@@ -13,19 +13,21 @@ export class LoginComponent {
   private password: string;
   private error_message: string = '';
 
-  constructor(private _router: Router, private _api: ApiService) { }
+  constructor(private _router: Router, private _auth: AuthService) { }
 
   login() {
     this.error_message = '';
-    let token = this._api.token(this.username, this.password)
+    this._auth.login(this.username, this.password)
       .subscribe(
-
-        (token: string) => {
-          this._api.set_token(token);
-          this._router.navigate(['/']);
+        (status: boolean) => {
+          if(status) {
+            this._router.navigate(['/']);
+          } else {
+            this.error_message = 'Failed to login';
+          }
         },
 
-        () => { this.error_message = 'Failed to login';}
+        (e: any) => { this.error_message = 'Failed to login';}
       );
   }
 }
