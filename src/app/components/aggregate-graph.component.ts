@@ -118,7 +118,7 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
         bottom: 50,
         left: 50
       },
-      x: function(d: Aggregate) { return d.start; },
+      x: function(d: Aggregate) { return d.timestamp; },
       y: function(d: Aggregate) { return d.sum/3600; },
       useInteractiveGuideline: true,
       interpolate: 'step',

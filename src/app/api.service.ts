@@ -52,8 +52,8 @@ export interface Aggregate {
   std: number;
   variance: number;
   sum: number;
-  start: Date;
-  end: Date;
+  from: Date;
+  to: Date;
   granularity: number;
 }
 
@@ -253,8 +253,8 @@ export class ApiService {
   private parse_one_aggregate(data: any): Aggregate {
     return <Aggregate>({
       timestamp: DATE_FORMAT.parse(data.timestamp),
-      start: DATE_FORMAT.parse(data.start),
-      end: DATE_FORMAT.parse(data.end),
+      from: DATE_FORMAT.parse(data.from),
+      to: DATE_FORMAT.parse(data.to),
       granularity: data.granularity,
       avg: data.avg,
       count: data.count,

@@ -77,9 +77,11 @@ export class DateRangeSelectorComponent implements OnInit {
   }
 
   private emit_daterange(): void {
+    let d_end: Date = moment(this.daterange_end).add(1, 'd').toDate();
+
     let r = <DateRange>({
       start: this.daterange_start,
-      end: this.daterange_end
+      end: d_end
     });
     this.selection_changed.emit(r);
   }
