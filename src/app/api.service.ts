@@ -214,13 +214,13 @@ export class ApiService {
 
   aggregate_for_one_project(project: Project, period: number, metric: Metric, daterange: DateRange, granularity: number): Observable<Aggregate[]> {
     return this._aggregate([project], period, metric, daterange, granularity)
-      .map((r: Response) => this.parse_aggregate_for_one_project(r.json().data[project.id]))
+      .map((r: Response) => this.parse_aggregate_for_one_project(r.json().data, project.id))
       .catch(this.handle_error);
   }
 
   aggregate_for_all_projects(period: number, metric: Metric, daterange: DateRange, granularity: number): Observable<Aggregate[]> {
     return this._aggregate([], period, metric, daterange, granularity)
-      .map((r: Response) => this.parse_aggregate_for_one_project(r.json().data))
+      .map((r: Response) => this.parse_aggregate_for_all_projects(r.json().data))
       .catch(this.handle_error);
   }
 
@@ -238,7 +238,15 @@ export class ApiService {
     return ret;
   }
 
-  private parse_aggregate_for_one_project(data: any): Aggregate[] {
+  private parse_aggregate_for_one_project(data: any, id: string): Aggregate[] {
+    if (!data[id]) {
+      return [];
+    }
+
+    return data[id].map((d: any) => this.parse_one_aggregate(d));
+  }
+
+  private parse_aggregate_for_all_projects(data: any): Aggregate[] {
     return data.map((d: any) => this.parse_one_aggregate(d));
   }
 
