@@ -2,6 +2,7 @@ import { NgModule }  from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule  } from '@angular/http';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 import { Ng2BootstrapModule } from 'ng2-bootstrap/ng2-bootstrap';
 import { PopoverModule } from 'ng2-popover';
@@ -30,6 +31,7 @@ import { AggregateGraphComponent } from './aggregate-graph.component';
     CommonModule,
     HttpModule,
     FormsModule,
+    RouterModule,
     Ng2BootstrapModule,
     PopoverModule,
   ],
@@ -37,6 +39,7 @@ import { AggregateGraphComponent } from './aggregate-graph.component';
     CommonModule,
     HttpModule,
     FormsModule,
+    RouterModule,
     Ng2BootstrapModule,
     PopoverModule,
     nvD3,
