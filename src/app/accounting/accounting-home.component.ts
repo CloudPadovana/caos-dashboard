@@ -4,6 +4,7 @@ import * as moment from 'moment';
 
 import { ApiService, Project, Metric, DateRange, Aggregate } from '../api.service';
 
+import { GraphType } from '../components/aggregate-graph.component';
 
 @Component({
   templateUrl: 'accounting/accounting-home.component.html'
@@ -18,6 +19,8 @@ export class AccountingHomeComponent implements OnInit {
   gridded_projects: Array<Project[]> = [];
 
   aggregates: { [id: string] : Aggregate } = {};
+
+  private GraphTypes = GraphType;
 
   constructor(private _api: ApiService) { }
 

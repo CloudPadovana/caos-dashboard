@@ -6,6 +6,11 @@ import 'nvd3';
 import { nvD3 } from 'ng2-nvd3';
 import moment from 'moment';
 
+export enum GraphType {
+  STANDARD,
+  OVERALL,
+}
+
 @Component({
   selector: 'aggregate-graph',
   templateUrl: 'components/aggregate-graph.component.html'
@@ -17,7 +22,7 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
   @Input() daterange: DateRange;
   @Input() granularity: number;
   @Input() show_table: boolean = false;
-  @Input() overall: boolean = false;
+  @Input() type: GraphType = GraphType.STANDARD;
 
   constructor(private _api: ApiService) {}
 
@@ -32,7 +37,7 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
 
     if (this.project) {
       this.update_samples_for_one_project();
-    } else if (this.overall) {
+    } else if (this.type == GraphType.OVERALL) {
       this.update_samples_for_all_projects();
     };
   }
@@ -50,7 +55,7 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
       if (dt > 90) {
         fmt = '%d %b';
       } else if (dt > 7) {
-        fmt = '%b %d %H:%M';
+        fmt = '%b %d';
       } else {
         fmt = '%b %d';
       }
