@@ -49,7 +49,8 @@ gulp.task('build:js', function() {
     var js_builder_opts = { sourceMaps: false, lowResSourceMaps: false, minify: true };
   } else {
     var js_builder_opts = { sourceMaps: true,
-                            lowResSourceMaps: true,
+                            sourceMapContents: true,
+                            lowResSourceMaps: false,
                             minify: false,
                             mangle: false,
                             globalDefs: { DEBUG: true }

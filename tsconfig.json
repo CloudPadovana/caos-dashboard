@@ -17,7 +17,8 @@
     "noLib": false,
     "pretty": true,
     "removeComments": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "inlineSources": true
   },
   "exclude": [
     "node_modules",
