@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { ApiService, Project } from '../api.service';
 
@@ -8,6 +8,8 @@ import { ApiService, Project } from '../api.service';
   templateUrl: 'components/project-selector.component.html'
 })
 export class ProjectSelectorComponent implements OnInit {
+  @Input() label: string;
+
   projects: Project[] = [];
   private _selected: { [id: string] : boolean } = {};
   private _searched: { [id: string] : boolean } = {};

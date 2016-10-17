@@ -82,28 +82,27 @@ daterange-selector {
   }
 }
 
-/* project-selector { */
-/*   .project-tag { */
-/*     @import "bootstrap/scss/variables"; */
-/*     @import "bootstrap/scss/mixins/border-radius"; */
-/*     border: $border-width solid; */
-/*     border-color: $brand-primary; */
-/*     @include border-radius($border-radius-sm); */
+project-selector {
+  .project-tag {
+    //    @import "bootstrap/scss/mixins/border-radius";
+    border: $border-width solid;
+    border-color: $brand-primary;
+    @include border-radius($border-radius-sm);
 
-/*     display: inline-block; */
-/*     padding: .25em .4em; */
-/*     font-size: 75%; */
-/*     text-align: center; */
-/*     white-space: nowrap; */
-/*   } */
+    display: inline-block;
+    padding: .25em .4em;
+    font-size: 75%;
+    text-align: center;
+    white-space: nowrap;
+  }
 
-/*   .dropdown { */
-/*     width: 200px; */
-/*   } */
+  .dropdown {
+    width: 200px;
+  }
 
-/*   .scrollable-menu { */
-/*      height: auto; */
-/*      max-height: 200px; */
-/*      overflow-x: hidden; */
-/*   } */
-/* } */
+  .scrollable-menu {
+     height: auto;
+     max-height: 200px;
+     overflow-x: hidden;
+  }
+}
