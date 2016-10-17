@@ -1,6 +1,7 @@
-.login-page
+.login-page.container-fluid
   .row
-    .col-lg-4.col-lg-offset-4
+    .col-xs-4
+    .col-xs-4
       h1 CAOS
 
       .alert.alert-danger(role="alert", *ngIf="error_message") {{ error_message }}
@@ -15,3 +16,4 @@
 
 
         button.btn(type="submit") Log in
+    .col-xs-4
