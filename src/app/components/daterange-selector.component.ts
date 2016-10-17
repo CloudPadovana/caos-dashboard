@@ -33,8 +33,13 @@ export class DateRangeSelectorComponent implements OnInit {
   private _daterange_start: Date;
   @Input()
   set daterange_start(d: Date) {
-    this._daterange_start = this.strip_time(d);
-    this.emit_daterange();
+    let new_d: Date = this.strip_time(d);
+
+    // NOTE: This is a workaround to avoid multiple fires from datepicker
+    if (!moment(new_d).isSame(this._daterange_start)) {
+      this._daterange_start = new_d;
+      this.emit_daterange();
+    }
   }
 
   get daterange_start(): Date {
@@ -44,8 +49,13 @@ export class DateRangeSelectorComponent implements OnInit {
   private _daterange_end: Date;
   @Input()
   set daterange_end(d: Date) {
-    this._daterange_end = this.strip_time(d);
-    this.emit_daterange();
+    let new_d: Date = this.strip_time(d);
+
+    // NOTE: This is a workaround to avoid multiple fires from datepicker
+    if (!moment(new_d).isSame(this._daterange_end)) {
+      this._daterange_end = new_d;
+      this.emit_daterange();
+    }
   }
 
   get daterange_end(): Date {
