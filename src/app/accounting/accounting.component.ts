@@ -1,6 +1,13 @@
 import { Component } from '@angular/core';
 
+import { Project, Metric, DateRange } from '../api.service';
+
 @Component({
-  template: `<router-outlet></router-outlet>`
+  templateUrl: 'accounting/accounting.component.html'
 })
-export class AccountingComponent { }
+export class AccountingComponent {
+  projects: Project[];
+  metric: Metric;
+  daterange: DateRange;
+  granularity: number;
+}

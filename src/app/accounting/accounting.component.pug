@@ -1,0 +1,17 @@
+h4 Accounting
+
+.container-fluid
+  .row
+    .form-inline
+      metric-selector((selection_changed)="metric=$event", label="Metric:")
+      granularity-selector((selection_changed)="granularity=$event", label="Granularity:")
+
+  .row
+    daterange-selector((selection_changed)="daterange=$event")
+  .row
+    project-selector((selection_changed)="projects = $event", label="Projects:")
+
+  .row
+    .card
+      .card-block(style="padding: 0;")
+        aggregate-graph([metric]="metric", [period]="3600", [daterange]="daterange", [granularity]="granularity", [projects]="projects", [show_table]="true")

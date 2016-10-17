@@ -6,8 +6,6 @@ import { LoginComponent } from './login.component';
 
 import { DashboardComponent } from './dashboard.component';
 import { AccountingComponent }  from './accounting/accounting.component';
-import { AccountingHomeComponent }  from './accounting/accounting-home.component';
-import { AccountingDetailsComponent }  from './accounting/accounting-details.component';
 
 const CAOS_ROUTES: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -18,13 +16,7 @@ const CAOS_ROUTES: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'accounting' },
 
-      { path: 'accounting', component: AccountingComponent,
-        children: [
-          { path: '', pathMatch: 'full', component: AccountingHomeComponent },
-
-          { path: ':id', component: AccountingDetailsComponent },
-        ]
-      },
+      { path: 'accounting', component: AccountingComponent },
     ]
   },
 

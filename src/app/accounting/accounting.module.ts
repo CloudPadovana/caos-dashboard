@@ -2,14 +2,10 @@ import { NgModule }  from '@angular/core';
 
 import { ComponentsModule } from '../components/components.module';
 import { AccountingComponent } from './accounting.component';
-import { AccountingHomeComponent } from './accounting-home.component';
-import { AccountingDetailsComponent } from './accounting-details.component';
 
 @NgModule({
   declarations: [
     AccountingComponent,
-    AccountingHomeComponent,
-    AccountingDetailsComponent,
   ],
   imports: [
     ComponentsModule

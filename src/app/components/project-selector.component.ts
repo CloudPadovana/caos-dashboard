@@ -2,6 +2,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { ApiService, Project } from '../api.service';
 
+export const OVERALL_PROJECT: Project = <Project>({
+  id: "__OVERALL",
+  name: "OVERALL"
+});
 
 @Component({
   selector: 'project-selector',
@@ -16,13 +20,18 @@ export class ProjectSelectorComponent implements OnInit {
 
   @Output() selection_changed = new EventEmitter();
 
-  constructor(private _api: ApiService) { }
+  constructor(private _api: ApiService) {
+    this.projects.push(OVERALL_PROJECT);
+  }
 
   ngOnInit() {
     this._api.projects().subscribe(
       (projects: Project[]) => {
-        this.projects = projects;
         for(let p of projects) {
+          this.projects.push(p);
+        }
+
+        for(let p of this.projects) {
           this._selected[p.id] = false;
           this._searched[p.id] = true;
         }

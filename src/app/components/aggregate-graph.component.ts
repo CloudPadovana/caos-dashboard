@@ -1,14 +1,24 @@
 import { Component, AfterViewInit, OnChanges, Input, ViewChild } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/forkJoin';
+
 import { ApiService, Project, Metric, Aggregate, DateRange } from '../api.service';
+import { OVERALL_PROJECT } from './project-selector.component';
 
 import * as d3 from 'd3';
 import 'nvd3';
 import { nvD3 } from 'ng2-nvd3';
 import moment from 'moment';
 
-export enum GraphType {
-  STANDARD,
-  OVERALL,
+interface AggregateMap {
+  [id: string] : Aggregate[]
+}
+
+interface TableRow {
+  from: Date;
+  to: Date;
+  sum: { [id: string] : number };
 }
 
 @Component({
@@ -16,13 +26,12 @@ export enum GraphType {
   templateUrl: 'components/aggregate-graph.component.html'
 })
 export class AggregateGraphComponent implements AfterViewInit, OnChanges {
-  @Input() project: Project;
+  @Input() projects: Project[];
   @Input() metric: Metric;
   @Input() period: number;
   @Input() daterange: DateRange;
   @Input() granularity: number;
   @Input() show_table: boolean = false;
-  @Input() type: GraphType = GraphType.STANDARD;
 
   constructor(private _api: ApiService) {}
 
@@ -30,16 +39,23 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
   nvD3: nvD3;
 
   ngOnChanges() {
+    if (!this.projects) { return };
     if (!this.metric) { return };
     if (!this.period) { return };
     if (!this.daterange) { return };
     if (!this.granularity) { return };
 
-    if (this.project) {
-      this.update_samples_for_one_project();
-    } else if (this.type == GraphType.OVERALL) {
-      this.update_samples_for_all_projects();
-    };
+    this._values = {};
+    this._values_sum = {};
+    this.data = [];
+
+    this.fetch_samples().subscribe(() => {
+      this.process_values();
+
+      setTimeout(() => {
+        this.update_chart();
+      }, 50);
+    });
   }
 
   private update_chart(): void {
@@ -47,13 +63,11 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
     if (!this.nvD3.chart) { return };
 
     if (this.daterange) {
-      //this.nvD3.chart.brushExtent([this.daterange.start, this.daterange.end]);
-
       let d1 = moment(this.daterange.start);
       let dt = moment(this.daterange.end).diff(d1, 'days');
       let fmt = "";
       if (dt > 90) {
-        fmt = '%d %b';
+        fmt = '%b %d';
       } else if (dt > 7) {
         fmt = '%b %d';
       } else {
@@ -65,46 +79,79 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
     }
 
     this.nvD3.chart.update();
-    // console.log("chart", this.nvD3.chart.focus.dispatch);
-    // this.nvD3.chart.focus.dispatch.on('brush', function(extent:any, brush:any){ console.log("brush",extent, brush); });
-    // this.nvD3.chart.focus.dispatch.on('onBrush', function(e:any){ console.log("onBrush",e); });
-    // this.nvD3.chart.focus.dispatch.on('renderEnd', function(e:any){ console.log("renderend",e); });
-
   }
 
-  private values: Aggregate[] = [];
-  private get values_sum(): number {
-    return this.values.map((a: Aggregate) => a.sum).reduce((acc, cur) => acc + cur, 0);
-  }
+  private _values: AggregateMap = {};
+  private _values_sum: { [id: string] : number } = {};
+  private values_sum(id: string): number {
+    return this._values_sum[id];
+  };
 
-  private update_samples_for_one_project(): void {
-    this._api.aggregate_for_one_project(this.project, this.period, this.metric, this.daterange, this.granularity)
-      .subscribe((a: Aggregate[]) => {
-        this.values = a;
-        this.data = [{
-          values: a,
-          key: this.project.name
-        }];
+  private table_values: TableRow[] = [];
+  private compute_tabular_data() {
+    this.table_values = [];
 
-        setTimeout(() => {
-          this.update_chart();
-        }, 50);
+    let ts: Date[] = [];
+
+    for (let k in this._values) {
+      this._values[k].map((a: Aggregate) => {
+        if (!ts.find((d: Date) => moment(d).isSame(a.timestamp))) {
+          ts.push(new Date(a.timestamp));
+        }
       });
+    }
+
+    let sorted_ts = ts.sort(
+      (d1: Date, d2: Date) => ( d1.valueOf() - d2.valueOf() ));
+
+    for (let t of sorted_ts) {
+      let to: Date = t;
+      let from: Date = moment(t).subtract(this.granularity, 'second').toDate();
+      let sum: { [id: string] : number } = {};
+
+      for (let k in this._values) {
+        sum[k] = this._values[k]
+          .filter((a: Aggregate) => moment(a.timestamp).isSame(t))
+          .map((a: Aggregate) => a.sum)
+          .reduce((acc, cur) => acc + cur, 0);
+      }
+
+      let row = <TableRow>({
+        from: from,
+        to: to,
+        sum: sum});
+      this.table_values.push(row);
+    }
   }
 
-  private update_samples_for_all_projects(): void {
-    this._api.aggregate_for_all_projects(this.period, this.metric, this.daterange, this.granularity)
-      .subscribe((a: Aggregate[]) => {
-        this.values = a;
-        this.data = [{
-          values: a,
-          key: "Overall"
-        }];
+  private fetch_samples(): Observable<void[]> {
+    let obs: Array< Observable<void> > = [];
 
-        setTimeout(() => {
-          this.update_chart();
-        }, 50);
+    for (let p of this.projects) {
+      if (p == OVERALL_PROJECT) {
+        obs.push(this._api.aggregate_for_all_projects(this.period, this.metric, this.daterange, this.granularity)
+                 .map((a: Aggregate[]) => {
+                 this._values[p.id] = a; }));
+      } else {
+        obs.push(this._api.aggregate_for_one_project(p, this.period, this.metric, this.daterange, this.granularity)
+                 .map((a: Aggregate[]) => {
+                   this._values[p.id] = a; }));
+      }
+    }
+
+    return Observable.forkJoin(obs);
+  }
+
+  private process_values() {
+    for (let p of this.projects) {
+      this._values_sum[p.id] = this._values[p.id].map((a: Aggregate) => a.sum).reduce((acc, cur) => acc + cur, 0);
+      this.compute_tabular_data();
+
+      this.data.push({
+        values: this._values[p.id],
+        key: p.name
       });
+    }
   }
 
   ngAfterViewInit() {
@@ -115,7 +162,7 @@ export class AggregateGraphComponent implements AfterViewInit, OnChanges {
   options = {
     chart: {
       type: 'lineChart',
-      showLegend: false,
+      showLegend: true,
       height: 250,
       margin: {
         top: 20,
