@@ -5,7 +5,7 @@
 #
 # Filename: Vagrantfile
 # Created: 2016-07-25T09:10:57+0200
-# Time-stamp: <2016-10-03T10:57:53cest>
+# Time-stamp: <2016-10-19T14:20:51cest>
 # Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
 #
 # Copyright © 2016 by Fabrizio Chiarello
@@ -64,6 +64,7 @@ yum install -v -y epel-release git zip
 yum install -v -y gcc-c++ make
 curl --location https://rpm.nodesource.com/setup_6.x | bash -
 yum install -v -y nodejs
+npm install yarn -g
 npm install gulp -g
 SCRIPT
 
