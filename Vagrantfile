@@ -58,13 +58,12 @@ systemctl reload sshd.service
 echo "cd /vagrant" >> /home/vagrant/.bash_profile
 
 yum update -v -y
-yum install -v -y epel-release git
+yum install -v -y epel-release git zip
 
 # nodejs & co
 yum install -v -y gcc-c++ make
 curl --location https://rpm.nodesource.com/setup_6.x | bash -
 yum install -v -y nodejs
-npm update npm -g
 npm install gulp -g
 SCRIPT
 
