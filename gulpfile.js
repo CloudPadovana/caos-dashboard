@@ -1,21 +1,17 @@
 const gulp = require('gulp');
 
 const _ = require('lodash');
-const concat = require('gulp-concat');
 const debug = require('gulp-debug');
 const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const inject = require('gulp-inject-string');
-const plumber = require('gulp-plumber');
 const pug = require('gulp-pug');
-const rename = require('gulp-rename');
 const sass = require('gulp-sass');
 const server = require('gulp-server-livereload');
 const sourcemaps = require('gulp-sourcemaps');
 const system_builder = require('systemjs-builder');
 const ts = require('gulp-typescript');
 const uglify = require('gulp-uglify');
-
 
 const SRC_DIR = './src';
 const APP_SRC_DIR = SRC_DIR + '/app';
@@ -28,7 +24,6 @@ const OUTPUT_JS_DIR = OUTPUT_DIR + 'js/';
 const OUTPUT_CSS_DIR = OUTPUT_DIR + 'css/';
 
 const DIST_DIR = 'dist';
-
 
 var flags = {
   production: false
@@ -71,11 +66,9 @@ gulp.task('build:js', function() {
                  inject.replace('// INJECT PRODUCTION CODE',
                                 "import { enableProdMode } from '@angular/core'; enableProdMode();")))
     .pipe(sourcemaps.init({loadMaps: true}))
-  // .pipe(plumber())
-    .pipe(ts(ts_project, {}, ts.reporter.fullReporter()))
+    .pipe(ts_project(ts.reporter.fullReporter()))
     .on('error', function (error) {
-      var log = gutil.log, colors = gutil.colors;
-      log('Typescript compilation exited with ' + colors.red(error));
+      console.log('Typescript compilation exited with ' + error);
     }).js
   // .pipe(debug({title: "Stream contents:", minimal: true}))
     .pipe(gulpif(flags.production, uglify()))
@@ -89,8 +82,7 @@ gulp.task('build:js', function() {
           console.log('Build complete');
         })
         .catch(function(err) {
-          console.log('Build error');
-          console.log(err);
+          console.log('JS builder compilation exited with ' + err);
         });
     });
 });
@@ -102,7 +94,6 @@ gulp.task('watch:js', ['build:js'], function() {
   watcher.on('change', function (event) {
     console.log('Event ' + event.type + ' on path: ' + event.path);
   });
-
 });
 
 gulp.task('build:css', function() {
@@ -243,6 +234,9 @@ gulp.task('dev', ['watch', 'server']);
 gulp.task('default', ['build']);
 
 gulp.task('server', ['build'], function () {
+
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
   gulp.src(OUTPUT_DIR)
     .pipe(server({
       host: '0.0.0.0',
@@ -250,11 +244,12 @@ gulp.task('server', ['build'], function () {
       log: 'debug',
       fallback: 'index.html',
       open: true,
+      https: true,
       livereload: {
         enable: true,
         port: 35729},
       proxies: [{
-        source: '/api',
+        source: '/api/v1',
         target: 'http://10.0.2.2:4000/api',
         options: {
           headers: {

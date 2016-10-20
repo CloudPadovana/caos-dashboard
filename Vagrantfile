@@ -5,7 +5,7 @@
 #
 # Filename: Vagrantfile
 # Created: 2016-07-25T09:10:57+0200
-# Time-stamp: <2016-10-19T14:20:51cest>
+# Time-stamp: <2016-10-20T15:44:55cest>
 # Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
 #
 # Copyright © 2016 by Fabrizio Chiarello
@@ -58,12 +58,16 @@ systemctl reload sshd.service
 echo "cd /vagrant" >> /home/vagrant/.bash_profile
 
 yum update -v -y
-yum install -v -y epel-release git zip
+yum install -v -y epel-release git zip wget
 
 # nodejs & co
 yum install -v -y gcc-c++ make
-curl --location https://rpm.nodesource.com/setup_6.x | bash -
-yum install -v -y nodejs
+
+rm -f nodesource-release-el7-1.noarch.rpm
+wget https://rpm.nodesource.com/pub_6.x/el/7/x86_64/nodesource-release-el7-1.noarch.rpm
+rpm -Uvh nodesource-release-el7-1.noarch.rpm
+yum install -v -y nodejs-6.9.1
+
 npm install yarn -g
 npm install gulp -g
 SCRIPT
