@@ -8,10 +8,10 @@ h4 Accounting
 
   .row
     daterange-selector((selection_changed)="daterange=$event")
-  .row
-    project-selector((selection_changed)="projects = $event", label="Projects:")
+  //.row
+    //project-selector((selection_changed)="projects = $event", label="Projects:")
 
   .row
     .card
       .card-block(style="padding: 0;")
-        aggregate-graph([metric]="metric", [period]="3600", [daterange]="daterange", [granularity]="granularity", [projects]="projects", [show_table]="true")
+        aggregate-graph([metric]="metric", [period]="3600", [daterange]="daterange", [granularity]="granularity")

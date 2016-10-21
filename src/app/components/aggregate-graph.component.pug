@@ -1,23 +1,21 @@
-div
-  nvd3([options]="options", [data]="data")
+div(*ngIf="loading>=0")
+  .row
+    .col-sm-2
+    .col-sm-8
+      | Loading data: {{ loading | percent }}
+      progress.progress([value]="loading" max="1")
 
-table.table.table-bordered(*ngIf="show_table")
-  thead
-    th(style="width: 10%;") #
-    th(style="width: 40%;") From
-    th(style="width: 40%;") To
-    th(*ngFor="let p of projects", style="width: 20%;") {{ p.name }} [hours]
-  tbody
-    tr
-      td(scope="row") Total
-      td {{ daterange?.start | date: 'y-MM-dd HH:mm Z' }}
-      td {{ daterange?.end | date: 'y-MM-dd HH:mm Z' }}
-      td(*ngFor="let p of projects")
-        | {{ values_sum(p.id)/3600 | number: '1.2-2' }}
-    tr(*ngFor="let s of table_values; let i = index")
-      td(scope="row") {{ i }}
-      td {{ s.from | date: 'y-MM-dd HH:mm Z' }}
-      td {{ s.to | date: 'y-MM-dd HH:mm Z' }}
-      td(*ngFor="let p of projects")
-        | {{ s.sum[p.id]/3600 | number: '1.2-2' }}
+div(*ngIf="loading<0")
+  div
+    nvd3([options]="options", [data]="data")
 
+  p Totals from {{ daterange?.start | date: 'y-MM-dd HH:mm Z' }} to {{ daterange?.end | date: 'y-MM-dd HH:mm Z' }}
+
+  table.table.table-bordered
+    thead
+      th Project
+      th Total [hours]
+    tbody
+      tr(*ngFor="let p of projects")
+        td {{ p.name }}
+        td {{ dataseries_sum(p)/3600 | number: '1.2-2' }}
