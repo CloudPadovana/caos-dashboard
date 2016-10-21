@@ -9,6 +9,10 @@ div(*ngIf="loading<0")
   div
     nvd3([options]="options", [data]="data")
 
+  button.btn.btn-primary(type="button", (click)="download_CSV('data.csv')")
+    | Download data
+    i.fa.fa-fw.fa-download
+
   p Totals from {{ daterange?.start | date: 'y-MM-dd HH:mm Z' }} to {{ daterange?.end | date: 'y-MM-dd HH:mm Z' }}
 
   table.table.table-bordered
