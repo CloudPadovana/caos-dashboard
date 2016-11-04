@@ -242,10 +242,10 @@ export class AggregateGraphComponent implements OnInit, AfterViewInit, OnChanges
       interactive: true,
       tooltip: {
         valueFormatter: function(d: any) {
-          return d3.format('.02s')(d) + ' hours';
+          return d3.format('.05s')(d) + ' hours';
         },
         headerFormatter: function (d: any) {
-          return d3.time.format("%a %b %d %H:%M %Y")(new Date(d));
+          return d3.time.format("%a %b %d %H:%M %Y %Z")(new Date(d));
         }
       }
     }

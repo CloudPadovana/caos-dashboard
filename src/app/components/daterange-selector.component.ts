@@ -69,7 +69,7 @@ export class DateRangeSelectorComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.preset_clicked(PRESETS[2]);
+    this.preset_clicked(PRESETS[1]);
   }
 
   is_selected(r: PresetDuration): boolean {

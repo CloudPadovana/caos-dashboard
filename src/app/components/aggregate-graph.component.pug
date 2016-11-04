@@ -13,7 +13,10 @@ div(*ngIf="loading<0")
     | Download data
     i.fa.fa-fw.fa-download
 
-  p Totals from {{ daterange?.start | date: 'y-MM-dd HH:mm Z' }} to {{ daterange?.end | date: 'y-MM-dd HH:mm Z' }}
+hr
+
+div(*ngIf="loading<0")
+  h5 Totals from {{ daterange?.start | date: 'y-MM-dd HH:mm Z' }} to {{ daterange?.end | date: 'y-MM-dd HH:mm Z' }}
 
   table.table.table-bordered
     thead
