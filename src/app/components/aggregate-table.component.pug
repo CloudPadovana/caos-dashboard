@@ -1,0 +1,8 @@
+table.table.table-bordered
+  thead
+    th Project
+    th Total [hours]
+  tbody
+    tr(*ngFor="let d of data")
+      td {{ d.project.name }}
+      td {{ d.value/3600 | number: '1.2-2' }}

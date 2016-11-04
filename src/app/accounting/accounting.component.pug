@@ -8,10 +8,20 @@ h4 Accounting
 
   .row
     daterange-selector((selection_changed)="daterange=$event")
-  //.row
-    //project-selector((selection_changed)="projects = $event", label="Projects:")
 
-  .row
-    .card
-      .card-block(style="padding: 0;")
-        aggregate-graph([metric]="metric", [period]="3600", [daterange]="daterange", [granularity]="granularity")
+  aggregate([metric]="metric", [period]="3600", [daterange]="daterange", [granularity]="granularity")
+    .row
+      .card
+        .card-block(style="padding: 0;")
+          aggregate-graph
+
+        .card-footer
+          aggregate-download
+
+    .row
+      .card
+        .card-header
+          h5 Totals from {{ daterange?.start | date: 'y-MM-dd HH:mm Z' }} to {{ daterange?.end | date: 'y-MM-dd HH:mm Z' }}
+
+        .card-block
+          aggregate-table
