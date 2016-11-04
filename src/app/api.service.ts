@@ -101,11 +101,12 @@ export class ApiService {
   }
 
   token(username: string, password: string): Observable<string> {
-    let params: URLSearchParams = new URLSearchParams();
-    params.set('username', username);
-    params.set('password', password);
+    let params = {
+      'username': username,
+      'password': password
+    }
 
-    return this._httpget(`${SETTINGS.CAOS_API_URL}/token`, { search: params })
+    return this.__http.post(`${SETTINGS.CAOS_API_URL}/token`, params)
       .map((r: Response) => r.json().data.token)
       .catch(this.handle_error);
   }
