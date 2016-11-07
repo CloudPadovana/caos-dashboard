@@ -14,7 +14,7 @@ const METRICS: Metric[] = [
 
 @Component({
   selector: 'metric-selector',
-  templateUrl: 'components/metric-selector.component.html'
+  templateUrl: 'accounting/components/metric-selector.component.html'
 })
 export class MetricSelectorComponent implements OnInit {
   @Input() label: string;

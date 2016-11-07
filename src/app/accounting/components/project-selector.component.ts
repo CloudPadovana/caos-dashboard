@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-import { ApiService, Project } from '../api.service';
+import { ApiService, Project } from '../../api.service';
 
 export const OVERALL_PROJECT: Project = <Project>({
   id: "__OVERALL",
@@ -9,7 +9,7 @@ export const OVERALL_PROJECT: Project = <Project>({
 
 @Component({
   selector: 'project-selector',
-  templateUrl: 'components/project-selector.component.html'
+  templateUrl: 'accounting/components/project-selector.component.html'
 })
 export class ProjectSelectorComponent implements OnInit {
   @Input() label: string;

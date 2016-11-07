@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import moment from 'moment';
 
-import { DateRange } from '../api.service';
+import { DateRange } from '../../api.service';
 
 interface PresetDuration {
   label: string;
@@ -27,7 +27,7 @@ const PRESETS: PresetDuration[] = [
 
 @Component({
   selector: 'daterange-selector',
-  templateUrl: 'components/daterange-selector.component.html'
+  templateUrl: 'accounting/components/daterange-selector.component.html'
 })
 export class DateRangeSelectorComponent implements OnInit {
   private _daterange_start: Date;

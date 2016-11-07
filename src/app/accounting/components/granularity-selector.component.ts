@@ -18,7 +18,7 @@ const GRANULARITIES: Granularity[] = [
 
 @Component({
   selector: 'granularity-selector',
-  templateUrl: 'components/granularity-selector.component.html'
+  templateUrl: 'accounting/components/granularity-selector.component.html'
 })
 export class GranularitySelectorComponent implements OnInit {
   @Input() label: string;

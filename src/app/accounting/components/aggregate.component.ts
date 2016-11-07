@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/forkJoin';
 
-import { ApiService, Project, Metric, Aggregate, DateRange } from '../api.service';
+import { ApiService, Project, Metric, Aggregate, DateRange } from '../../api.service';
 
 import { AggregateDownloadComponent } from './aggregate-download.component';
 import { AggregateGraphComponent } from './aggregate-graph.component';

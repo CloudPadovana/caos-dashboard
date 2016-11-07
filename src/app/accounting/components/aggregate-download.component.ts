@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Project, DateRange, Aggregate } from '../api.service';
+import { Project, DateRange, Aggregate } from '../../api.service';
 import { AggregateData } from './aggregate.component';
 
 import moment from 'moment';

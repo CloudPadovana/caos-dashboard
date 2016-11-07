@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Project, Aggregate } from '../api.service';
+import { Project, Aggregate } from '../../api.service';
 
 import { AggregateData } from './aggregate.component';
 
@@ -11,7 +11,7 @@ interface TableRow {
 
 @Component({
   selector: 'aggregate-table',
-  templateUrl: 'components/aggregate-table.component.html'
+  templateUrl: 'accounting/components/aggregate-table.component.html'
 })
 export class AggregateTableComponent {
   data: TableRow[] = [];

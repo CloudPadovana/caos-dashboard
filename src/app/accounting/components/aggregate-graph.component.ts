@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnChanges, Input, ViewChild } from '@angular/core';
 
-import { Aggregate } from '../api.service';
+import { Aggregate } from '../../api.service';
 import { AggregateData } from './aggregate.component';
 
 import * as d3 from 'd3';

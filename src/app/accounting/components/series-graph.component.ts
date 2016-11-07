@@ -1,5 +1,5 @@
 import { Component, OnChanges, AfterViewInit, Input, ViewChild } from '@angular/core';
-import { ApiService, Project, Metric, Sample, DateRange } from '../api.service';
+import { ApiService, Project, Metric, Sample, DateRange } from '../../api.service';
 
 import * as d3 from 'd3';
 import 'nvd3';
