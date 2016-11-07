@@ -1,8 +1,10 @@
 table.table.table-bordered
   thead
     th Project
-    th Total [hours]
+    th Sum [hours]
+    th Ratio (w.r.t. overall)
   tbody
     tr(*ngFor="let d of data")
       td {{ d.project.name }}
       td {{ d.value/3600 | number: '1.2-2' }}
+      td {{ d.percent | percent: '1.2-2' }}
