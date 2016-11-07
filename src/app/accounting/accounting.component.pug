@@ -3,13 +3,13 @@ h4 Accounting
 .container-fluid
   .row
     .form-inline
-      metric-selector((selection_changed)="metric=$event", label="Metric:")
-      granularity-selector((selection_changed)="granularity=$event", label="Granularity:")
+      metric-selector(label="Metric:")
+      granularity-selector(label="Granularity:")
 
   .row
-    daterange-selector((selection_changed)="daterange=$event")
+    daterange-selector
 
-  aggregate([metric]="metric", [period]="3600", [daterange]="daterange", [granularity]="granularity")
+  aggregate
     .row
       .card
         .card-block(style="padding: 0;")

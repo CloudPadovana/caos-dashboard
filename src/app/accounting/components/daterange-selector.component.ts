@@ -1,12 +1,7 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import moment from 'moment';
 
-import { DateRange } from '../../api.service';
-
-interface PresetDuration {
-  label: string;
-  duration: moment.MomentInput;
-}
+import { AccountingService, DateRange, PresetDuration } from '../accounting.service';
 
 const PRESETS: PresetDuration[] = [
     <PresetDuration>({label: "day",
@@ -62,11 +57,9 @@ export class DateRangeSelectorComponent implements OnInit {
     return this._daterange_end;
   }
 
-  @Output() selection_changed = new EventEmitter<DateRange>();
-
   readonly presets = PRESETS;
 
-  constructor() { }
+  constructor(private _accounting: AccountingService) { }
 
   ngOnInit() {
     this.preset_clicked(PRESETS[1]);
@@ -93,7 +86,7 @@ export class DateRangeSelectorComponent implements OnInit {
       start: this.daterange_start,
       end: d_end
     });
-    this.selection_changed.emit(r);
+    this._accounting.daterange = r;
   }
 
   private daterange_from_preset(r: PresetDuration): DateRange {

@@ -1,19 +1,17 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import moment from 'moment';
 
-import * as moment from 'moment';
+import { AccountingService, Granularity, PresetDuration } from '../accounting.service';
 
-interface Granularity {
-  label: string;
-  duration: moment.MomentInput;
-}
+const PRESETS: PresetDuration[] = [
+    <PresetDuration>({label: "1 hour",
+                      duration: {hours: 1}}),
 
-const GRANULARITIES: Granularity[] = [
-    <Granularity>({label: "1 hour",
-                   duration: {hours: 1}}),
-    <Granularity>({label: "1 day",
-                   duration: {days: 1}}),
-    <Granularity>({label: "1 week",
-                   duration: {days: 7}}),
+    <PresetDuration>({label: "1 day",
+                      duration: {days: 1}}),
+
+    <PresetDuration>({label: "1 week",
+                      duration: {days: 7}}),
 ]
 
 @Component({
@@ -24,23 +22,27 @@ export class GranularitySelectorComponent implements OnInit {
   @Input() label: string;
 
   _selection: Granularity;
-  readonly granularities = GRANULARITIES;
+  readonly presets = PRESETS;
 
-  @Output() selection_changed = new EventEmitter<number>();
-
-  constructor() { }
+  constructor(private _accounting: AccountingService) { }
 
   ngOnInit() {
-    this.granularity_selected(this.granularities[1]);
+    this.preset_clicked(PRESETS[1]);
   }
 
-  granularity_selected(g: Granularity): void {
+  private granularity_from_preset(r: PresetDuration): Granularity {
+    let s = moment.duration(r.duration).asSeconds();
+    return s;
+  }
+
+  preset_clicked(r: PresetDuration): void {
+    let g = this.granularity_from_preset(r);
     this._selection = g;
-    let s = moment.duration(g.duration).asSeconds();
-    this.selection_changed.emit(s);
+    this._accounting.granularity = g;
   }
 
-  is_selected(g: Granularity): boolean {
+  is_selected(r: PresetDuration): boolean {
+    let g = this.granularity_from_preset(r);
     return this._selection == g;
   }
 }

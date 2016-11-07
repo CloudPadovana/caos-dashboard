@@ -1,16 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
-interface Metric {
-  label: string;
-  name: string;
+import { ApiService, Metric } from '../../api.service';
+import { AccountingService } from '../accounting.service';
+
+const LABELS: { [key: string] : string } = {
+  "cpu": "CPU Usage",
+  "wallclocktime": "Wall Clock Time",
 }
-
-const METRICS: Metric[] = [
-    <Metric>({label: "CPU Usage",
-              name: "cpu"}),
-    <Metric>({label: "Wall Clock Time",
-              name: "wallclocktime"}),
-]
 
 @Component({
   selector: 'metric-selector',
@@ -18,24 +14,29 @@ const METRICS: Metric[] = [
 })
 export class MetricSelectorComponent implements OnInit {
   @Input() label: string;
-
-  readonly metrics: Metric[] = METRICS;
   _selection: Metric;
+  metrics: Metric[] = [];
 
-  @Output() selection_changed = new EventEmitter<Metric>();
-
-  constructor() { }
+  constructor(private _api: ApiService, private _accounting: AccountingService) { }
 
   ngOnInit() {
-    this.metric_selected(this.metrics[0]);
+    this._api.metrics().subscribe(
+      (metrics: Metric[]) => {
+        this.metrics = metrics;
+        this.metric_selected(metrics[0]);
+      });
   }
 
   metric_selected(m: Metric): void {
     this._selection = m;
-    this.selection_changed.emit(m);
+    this._accounting.metric = m;
   }
 
   is_selected(m: Metric): boolean {
     return this._selection == m;
+  }
+
+  metric_label(m: Metric): string {
+    return LABELS[m.name] || m.name;
   }
 }

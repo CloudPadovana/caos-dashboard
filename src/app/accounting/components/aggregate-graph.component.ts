@@ -1,7 +1,7 @@
-import { Component, OnInit, AfterViewInit, OnChanges, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
 
-import { Aggregate } from '../../api.service';
-import { AggregateData } from './aggregate.component';
+import { AccountingService, Aggregate, ProjectAggregate } from '../accounting.service';
 
 import * as d3 from 'd3';
 import 'nvd3';
@@ -17,17 +17,29 @@ interface GraphSeries {
   selector: 'aggregate-graph',
   template: `<nvd3 [options]="options" [data]="data"></nvd3>`
 })
-export class AggregateGraphComponent implements AfterViewInit {
+export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(nvD3) nvD3: nvD3;
+  data: GraphSeries[] = [];
 
-  constructor() {}
+  _subscription: Subscription;
+  constructor(private _accounting: AccountingService) {}
 
-  update(data: AggregateData[]) {
+  ngOnInit() {
+    this._subscription = this._accounting.data$
+      .subscribe(
+        (pas: ProjectAggregate[]) => this.update(pas));
+  }
+
+  ngOnDestroy() {
+    this._subscription.unsubscribe();
+  }
+
+  update(data: ProjectAggregate[]) {
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
 
     let tmp = data
-      .map((a: AggregateData) => <GraphSeries>({
+      .map((a: ProjectAggregate) => <GraphSeries>({
         values: a.values,
         key: a.project.name,
         disabled: (a.values.length < 1)
@@ -45,7 +57,6 @@ export class AggregateGraphComponent implements AfterViewInit {
     this.update([]);
   }
 
-  data: GraphSeries[] = [];
   options = {
     chart: {
       type: 'lineChart',

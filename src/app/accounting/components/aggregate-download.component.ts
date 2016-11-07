@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
-
-import { Project, DateRange, Aggregate } from '../../api.service';
-import { AggregateData } from './aggregate.component';
-
 import moment from 'moment';
+
+import { AccountingService, Project, DateRange, Aggregate, ProjectAggregate } from '../accounting.service';
 
 @Component({
   selector: 'aggregate-download',
@@ -12,19 +10,19 @@ import moment from 'moment';
 `
 })
 export class AggregateDownloadComponent {
-  data: AggregateData[] = [];
-  projects: Project[] = [];
+  data: ProjectAggregate[];
+  projects: Project[];
   daterange: DateRange;
   granularity: number;
 
-  update(data: AggregateData[], projects: Project[], daterange: DateRange, granularity: number) {
-    this.data = data;
-    this.projects = projects;
-    this.daterange = daterange;
-    this.granularity = granularity;
-  }
+  constructor(private _accounting: AccountingService) { }
 
   download_CSV(filename: string) {
+    this.data = this._accounting.data;
+    this.projects = this._accounting.projects;
+    this.daterange = this._accounting.daterange;
+    this.granularity = this._accounting.granularity;
+
     let data = this.data_to_CSV();
 
     let blob = new Blob([data], { type: 'text/csv' });
@@ -40,8 +38,8 @@ export class AggregateDownloadComponent {
     a.click();
   }
 
-  private dataseries(p: Project): AggregateData {
-    return this.data.find((d: AggregateData) => d.project == p);
+  private dataseries(p: Project): ProjectAggregate {
+    return this.data.find((d: ProjectAggregate) => d.project == p);
   }
 
   private dataseries_sum(p: Project): number {

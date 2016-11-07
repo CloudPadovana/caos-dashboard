@@ -2,4 +2,4 @@
   label(for="metric_button_group", *ngIf="label") {{ label }}
   .btn-group#metric_button_group
     button.btn.btn-secondary.btn-xs(type="button", *ngFor="let m of metrics", [class.active]="is_selected(m)", (click)="metric_selected(m)")
-      | {{ m.label }}
+      | {{ metric_label(m) }}
