@@ -37,10 +37,48 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
             d.percent = d.value / s.value;
             return d;
           });
+
+          if(this._sorting_field) {
+            // If we were sorting, resort the data
+            this.sort(this._sorting_field, this._sorting_ascending);
+          }
         });
   }
 
   ngOnDestroy() {
     this._subscription.unsubscribe();
+  }
+
+  _sorting_field: string;
+  _sorting_ascending: boolean;
+
+  is_sorting(field: string, ascending: boolean) {
+    return this._sorting_field === field && this._sorting_ascending == ascending;
+  }
+
+  sort(field: string, ascending: boolean) {
+    this._sorting_field = field;
+    this._sorting_ascending = ascending;
+
+    this.data.sort((r1: Row, r2: Row) => {
+      let v1 = this.deep_get(r1, field);
+      let v2 = this.deep_get(r2, field);
+
+      let sign = ascending ? +1 : -1;
+      if (v1 > v2) { return sign * +1; }
+      if (v1 < v2) { return sign * -1; }
+      return 0;
+    });
+  }
+
+  deep_get(r: Row, field: string) {
+    let cur = r;
+    let split = field.split('.');
+
+    for(let s of split) {
+      cur = (<any>cur)[s];
+    }
+
+    return cur;
   }
 }

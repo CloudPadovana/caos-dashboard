@@ -1,8 +1,33 @@
 table.table.table-bordered
   thead
-    th Project
-    th Sum [hours]
-    th Ratio (w.r.t. overall)
+    th
+      | Project
+      .btn-group.pull-right
+        button.btn.btn-outline-primary.btn-xs(type="button", (click)="sort('project.name', true)", [ngClass]="{'active': is_sorting('project.name', true)}")
+          i.fa.fa-chevron-down
+
+        button.btn.btn-outline-primary.btn-xs(type="button", (click)="sort('project.name', false)", [ngClass]="{'active': is_sorting('project.name', false)}")
+          i.fa.fa-chevron-up
+
+    th
+      | Sum [hours]
+      .btn-group.pull-right
+        button.btn.btn-outline-primary.btn-xs(type="button", (click)="sort('value', true)", [ngClass]="{'active': is_sorting('value', true)}")
+          i.fa.fa-chevron-down
+
+        button.btn.btn-outline-primary.btn-xs(type="button", (click)="sort('value', false)", [ngClass]="{'active': is_sorting('value', false)}")
+          i.fa.fa-chevron-up
+
+
+    th
+      | Ratio
+      .btn-group.pull-right
+        button.btn.btn-outline-primary.btn-xs(type="button", (click)="sort('percent', true)", [ngClass]="{'active': is_sorting('percent', true)}")
+          i.fa.fa-chevron-down
+
+        button.btn.btn-outline-primary.btn-xs(type="button", (click)="sort('percent', false)", [ngClass]="{'active': is_sorting('percent', false)}")
+          i.fa.fa-chevron-up
+
   tbody
     tr(*ngFor="let d of data")
       td {{ d.project.name }}
