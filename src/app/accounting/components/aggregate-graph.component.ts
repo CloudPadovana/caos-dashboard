@@ -18,9 +18,11 @@ interface GraphSeries {
   selector: 'aggregate-graph',
   template: `
 <nvd3 [options]="options" [data]="data"></nvd3>
+<button type="button" class="btn btn-primary btn-xs" (click)="select_all()" tooltip="Click here to select all projects.">Select all</button>
+<button type="button" class="btn btn-primary btn-xs" (click)="deselect_all()" tooltip="Click here to deselect all projects.">Deselect all</button>
 <button class="btn btn-primary btn-xs" type="button" (click)="downloader.download_CSV('data.csv')" tooltip="Download raw data in CSV format.">Download data<i class="fa fa-fw fa-download"></i></button>
 
-<p>Double click on legend bullet to select only one project.</p>
+<p>To select a single project, <b>double click</b> on its marker.</p>
 `
 })
 export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -73,6 +75,16 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
 
   ngOnDestroy() {
     this._subscriptions.forEach((s: Subscription) => s.unsubscribe());
+  }
+
+  select_all() {
+    this.data.forEach((d: GraphSeries) => d.disabled = false);
+    this.update();
+  }
+
+  deselect_all() {
+    this.data.forEach((d: GraphSeries) => d.disabled = true);
+    this.update();
   }
 
   update() {
