@@ -33,7 +33,11 @@ export class AccountingService {
   constructor(private _api: ApiService) {
     this._api.projects().subscribe(
       (projects: Project[]) => {
-        this.projects = projects;
+        this.projects = projects.sort((p1: Project, p2: Project) => {
+          if (p1.name > p2.name) { return +1; }
+          if (p1.name < p2.name) { return -1; }
+          return 0;
+        });
       });
   }
 
