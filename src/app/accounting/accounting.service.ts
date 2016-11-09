@@ -19,12 +19,12 @@ export interface PresetDuration {
 export interface ProjectAggregate {
   project: Project;
   values: Aggregate[];
-};
+}
 
-export const OVERALL_PROJECT: Project = <Project>({
-  id: "__OVERALL",
-  name: "OVERALL"
-});
+export interface Data {
+  aggregates: ProjectAggregate[];
+  overall: ProjectAggregate;
+}
 
 @Injectable()
 export class AccountingService {
@@ -33,7 +33,7 @@ export class AccountingService {
   constructor(private _api: ApiService) {
     this._api.projects().subscribe(
       (projects: Project[]) => {
-        this.projects = [OVERALL_PROJECT].concat(projects);
+        this.projects = projects;
       });
   }
 
@@ -77,12 +77,12 @@ export class AccountingService {
     return this._granularity.value;
   }
 
-  private _data = new BehaviorSubject<ProjectAggregate[]>([]);
+  private _data = new BehaviorSubject<Data>(undefined);
   data$ = this._data.asObservable();
-  set data(d: ProjectAggregate[]) {
+  set data(d: Data) {
     this._data.next(d);
   }
-  get data(): ProjectAggregate[] {
+  get data(): Data {
     return this._data.value;
   }
 
@@ -102,41 +102,58 @@ export class AccountingService {
     if (!this.granularity) { return };
 
     this.fetching_data = 0;
-    this.fetch_data().subscribe((d: ProjectAggregate[]) => {
-      this.fetching_data = undefined;
-      this.data = d;
-    });
+
+    // +1 for the overall aggregate data
+    let increment: number = 1/(1+this.projects.length);
+
+    this.fetch_data(increment)
+      .subscribe((aggregates: ProjectAggregate[]) => {
+        this.fetch_aggregate_data(increment)
+          .subscribe((overall: ProjectAggregate) => {
+            this.fetching_data = undefined;
+            this.data = <Data>({
+              aggregates: aggregates,
+              overall: overall
+            });
+          })
+      });
   }
 
-  private fetch_data(): Observable<ProjectAggregate[]> {
+  private fetch_data(inc: number): Observable<ProjectAggregate[]> {
     let obs: Array< Observable<ProjectAggregate> > = [];
+    let req: Observable<Aggregate[]>;
 
     for (let p of this.projects) {
-      let req: Observable<Aggregate[]>;
+      req = this._api.aggregate_for_one_project(p, this.period,
+                                                this.metric,
+                                                this.daterange,
+                                                this.granularity);
+      obs.push(req.map(
+        (a: Aggregate[]) => {
+          this.fetching_data += inc;
 
-      if (p == OVERALL_PROJECT) {
-        req = this._api.aggregate_for_all_projects(this.period,
+          return <ProjectAggregate>({
+            project: p,
+            values: a
+          });
+        }));
+    }
+
+    return Observable.forkJoin(obs);
+  }
+
+  private fetch_aggregate_data(inc: number): Observable<ProjectAggregate> {
+    let req = this._api.aggregate_for_all_projects(this.period,
                                                    this.metric,
                                                    this.daterange,
                                                    this.granularity);
-      } else {
-        req = this._api.aggregate_for_one_project(p, this.period,
-                                                  this.metric,
-                                                  this.daterange,
-                                                  this.granularity);
-      }
 
-      obs.push(
-        req.map(
-          (a: Aggregate[]) => {
-            this.fetching_data += 1/this.projects.length;
-
-            return <ProjectAggregate>({
-              project: p,
-              values: a
-            });
-          }));
-    }
-    return Observable.forkJoin(obs);
+    return req.map((a: Aggregate[]) => {
+      this.fetching_data += inc;
+      return <ProjectAggregate>({
+        project: <Project>({name: "OVERALL"}),
+        values: a
+      });
+    });
   }
 }

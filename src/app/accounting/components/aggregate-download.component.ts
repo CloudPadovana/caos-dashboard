@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import moment from 'moment';
 
-import { AccountingService, Project, DateRange, Aggregate, ProjectAggregate } from '../accounting.service';
+import { AccountingService, Project, DateRange, Aggregate, ProjectAggregate, Data } from '../accounting.service';
 
 @Component({
   selector: 'aggregate-download',
   template: `
-<button class="btn btn-primary" type="button" (click)="download_CSV('data.csv')">Download data<i class="fa fa-fw fa-download"></i></button>
+<button class="btn btn-primary btn-xs" type="button" (click)="download_CSV('data.csv')">Download data<i class="fa fa-fw fa-download"></i></button>
 `
 })
 export class AggregateDownloadComponent {
-  data: ProjectAggregate[];
+  data: Data;
   projects: Project[];
   daterange: DateRange;
   granularity: number;
@@ -39,13 +39,15 @@ export class AggregateDownloadComponent {
   }
 
   private dataseries(p: Project): ProjectAggregate {
-    return this.data.find((d: ProjectAggregate) => d.project == p);
+    return this.data.aggregates.find((d: ProjectAggregate) => d.project == p);
   }
 
   private dataseries_sum(p: Project): number {
-    return this.dataseries(p)
-      .values
-      .map((a: Aggregate) => a.sum)
+    return this.aggregate_sum(this.dataseries(p).values);
+  }
+
+  private aggregate_sum(ag: Aggregate[]): number {
+    return ag.map((a: Aggregate) => a.sum)
       .reduce((acc, cur) => acc + cur, 0);
   }
 
@@ -55,12 +57,17 @@ export class AggregateDownloadComponent {
     let row: string[] = [];
     row.push("From");
     row.push("To");
+    row.push(this.data.overall.project.name);
     this.projects.map((p: Project) => row.push(p.name));
     s.push(row.join());
 
     let ts: Date[] = [];
-
-    for (let series of this.data) {
+    this.data.overall.values.map((a: Aggregate) => {
+      if (!ts.find((d: Date) => moment(d).isSame(a.timestamp))) {
+        ts.push(new Date(a.timestamp));
+      }
+    });
+    for (let series of this.data.aggregates) {
       series.values.map((a: Aggregate) => {
         if (!ts.find((d: Date) => moment(d).isSame(a.timestamp))) {
           ts.push(new Date(a.timestamp));
@@ -76,6 +83,12 @@ export class AggregateDownloadComponent {
       row.push(moment(t).subtract(this.granularity, 'second').toString());
       row.push(moment(t).toString());
 
+      let tmp = this.data.overall.values.find((a: Aggregate) => moment(t).isSame(a.timestamp));
+      if (tmp) {
+        row.push((tmp.sum/3600).toString());
+      } else {
+        row.push("NaN");
+      }
       for (let p of this.projects) {
         let tmp = this.dataseries(p).values.find((a: Aggregate) => moment(t).isSame(a.timestamp));
         if (tmp) {
@@ -90,6 +103,7 @@ export class AggregateDownloadComponent {
     row = [];
     row.push(moment(this.daterange.start).toString());
     row.push(moment(this.daterange.end).toString());
+    row.push((this.aggregate_sum(this.data.overall.values)/3600).toString());
     for (let p of this.projects) {
       row.push((this.dataseries_sum(p)/3600).toString());
     }

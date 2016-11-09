@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-import { AccountingService, Project, Aggregate, ProjectAggregate } from '../accounting.service';
-import { OVERALL_PROJECT } from '../accounting.service';
+import { AccountingService, Project, Aggregate, ProjectAggregate, Data } from '../accounting.service';
 
 interface Row {
   project: Project;
@@ -15,38 +14,50 @@ interface Row {
   templateUrl: 'accounting/components/aggregate-table.component.html'
 })
 export class AggregateTableComponent implements OnInit, OnDestroy {
-  data: Row[] = [];
+  rows: Row[] = [];
 
   _subscription: Subscription;
   constructor(private _accounting: AccountingService) {}
 
   ngOnInit() {
-    this._subscription = this._accounting.data$
-      .subscribe(
-        (pas: ProjectAggregate[]) => {
-          let data = pas.map(
-            (pa: ProjectAggregate) => <Row>({
-              project: pa.project,
-              value: pa.values
-                .map((a: Aggregate) => a.sum)
-                .reduce((acc, cur) => acc + cur, 0)
-            }));
-
-          let s = data.find((r: Row) => r.project == OVERALL_PROJECT);
-          this.data = data.map((d: Row) => {
-            d.percent = d.value / s.value;
-            return d;
-          });
-
-          if(this._sorting_field) {
-            // If we were sorting, resort the data
-            this.sort(this._sorting_field, this._sorting_ascending);
-          }
-        });
+    this._subscription = this._accounting.data$.subscribe((data: Data) => {
+      if(!data) { return; }
+      this.update(data);
+    });
   }
 
   ngOnDestroy() {
     this._subscription.unsubscribe();
+  }
+
+  update(d: Data) {
+    // this can be 0, so that percent could be NaN
+    let overall_value = d.overall.values
+      .map((a: Aggregate) => a.sum)
+      .reduce((acc, cur) => acc + cur, 0);
+
+    let overall = <Row>({
+      project: d.overall.project,
+      value: overall_value,
+      percent: overall_value / overall_value
+    });
+
+    this.rows = [overall].concat(d.aggregates.map((pa: ProjectAggregate) => {
+      let value = pa.values
+        .map((a: Aggregate) => a.sum)
+        .reduce((acc, cur) => acc + cur, 0);
+
+      return <Row>({
+        project: pa.project,
+        value: value,
+        percent: value / overall.value
+      });
+    }));
+
+    if(this._sorting_field) {
+      // If we were sorting, resort the data
+      this.sort(this._sorting_field, this._sorting_ascending);
+    }
   }
 
   _sorting_field: string;
@@ -60,7 +71,7 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
     this._sorting_field = field;
     this._sorting_ascending = ascending;
 
-    this.data.sort((r1: Row, r2: Row) => {
+    this.rows.sort((r1: Row, r2: Row) => {
       let v1 = this.deep_get(r1, field);
       let v2 = this.deep_get(r2, field);
 

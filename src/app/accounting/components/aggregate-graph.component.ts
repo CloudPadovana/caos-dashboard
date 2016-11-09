@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-import { AccountingService, Aggregate, ProjectAggregate } from '../accounting.service';
+import { AccountingService, Project, Aggregate, ProjectAggregate, Data } from '../accounting.service';
 
 import * as d3 from 'd3';
 import 'nvd3';
@@ -15,37 +15,64 @@ interface GraphSeries {
 
 @Component({
   selector: 'aggregate-graph',
-  template: `<nvd3 [options]="options" [data]="data"></nvd3>`
+  template: `
+<nvd3 [options]="options" [data]="data"></nvd3>
+
+<p>Double click on legend bullet to select only one project.</p>
+`
 })
 export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(nvD3) nvD3: nvD3;
-  data: GraphSeries[] = [];
+  data: GraphSeries[];
 
-  _subscription: Subscription;
+  _subscriptions: Subscription[];
   constructor(private _accounting: AccountingService) {}
 
   ngOnInit() {
-    this._subscription = this._accounting.data$
-      .subscribe(
-        (pas: ProjectAggregate[]) => this.update(pas));
+    this._subscriptions = [];
+
+    this._subscriptions.push(this._accounting.projects$.subscribe((projects: Project[]) => {
+      this.data = [];
+      this.data.push(<GraphSeries>({
+        values: [],
+        key: "",
+        disabled: false
+      }));
+
+      for(let p of projects) {
+        this.data.push(<GraphSeries>({
+          values: [],
+          key: p.name,
+          disabled: false
+        }));
+      }
+    }));
+
+    this._subscriptions.push(this._accounting.data$.subscribe((d: Data) => {
+      if(!d || !this.data) { return; }
+
+      this.data[0].key = d.overall.project.name;
+      this.data[0].values = d.overall.values;
+
+      d.aggregates.forEach((a: ProjectAggregate) => {
+        let index = this.data.findIndex((s: GraphSeries) => s.key == a.project.name);
+
+        if(index > -1) {
+          this.data[index].values = a.values;
+        }
+      });
+
+      this.update();
+    }));
   }
 
   ngOnDestroy() {
-    this._subscription.unsubscribe();
+    this._subscriptions.forEach((s: Subscription) => s.unsubscribe());
   }
 
-  update(data: ProjectAggregate[]) {
+  update() {
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
-
-    let tmp = data
-      .map((a: ProjectAggregate) => <GraphSeries>({
-        values: a.values,
-        key: a.project.name,
-        disabled: (a.values.length < 1)
-      }));
-
-    this.data = tmp;
 
     // Without this timeout, the chart is not correctly setup
     setTimeout(() => {
@@ -54,7 +81,7 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngAfterViewInit() {
-    this.update([]);
+    this.update();
   }
 
   options = {

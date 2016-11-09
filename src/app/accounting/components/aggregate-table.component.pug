@@ -29,7 +29,7 @@ table.table.table-bordered
           i.fa.fa-chevron-up
 
   tbody
-    tr(*ngFor="let d of data")
-      td {{ d.project.name }}
-      td {{ d.value/3600 | number: '1.2-2' }}
-      td {{ d.percent | percent: '1.2-2' }}
+    tr(*ngFor="let r of rows")
+      td {{ r.project.name }}
+      td {{ r.value/3600 | number: '1.2-2' }}
+      td {{ r.percent | percent: '1.2-2' }}

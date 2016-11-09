@@ -1,35 +1,40 @@
-.form-inline
-  .form-group
-    label(for="projects_group", *ngIf="label") {{ label }}
+.form-inline.form-group
+  label(for="projects_button_group", *ngIf="label") {{ label }}
 
-    .input-group#projects_group(dropdown, autoClose="outsideClick")
-      .input-group.input-group-sm(dropdownToggle, [addToggleClass]="false")
-        span.input-group-addon
-          i.fa.fa-search
-        input.form-control(type="text", placeholder="Select projects...", [(ngModel)]="search_text")
-        span.input-group-btn(*ngIf="search_text")
-          button.btn.btn-default.close(type="button", (click)="clear_search()")
-            i.fa.fa-fw.fa-times
+  .btn-group#projects_button_group
+    button.btn.btn-xs(type="button", (click)="select_all()")
+      | Select All
 
-      div(dropdownMenu, role="menu")
-        button.dropdown-item(role="menuitem", (click)="select_all()")
-          span.fa.fa-fw.fa-check
-          | Select All
+    button.btn.btn-xs(type="button", (click)="unselect_all()")
+      | Unselect All
 
-        button.dropdown-item(role="menuitem", (click)="unselect_all()")
-          span.fa.fa-fw.fa-times
-          | Unselect All
+    button.btn.btn-secondary.btn-xs(type="button", *ngFor="let p of projects", [class.active]="is_selected(p)", (click)="toggle_selected(p)") {{ p.name }}
+  //   .input-group#projects_group(dropdown, autoClose="outsideClick")
+  //     .input-group.input-group-sm(dropdownToggle, [addToggleClass]="false")
+  //       span.input-group-addon
+  //         i.fa.fa-search
+  //       input.form-control(type="text", placeholder="Select projects...", [(ngModel)]="search_text")
+  //       span.input-group-btn(*ngIf="search_text")
 
-        .dropdown-divider
+  //     div(dropdownMenu, role="menu")
+  //       button.dropdown-item(role="menuitem", (click)="select_all()")
+  //         span.fa.fa-fw.fa-check
+  //         | Select All
 
-        .scrollable-menu
-          button.dropdown-item(*ngFor="let p of searched_projects", role="menuitem", (click)="toggle_selected(p)")
-            span.fa.fa-fw([class.fa-check]="is_selected(p)")
-            | {{ p.name }}
+  //       button.dropdown-item(role="menuitem", (click)="unselect_all()")
+  //         span.fa.fa-fw.fa-times
+  //         | Unselect All
 
-  div
-    p(*ngIf="!selected_projects.length") No project selected
-    span.project-tag(*ngFor="let p of selected_projects")
-      | {{ p.name }}
-      button.close.btn-xs(type="button", (click)="toggle_selected(p)")
-        span.fa.fa-fw.fa-border.fa-times
+  //       .dropdown-divider
+
+  //       .scrollable-menu
+  //         button.dropdown-item(*ngFor="let p of searched_projects", role="menuitem", (click)="toggle_selected(p)")
+  //           span.fa.fa-fw([class.fa-check]="is_selected(p)")
+  //           | {{ p.name }}
+
+  // div
+  //   p(*ngIf="!selected_projects.length") No project selected
+  //   span.project-tag(*ngFor="let p of selected_projects")
+  //     | {{ p.name }}
+  //     button.close.btn-xs(type="button", (click)="toggle_selected(p)")
+  //       span.fa.fa-fw.fa-border.fa-times
