@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular
 import { Subscription } from 'rxjs/Subscription';
 
 import { AccountingService, Project, Aggregate, ProjectAggregate, Data } from '../accounting.service';
+import { AggregateDownloader } from './aggregate-downloader';
 
 import * as d3 from 'd3';
 import 'nvd3';
@@ -17,6 +18,7 @@ interface GraphSeries {
   selector: 'aggregate-graph',
   template: `
 <nvd3 [options]="options" [data]="data"></nvd3>
+<button class="btn btn-primary btn-xs" type="button" (click)="downloader.download_CSV('data.csv')" tooltip="Download raw data in CSV format.">Download data<i class="fa fa-fw fa-download"></i></button>
 
 <p>Double click on legend bullet to select only one project.</p>
 `
@@ -24,9 +26,12 @@ interface GraphSeries {
 export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(nvD3) nvD3: nvD3;
   data: GraphSeries[];
+  downloader: AggregateDownloader;
 
   _subscriptions: Subscription[];
-  constructor(private _accounting: AccountingService) {}
+  constructor(private _accounting: AccountingService) {
+    this.downloader = new AggregateDownloader(_accounting);
+  }
 
   ngOnInit() {
     this._subscriptions = [];

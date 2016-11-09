@@ -9,7 +9,6 @@ import { ProjectSelectorComponent } from './project-selector.component';
 import { SeriesGraphComponent } from './series-graph.component';
 
 import { AggregateComponent } from './aggregate.component';
-import { AggregateDownloadComponent } from './aggregate-download.component';
 import { AggregateGraphComponent } from './aggregate-graph.component';
 import { AggregateTableComponent } from './aggregate-table.component';
 
@@ -21,7 +20,6 @@ import { AggregateTableComponent } from './aggregate-table.component';
     SeriesGraphComponent,
 
     AggregateComponent,
-    AggregateDownloadComponent,
     AggregateGraphComponent,
     AggregateTableComponent,
 
@@ -38,7 +36,6 @@ import { AggregateTableComponent } from './aggregate-table.component';
     SeriesGraphComponent,
 
     AggregateComponent,
-    AggregateDownloadComponent,
     AggregateGraphComponent,
     AggregateTableComponent,
 

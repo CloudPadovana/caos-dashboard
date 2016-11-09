@@ -1,15 +1,7 @@
-import { Component } from '@angular/core';
 import moment from 'moment';
 
 import { AccountingService, Project, DateRange, Aggregate, ProjectAggregate, Data } from '../accounting.service';
-
-@Component({
-  selector: 'aggregate-download',
-  template: `
-<button class="btn btn-primary btn-xs" type="button" (click)="download_CSV('data.csv')">Download data<i class="fa fa-fw fa-download"></i></button>
-`
-})
-export class AggregateDownloadComponent {
+export class AggregateDownloader {
   data: Data;
   projects: Project[];
   daterange: DateRange;
