@@ -29,6 +29,11 @@ table.table.table-bordered
           i.fa.fa-chevron-up
 
   tbody
+    tr
+      td.font-weight-bold {{ overall?.project.name }}
+      td.font-weight-bold {{ overall?.value/3600 | number: '1.2-2' }}
+      td.font-weight-bold {{ overall?.percent | percent: '1.2-2' }}
+
     tr(*ngFor="let r of rows")
       td {{ r.project.name }}
       td {{ r.value/3600 | number: '1.2-2' }}

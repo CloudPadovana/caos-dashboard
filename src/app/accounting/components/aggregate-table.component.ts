@@ -15,6 +15,7 @@ interface Row {
 })
 export class AggregateTableComponent implements OnInit, OnDestroy {
   rows: Row[] = [];
+  overall: Row;
 
   _subscription: Subscription;
   constructor(private _accounting: AccountingService) {}
@@ -41,8 +42,9 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
       value: overall_value,
       percent: overall_value / overall_value
     });
+    this.overall = overall;
 
-    this.rows = [overall].concat(d.aggregates.map((pa: ProjectAggregate) => {
+    this.rows = d.aggregates.map((pa: ProjectAggregate) => {
       let value = pa.values
         .map((a: Aggregate) => a.sum)
         .reduce((acc, cur) => acc + cur, 0);
@@ -52,7 +54,7 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
         value: value,
         percent: value / overall.value
       });
-    }));
+    });
 
     if(this._sorting_field) {
       // If we were sorting, resort the data
