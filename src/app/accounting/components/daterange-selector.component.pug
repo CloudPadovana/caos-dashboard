@@ -25,8 +25,15 @@
     .btn-group#daterange_start_group
       popover-content(#popoverstart, placement="bottom", [closeOnClickOutside]="true", (click)="$event.stopPropagation();")
         datepicker([(ngModel)]="daterange_start", [showWeeks]="false", [startingDay]="1")
+
+        .form-inline
+          .form-group
+            label(for="daterange_starttime_group") Time: {{ preview_start_hour | number: '2.0-0' }}:00
+          .input-group#daterange_starttime_group
+            input(type="range", min=0, max=23, step=1, #start_hour, (change)="change_start_hour(start_hour.value)", [(ngModel)]="preview_start_hour")
+
       button.btn.btn-secondary.btn-xs(type="button", [popover]="popoverstart")
-        | {{ daterange_start | date: 'dd/MM/y' }}
+        | {{ daterange_start | date: 'dd/MM/y HH:mm' }}
         i.fa.fa-fw.fa-calendar
 
 
@@ -34,8 +41,15 @@
     .btn-group#daterange_end_group
       popover-content(#popoverend, placement="bottom", [closeOnClickOutside]="true", (click)="$event.stopPropagation();")
         datepicker([(ngModel)]="daterange_end", [showWeeks]="false", [startingDay]="1")
+
+        .form-inline
+          .form-group
+            label(for="daterange_endtime_group") Time: {{ preview_end_hour | number: '2.0-0' }}:00
+          .input-group#daterange_endtime_group
+            input(type="range", min=0, max=23, step=1, #end_hour, (change)="change_end_hour(end_hour.value)", [(ngModel)]="preview_end_hour")
+
       button.btn.btn-secondary.btn-xs(type="button", [popover]="popoverend")
-        | {{ daterange_end | date: 'dd/MM/y' }}
+        | {{ daterange_end | date: 'dd/MM/y HH:mm' }}
         i.fa.fa-fw.fa-calendar
 
   .form-group

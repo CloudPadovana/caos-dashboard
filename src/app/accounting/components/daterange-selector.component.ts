@@ -48,6 +48,9 @@ const PRESETS: PresetDuration[] = [
   templateUrl: 'accounting/components/daterange-selector.component.html'
 })
 export class DateRangeSelectorComponent implements OnInit {
+  private preview_start_hour: number = 0;
+  private preview_end_hour: number = 0;
+
   private _daterange_start: Date;
   @Input()
   set daterange_start(d: Date) {
@@ -96,7 +99,6 @@ export class DateRangeSelectorComponent implements OnInit {
 
   private strip_time(d: Date): Date {
     return moment(d)
-      .hour(0)
       .minute(0)
       .second(0)
       .millisecond(0).toDate();
@@ -133,4 +135,15 @@ export class DateRangeSelectorComponent implements OnInit {
     this.daterange_start = d.start;
     this.daterange_end = d.end;
   };
+
+  change_start_hour(h: number): void {
+    let d = this.daterange_start;
+    this.daterange_start = moment(d).hour(h).toDate();
+  }
+
+  change_end_hour(h: number): void {
+    let d = this.daterange_end;
+    this.daterange_end = moment(d).hour(h).toDate();
+  }
+
 }
