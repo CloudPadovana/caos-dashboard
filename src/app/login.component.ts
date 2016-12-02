@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// caos-frontend - CAOS frontend
+// caos-dashboard - CAOS dashboard
 //
 // Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //

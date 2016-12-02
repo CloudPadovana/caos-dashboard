@@ -1,6 +1,6 @@
 {
-  "name": "caos-frontend",
-  "description": "CAOS frontend",
+  "name": "caos-dashboard",
+  "description": "CAOS dashboard",
   "author": "Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>",
   "version": "0.0.1",
   "license": "Apache-2.0",

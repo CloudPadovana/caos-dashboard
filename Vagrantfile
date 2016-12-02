@@ -48,7 +48,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # WebSocket for live reload
   config.vm.network :forwarded_port, guest: 35729, host: 35729
 
-  config.vm.hostname = "frontend.caos.vagrant.localhost"
+  config.vm.hostname = "dashboard.caos.vagrant.localhost"
 
   $script = <<SCRIPT
 sed -i 's/AcceptEnv/# AcceptEnv/' /etc/ssh/sshd_config
