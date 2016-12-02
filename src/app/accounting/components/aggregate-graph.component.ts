@@ -43,7 +43,7 @@ interface GraphSeries {
 <nvd3 [options]="options" [data]="data"></nvd3>
 <button type="button" class="btn btn-primary btn-xs" (click)="select_all()" tooltip="Click here to select all projects.">Select all</button>
 <button type="button" class="btn btn-primary btn-xs" (click)="deselect_all()" tooltip="Click here to deselect all projects.">Deselect all</button>
-<button class="btn btn-primary btn-xs" type="button" (click)="downloader.download_CSV('data.csv')" tooltip="Download raw data in CSV format.">Download data<i class="fa fa-fw fa-download"></i></button>
+<button *ngIf="download_button_enabled" class="btn btn-primary btn-xs" type="button" (click)="downloader.download_CSV('data.csv')" tooltip="Download raw data in CSV format.">Download data<i class="fa fa-fw fa-download"></i></button>
 
 <p>To select a single project, <b>double click</b> on its marker.</p>
 `
@@ -98,6 +98,14 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
 
   ngOnDestroy() {
     this._subscriptions.forEach((s: Subscription) => s.unsubscribe());
+  }
+
+  get download_button_enabled(): boolean {
+    if(!this._accounting.metric) { return false }
+
+    let m = this._accounting.metric;
+    if(m.name === 'efficiency') { return false }
+    return true;
   }
 
   select_all() {

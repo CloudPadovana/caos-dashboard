@@ -54,6 +54,14 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
     this._subscription.unsubscribe();
   }
 
+  get table_enabled(): boolean {
+    if(!this._accounting.metric) { return false }
+
+    let m = this._accounting.metric;
+    if(m.name === 'efficiency') { return false }
+    return true;
+  }
+
   update(d: Data) {
     // this can be 0, so that percent could be NaN
     let overall_value = d.overall.values

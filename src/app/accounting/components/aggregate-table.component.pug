@@ -19,7 +19,11 @@
 //- Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
 //-
 
-table.table.table-bordered.table-hover
+div(*ngIf="!table_enabled")
+  .alert.alert-warning(role="alert")
+    h4.alert-heading Table not available!
+
+table.table.table-bordered.table-hover(*ngIf="table_enabled")
   thead.thead-inverse
     th
       | Project
