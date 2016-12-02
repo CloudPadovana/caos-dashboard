@@ -24,7 +24,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-import { AccountingService, Project, Aggregate, ProjectAggregate, Data } from '../accounting.service';
+import { AccountingService, Metric, Project, Aggregate, ProjectAggregate, Data } from '../accounting.service';
 import { AggregateDownloader } from './aggregate-downloader';
 
 import * as d3 from 'd3';
@@ -114,6 +114,9 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
 
+    this.update_chart_options();
+    this.nvD3.updateWithOptions(this.options);
+
     // Without this timeout, the chart is not correctly setup
     setTimeout(() => {
       this.nvD3.chart.update();
@@ -122,6 +125,23 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
 
   ngAfterViewInit() {
     this.update();
+  }
+
+  private update_chart_options() {
+    let metric = this._accounting.metric;
+    if(!metric) { return; }
+
+    let chart = this.options.chart;
+
+    if(metric.name === 'efficiency') {
+      chart.y = (d: Aggregate) => d.sum*100;
+      chart.yAxis.axisLabel = '%';
+      chart.tooltip.valueFormatter = (d: any) => d3.format('.05s')(d) + ' %';
+    } else {
+      chart.y = (d: Aggregate) => d.sum/3600;
+      chart.yAxis.axisLabel = 'hours';
+      chart.tooltip.valueFormatter = (d: any) => d3.format('.05s')(d) + ' hours';
+    }
   }
 
   options = {

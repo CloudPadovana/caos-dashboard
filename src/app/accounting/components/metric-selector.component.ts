@@ -29,6 +29,7 @@ import { AccountingService } from '../accounting.service';
 const LABELS: { [key: string] : string } = {
   "cpu": "CPU Usage",
   "wallclocktime": "Wall Clock Time",
+  "efficiency": "Efficiency",
 }
 
 @Component({
