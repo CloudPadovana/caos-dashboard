@@ -26,6 +26,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/observable/zip';
 
 import moment from 'moment';
 
@@ -133,6 +134,22 @@ export class AccountingService {
     // +1 for the overall aggregate data
     let increment: number = 1/(1+this.projects.length);
 
+    // PDCL-642: workaround waiting the efficiency metric to be implemented in the collector
+    if(this.metric.name === 'efficiency') {
+      this.fetch_data_pdcl_642(increment)
+        .subscribe((aggregates: ProjectAggregate[]) => {
+          this.fetch_aggregate_data_pdcl_642(increment)
+            .subscribe((overall: ProjectAggregate) => {
+              this.fetching_data = undefined;
+              this.data = <Data>({
+                aggregates: aggregates,
+                overall: overall
+              });
+            })
+        });
+      return;
+    }
+
     this.fetch_data(increment)
       .subscribe((aggregates: ProjectAggregate[]) => {
         this.fetch_aggregate_data(increment)
@@ -180,6 +197,94 @@ export class AccountingService {
       return <ProjectAggregate>({
         project: <Project>({name: "OVERALL"}),
         values: a
+      });
+    });
+  }
+
+  // PDCL-642: workaround waiting the efficiency metric to be implemented in the collector
+  private fetch_data_pdcl_642(inc: number): Observable<ProjectAggregate[]> {
+    let obs: Array< Observable<ProjectAggregate> > = [];
+    let req: Observable<Aggregate[]>;
+
+    let req_cpu: Observable<Aggregate[]>;
+    let req_wall: Observable<Aggregate[]>;
+    for (let p of this.projects) {
+      req_cpu = this._api.aggregate_for_one_project(p, this.period,
+                                                    <Metric>({name: 'cpu'}),
+                                                    this.daterange,
+                                                    this.granularity);
+      req_wall = this._api.aggregate_for_one_project(p, this.period,
+                                                     <Metric>({name: 'wallclocktime'}),
+                                                     this.daterange,
+                                                     this.granularity);
+
+      req = Observable.zip(req_cpu, req_wall)
+        .map((AA: Array<Aggregate[]>) => {
+          let a1 = AA[0];
+          let a2 = AA[1];
+
+          let ts = a1.map((a: Aggregate) => a.timestamp).sort(
+            (d1: Date, d2: Date) => ( d1.valueOf() - d2.valueOf() ));
+
+          for (let a of a1) {
+            let v2 = a2.find((atmp: Aggregate) => moment(a.timestamp).isSame(atmp.timestamp));
+            if(v2) {
+              a.sum = a.sum / v2.sum;
+            } else {
+              a.sum = a.sum / 0;
+            }
+          }
+          return a1;
+        });
+
+
+      obs.push(req.map(
+        (a: Aggregate[]) => {
+          this.fetching_data += inc;
+
+          return <ProjectAggregate>({
+            project: p,
+            values: a
+          });
+        }));
+    }
+
+    return Observable.forkJoin(obs);
+  }
+
+  // PDCL-642: workaround waiting the efficiency metric to be implemented in the collector
+  private fetch_aggregate_data_pdcl_642(inc: number): Observable<ProjectAggregate> {
+    let req_cpu = this._api.aggregate_for_all_projects(this.period,
+                                                       <Metric>({name: 'cpu'}),
+                                                       this.daterange,
+                                                       this.granularity);
+
+    let req_wall = this._api.aggregate_for_all_projects(this.period,
+                                                        <Metric>({name: 'wallclocktime'}),
+                                                        this.daterange,
+                                                        this.granularity);
+
+    let obs = Observable.zip(req_cpu, req_wall);
+    return obs.map((AA: Array<Aggregate[]>) => {
+      let a1 = AA[0];
+      let a2 = AA[1];
+
+      this.fetching_data += inc;
+
+      let ts = a1.map((a: Aggregate) => a.timestamp).sort(
+        (d1: Date, d2: Date) => ( d1.valueOf() - d2.valueOf() ));
+
+      for (let a of a1) {
+        let v1 = a.sum;
+        let v2 = a2.find((atmp: Aggregate) => moment(a.timestamp).isSame(atmp.timestamp)).sum;
+        let v = v1/v2;
+
+        a.sum = v;
+      }
+
+      return <ProjectAggregate>({
+        project: <Project>({name: "OVERALL"}),
+        values: a1
       });
     });
   }

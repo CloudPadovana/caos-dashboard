@@ -188,6 +188,13 @@ export class ApiService {
         .map((r: Response) => {
           this._metrics_observable = null;
           this._metrics = this.parse_metrics(r.json().data);
+
+          // PDCL-642: workaround waiting the efficiency metric to be implemented in the collector
+          this._metrics.push(<Metric>({
+            name: 'efficiency',
+            type: ''
+          }));
+
           return this._metrics;})
         .share()
         .catch(this.handle_error);
