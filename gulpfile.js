@@ -273,7 +273,7 @@ gulp.task('server', ['build'], function () {
         port: 35729},
       proxies: [{
         source: '/api/v1',
-        target: 'http://10.0.2.2:4000/api/v1',
+        target: 'https://10.0.2.2:4000/api/v1',
         options: {
           headers: {
             'Access-Control-Allow-Origin': '*'}}
