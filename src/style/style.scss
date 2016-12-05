@@ -91,6 +91,13 @@ daterange-selector {
   datepicker {
     z-index: $zindex-popover;
 
+    datepicker-inner {
+      .card {
+        //min-width: 100%;
+        max-width: none;
+      }
+    }
+
     yearpicker,
     monthpicker,
     daypicker {
@@ -102,6 +109,7 @@ daterange-selector {
 
   .popover, .popover-content {
     z-index: $zindex-popover;
+    max-width: none;
   }
 }
 
