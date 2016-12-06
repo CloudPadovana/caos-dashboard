@@ -41,7 +41,7 @@ popover-content(#daterange_popover, placement="auto bottom", (click)="$event.sto
     .row
       .col-xs-3
         .btn-group-vertical
-          button.btn.btn-secondary.btn-sm(type="button", *ngFor="let r of presets", [class.active]="is_selected(r)",  [class.btn-primary]="is_global_selected(r)", (click)="preset_clicked(r)")
+          button.btn.btn-sm(type="button", *ngFor="let r of presets", [class.btn-primary]="is_global_selected(r)", [class.btn-secondary]="!is_global_selected(r)", [class.active]="is_global_selected(r) || is_selected(r)", (click)="preset_clicked(r)")
             | {{ r.label }}
 
       .col-xs-9
