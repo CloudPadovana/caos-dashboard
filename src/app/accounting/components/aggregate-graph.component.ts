@@ -136,7 +136,7 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
       },
       x: function(d: Aggregate) { return d.timestamp; },
       y: function(d: Aggregate) { return d.sum/3600; },
-      interpolate: 'step',
+      interpolate: 'linear',
       xAxis: {
         axisLabel: 'Date',
         tickFormat: function(d: any) {
