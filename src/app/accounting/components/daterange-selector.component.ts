@@ -21,25 +21,63 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import moment from 'moment';
 
-import { AccountingService, DateRange, PresetDuration } from '../accounting.service';
+import { AccountingService, DateRange, PresetDuration as PresetDurationOnly } from '../accounting.service';
+
+interface PresetDuration extends PresetDurationOnly {
+  // aurgument to moment.startOf()
+  starting: moment.unitOfTime.StartOf;
+
+  // how much to go back in time
+  backward: moment.MomentInput;
+}
 
 const PRESETS: PresetDuration[] = [
-    <PresetDuration>({label: "day",
+    <PresetDuration>({label: "today",
+                      starting: 'day',
+                      backward: {days: 0},
                       duration: {days: 1}}),
 
-    <PresetDuration>({label: "week",
+    <PresetDuration>({label: "past 24h",
+                      starting: 'hour',
+                      backward: {days: 1},
+                      duration: {days: 1}}),
+
+    <PresetDuration>({label: "yesterday",
+                      starting: 'day',
+                      backward: {days: 1},
+                      duration: {days: 1}}),
+
+    <PresetDuration>({label: "current week",
+                      starting: 'week',
+                      backward: {weeks: 0},
                       duration: {weeks: 1}}),
 
-    <PresetDuration>({label: "month",
+    <PresetDuration>({label: "last week",
+                      starting: 'day',
+                      backward: {weeks: 1},
+                      duration: {weeks: 1}}),
+
+    <PresetDuration>({label: "current month",
+                      starting: 'month',
+                      backward: {months: 0},
                       duration: {months: 1}}),
 
-    <PresetDuration>({label: "3 months",
+    <PresetDuration>({label: "last month",
+                      starting: 'day',
+                      backward: {months: 1},
+                      duration: {months: 1}}),
+
+    <PresetDuration>({label: "last 3 months",
+                      starting: 'day',
+                      backward: {months: 3},
                       duration: {months: 3}}),
 
-    <PresetDuration>({label: "year",
+    <PresetDuration>({label: "current year",
+                      starting: 'year',
+                      backward: {years: 0},
                       duration: {years: 1}}),
 ]
 
@@ -47,90 +85,125 @@ const PRESETS: PresetDuration[] = [
   selector: 'daterange-selector',
   templateUrl: 'accounting/components/daterange-selector.component.html'
 })
-export class DateRangeSelectorComponent implements OnInit {
-  private _daterange_start: Date;
-  @Input()
-  set daterange_start(d: Date) {
-    let new_d: Date = this.strip_time(d);
+export class DateRangeSelectorComponent {
+  private start_date: Date;
+  private end_date: Date;
 
-    // NOTE: This is a workaround to avoid multiple fires from datepicker
-    if (!moment(new_d).isSame(this._daterange_start)) {
-      this._daterange_start = new_d;
-      this.emit_daterange();
-    }
-  }
-
-  get daterange_start(): Date {
-    return this._daterange_start;
-  }
-
-  private _daterange_end: Date;
-  @Input()
-  set daterange_end(d: Date) {
-    let new_d: Date = this.strip_time(d);
-
-    // NOTE: This is a workaround to avoid multiple fires from datepicker
-    if (!moment(new_d).isSame(this._daterange_end)) {
-      this._daterange_end = new_d;
-      this.emit_daterange();
-    }
-  }
-
-  get daterange_end(): Date {
-    return this._daterange_end;
-  }
+  // minutes since midnight
+  private start_time: number;
+  private end_time: number;
 
   readonly presets = PRESETS;
 
-  constructor(private _accounting: AccountingService) { }
+  constructor(private _accounting: AccountingService) {
+    this.preset_clicked(PRESETS[0]);
+    this.emit_daterange();
+  }
 
-  ngOnInit() {
-    this.preset_clicked(PRESETS[1]);
+  is_daterange_same(d1: DateRange, d2: DateRange): boolean {
+    return ((moment(d1.start).isSame(d2.start)) &&
+            (moment(d1.end).isSame(d2.end)));
   }
 
   is_selected(r: PresetDuration): boolean {
     let d = this.daterange_from_preset(r);
-    return ((moment(d.start).isSame(this.daterange_start)) &&
-            (moment(d.end).isSame(this.daterange_end)));
+    let c = this.daterange;
+
+    return this.is_daterange_same(d, c);
   }
 
-  private strip_time(d: Date): Date {
-    return moment(d)
-      .hour(0)
-      .minute(0)
-      .second(0)
-      .millisecond(0).toDate();
+  is_global_selected(r: PresetDuration): boolean {
+    let d = this.daterange_from_preset(r);
+    let c = this.global_daterange;
+
+    return this.is_daterange_same(d, c);
+  }
+
+  private get global_daterange(): DateRange {
+    return this._accounting.daterange;
+  }
+
+  private get global_daterange_label(): string {
+    for(let r of this.presets) {
+      if(this.is_global_selected(r)) {
+        return r.label;
+      }
+    }
+    return "Custom";
   }
 
   private emit_daterange(): void {
-    let d_end: Date = moment(this.daterange_end).add(1, 'd').toDate();
-
-    let r = <DateRange>({
-      start: this.daterange_start,
-      end: d_end
-    });
+    let r = this.daterange;
     this._accounting.daterange = r;
   }
 
-  private daterange_from_preset(r: PresetDuration): DateRange {
-    let now = moment()
-      .hour(0)
-      .minute(0)
-      .second(0)
-      .millisecond(0);
+  private get daterange(): DateRange {
+    let start = moment(this.start_date)
+      .clone()
+      .minutes(this.start_time)
+      .toDate();
 
-    let duration = moment.duration(r.duration);
-    let end = now.toDate();
-    let start = now.subtract(duration).toDate();
+    let end = moment(this.end_date)
+      .clone()
+      .minutes(this.end_time)
+      .toDate();
+
     return <DateRange>({
       start: start,
       end: end
     });
   }
 
+  private set daterange(r: DateRange) {
+    let start = r.start;
+    let end = r.end;
+
+    this.start_date = moment(start).hours(0).minutes(0).toDate();
+    this.end_date = moment(end).hours(0).minutes(0).toDate();
+
+    this.start_time = moment(start).hours()*60 + moment(start).minutes();
+    this.end_time = moment(end).hours()*60 + moment(end).minutes();
+  }
+
+  private daterange_from_preset(r: PresetDuration): DateRange {
+    let now = moment()
+      .clone()
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    let backward = r.backward;
+    let starting = r.starting;
+
+    // Week starts on Monday!!!
+    if(r.starting == 'week') {
+      starting = 'isoWeek';
+    }
+
+    let start = now
+      .clone()
+      .subtract(backward)
+      .startOf(starting);
+
+    let end = start
+      .clone()
+      .add(r.duration);
+
+    return <DateRange>({
+      start: start.toDate(),
+      end: end.toDate()
+    });
+  }
+
   preset_clicked(r: PresetDuration): void {
-    let d = this.daterange_from_preset(r);
-    this.daterange_start = d.start;
-    this.daterange_end = d.end;
+    this.daterange = this.daterange_from_preset(r);
   };
+
+  ok_clicked() {
+    this.emit_daterange();
+  }
+
+  cancel_clicked() {
+    this.daterange = this.global_daterange;
+  }
 }
