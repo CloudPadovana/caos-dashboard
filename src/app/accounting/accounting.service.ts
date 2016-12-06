@@ -226,17 +226,16 @@ export class AccountingService {
           let ts = a1.map((a: Aggregate) => a.timestamp).sort(
             (d1: Date, d2: Date) => ( d1.valueOf() - d2.valueOf() ));
 
+          let A: Aggregate[] = [];
           for (let a of a1) {
             let v2 = a2.find((atmp: Aggregate) => moment(a.timestamp).isSame(atmp.timestamp));
             if(v2) {
               a.sum = a.sum / v2.sum;
-            } else {
-              a.sum = a.sum / 0;
+              A.push(a);
             }
           }
-          return a1;
+          return A;
         });
-
 
       obs.push(req.map(
         (a: Aggregate[]) => {
@@ -274,17 +273,18 @@ export class AccountingService {
       let ts = a1.map((a: Aggregate) => a.timestamp).sort(
         (d1: Date, d2: Date) => ( d1.valueOf() - d2.valueOf() ));
 
+      let A: Aggregate[] = [];
       for (let a of a1) {
-        let v1 = a.sum;
-        let v2 = a2.find((atmp: Aggregate) => moment(a.timestamp).isSame(atmp.timestamp)).sum;
-        let v = v1/v2;
-
-        a.sum = v;
+        let v2 = a2.find((atmp: Aggregate) => moment(a.timestamp).isSame(atmp.timestamp));
+        if(v2) {
+          a.sum = a.sum / v2.sum;
+          A.push(a);
+        }
       }
 
       return <ProjectAggregate>({
         project: <Project>({name: "OVERALL"}),
-        values: a1
+        values: A
       });
     });
   }
