@@ -142,13 +142,15 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
     let chart = this.options.chart;
 
     if(metric.name === 'efficiency') {
-      chart.y = (d: Aggregate) => d.sum*100;
+      chart.y = (d: Aggregate) => d.sum;
       chart.yAxis.axisLabel = '%';
-      chart.tooltip.valueFormatter = (d: any) => d3.format('.05s')(d) + ' %';
+      chart.yAxis.tickFormat = (d: number) => d3.format('.01%')(d);
+      chart.tooltip.valueFormatter = (d: number) => d3.format('.02%')(d);
     } else {
       chart.y = (d: Aggregate) => d.sum/3600;
       chart.yAxis.axisLabel = 'hours';
-      chart.tooltip.valueFormatter = (d: any) => d3.format('.05s')(d) + ' hours';
+      chart.yAxis.tickFormat = (d: number) => d3.format('.02s')(d);
+      chart.tooltip.valueFormatter = (d: number) => d3.format('.05s')(d) + ' hours';
     }
   }
 
