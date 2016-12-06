@@ -50,7 +50,7 @@ export class GranularitySelectorComponent implements OnInit {
   constructor(private _accounting: AccountingService) { }
 
   ngOnInit() {
-    this.preset_clicked(PRESETS[1]);
+    this.preset_clicked(PRESETS[0]);
   }
 
   private granularity_from_preset(r: PresetDuration): Granularity {
