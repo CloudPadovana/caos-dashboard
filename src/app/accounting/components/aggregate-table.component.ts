@@ -64,9 +64,7 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
 
   update(d: Data) {
     // this can be 0, so that percent could be NaN
-    let overall_value = d.overall.values
-      .map((a: Aggregate) => a.sum)
-      .reduce((acc, cur) => acc + cur, 0);
+    let overall_value = d.overall.aggregate.sum;
 
     let overall = <Row>({
       project: d.overall.project,
@@ -76,9 +74,7 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
     this.overall = overall;
 
     this.rows = d.aggregates.map((pa: ProjectAggregate) => {
-      let value = pa.values
-        .map((a: Aggregate) => a.sum)
-        .reduce((acc, cur) => acc + cur, 0);
+      let value = pa.aggregate.sum || 0;
 
       return <Row>({
         project: pa.project,
