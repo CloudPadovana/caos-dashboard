@@ -54,14 +54,6 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
     this._subscription.unsubscribe();
   }
 
-  get table_enabled(): boolean {
-    if(!this._accounting.metric) { return false }
-
-    let m = this._accounting.metric;
-    if(m.name === 'efficiency') { return false }
-    return true;
-  }
-
   update(d: Data) {
     // this can be 0, so that percent could be NaN
     let overall_value = d.overall.aggregate.sum;
@@ -87,6 +79,21 @@ export class AggregateTableComponent implements OnInit, OnDestroy {
       // If we were sorting, resort the data
       this.sort(this._sorting_field, this._sorting_ascending);
     }
+  }
+
+  get value_label(): string {
+    if(this._accounting.metric && this._accounting.metric.name === 'efficiency') {
+      return 'Efficiency [%]';
+    }
+
+    return 'Sum [hours]';
+  }
+
+  value(n: number): number {
+    if(this._accounting.metric && this._accounting.metric.name === 'efficiency') {
+      return n*100;
+    }
+    return n/3600;
   }
 
   _sorting_field: string;
