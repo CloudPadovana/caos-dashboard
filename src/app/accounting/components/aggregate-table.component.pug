@@ -31,14 +31,13 @@ table.table.table-bordered.table-hover
           i.fa.fa-chevron-up
 
     th
-      | Sum [hours]
+      | {{ value_label }}
       .btn-group.pull-right
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('value', true)", [class.active]="is_sorting('value', true)")
           i.fa.fa-chevron-down
 
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('value', false)", [class.active]="is_sorting('value', false)")
           i.fa.fa-chevron-up
-
 
     th
       | Ratio
@@ -52,10 +51,10 @@ table.table.table-bordered.table-hover
   tbody
     tr
       td.font-weight-bold {{ overall?.project.name }}
-      td.font-weight-bold {{ overall?.value/3600 | number: '1.2-2' }}
+      td.font-weight-bold {{ value(overall?.value) | number: '1.2-2' }}
       td.font-weight-bold {{ overall?.percent | percent: '1.2-2' }}
 
     tr(*ngFor="let r of rows")
       td {{ r.project.name }}
-      td {{ r.value/3600 | number: '1.2-2' }}
+      td {{ value(r.value) | number: '1.2-2' }}
       td {{ r.percent | percent: '1.2-2' }}

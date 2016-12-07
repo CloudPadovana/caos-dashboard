@@ -24,7 +24,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-import { AccountingService, Project, Aggregate, ProjectAggregate, Data } from '../accounting.service';
+import { AccountingService, Metric, Project, Aggregate, ProjectAggregate, Data } from '../accounting.service';
 import { AggregateDownloader } from './aggregate-downloader';
 
 import * as d3 from 'd3';
@@ -43,7 +43,7 @@ interface GraphSeries {
 <nvd3 [options]="options" [data]="data"></nvd3>
 <button type="button" class="btn btn-primary btn-xs" (click)="select_all()" tooltip="Click here to select all projects.">Select all</button>
 <button type="button" class="btn btn-primary btn-xs" (click)="deselect_all()" tooltip="Click here to deselect all projects.">Deselect all</button>
-<button class="btn btn-primary btn-xs" type="button" (click)="downloader.download_CSV('data.csv')" tooltip="Download raw data in CSV format.">Download data<i class="fa fa-fw fa-download"></i></button>
+<button *ngIf="download_button_enabled" class="btn btn-primary btn-xs" type="button" (click)="downloader.download_CSV('data.csv')" tooltip="Download raw data in CSV format.">Download data<i class="fa fa-fw fa-download"></i></button>
 
 <p>To select a single project, <b>double click</b> on its marker.</p>
 `
@@ -100,6 +100,14 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
     this._subscriptions.forEach((s: Subscription) => s.unsubscribe());
   }
 
+  get download_button_enabled(): boolean {
+    if(!this._accounting.metric) { return false }
+
+    let m = this._accounting.metric;
+    if(m.name === 'efficiency') { return false }
+    return true;
+  }
+
   select_all() {
     this.data.forEach((d: GraphSeries) => d.disabled = false);
     this.update();
@@ -114,6 +122,9 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
 
+    this.update_chart_options();
+    this.nvD3.updateWithOptions(this.options);
+
     // Without this timeout, the chart is not correctly setup
     setTimeout(() => {
       this.nvD3.chart.update();
@@ -122,6 +133,25 @@ export class AggregateGraphComponent implements OnInit, OnDestroy, AfterViewInit
 
   ngAfterViewInit() {
     this.update();
+  }
+
+  private update_chart_options() {
+    let metric = this._accounting.metric;
+    if(!metric) { return; }
+
+    let chart = this.options.chart;
+
+    if(metric.name === 'efficiency') {
+      chart.y = (d: Aggregate) => d.sum;
+      chart.yAxis.axisLabel = '%';
+      chart.yAxis.tickFormat = (d: number) => d3.format('.01%')(d);
+      chart.tooltip.valueFormatter = (d: number) => d3.format('.02%')(d);
+    } else {
+      chart.y = (d: Aggregate) => d.sum/3600;
+      chart.yAxis.axisLabel = 'hours';
+      chart.yAxis.tickFormat = (d: number) => d3.format('.02s')(d);
+      chart.tooltip.valueFormatter = (d: number) => d3.format('.05s')(d) + ' hours';
+    }
   }
 
   options = {
