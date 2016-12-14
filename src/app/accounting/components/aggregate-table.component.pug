@@ -40,7 +40,10 @@ table.table.table-bordered.table-hover
           i.fa.fa-chevron-up
 
     th
-      | Ratio
+      span(tooltip="Percentage with respect to overall")
+        | Percentage
+        sup ?
+
       .btn-group.pull-right
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('percent', true)", [class.active]="is_sorting('percent', true)")
           i.fa.fa-chevron-down
