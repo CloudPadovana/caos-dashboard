@@ -25,31 +25,32 @@ table.table.table-bordered.table-hover
       | Project
       .btn-group.pull-right
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('project.name', true)", [class.active]="is_sorting('project.name', true)")
-          i.fa.fa-chevron-down
+          i.fa.fa-chevron-up
 
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('project.name', false)", [class.active]="is_sorting('project.name', false)")
-          i.fa.fa-chevron-up
+          i.fa.fa-chevron-down
 
     th
       | {{ value_label }}
       .btn-group.pull-right
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('value', true)", [class.active]="is_sorting('value', true)")
-          i.fa.fa-chevron-down
+          i.fa.fa-chevron-up
 
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('value', false)", [class.active]="is_sorting('value', false)")
-          i.fa.fa-chevron-up
+          i.fa.fa-chevron-down
 
     th
       span(tooltip="Percentage with respect to overall")
         | Percentage
-        sup ?
+        sup
+          i.fa.fa-question-circle
 
       .btn-group.pull-right
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('percent', true)", [class.active]="is_sorting('percent', true)")
-          i.fa.fa-chevron-down
+          i.fa.fa-chevron-up
 
         button.btn.btn-secondary.btn-xs(type="button", (click)="sort('percent', false)", [class.active]="is_sorting('percent', false)")
-          i.fa.fa-chevron-up
+          i.fa.fa-chevron-down
 
   tbody
     tr
