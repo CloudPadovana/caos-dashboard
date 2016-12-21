@@ -41,6 +41,14 @@ export interface Status {
   version: string;
 }
 
+export interface Tag {
+  key: string;
+  value: string;
+  extra: {
+    [key: string] : string
+  };
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -92,6 +100,9 @@ const DATE_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
 export class ApiService {
   private _token: string;
 
+  private _tags: Tag[];
+  private _tags_observable: Observable<Tag[]>;
+
   private _projects: Project[];
   private _projects_observable: Observable<Project[]>;
 
@@ -136,6 +147,44 @@ export class ApiService {
 
   set_token(token: string) {
     this._token = token;
+  }
+
+  tags(): Observable<Tag[]> {
+    if (this._tags) {
+      // if `this._tags` is available just return it as an
+      // `Observable`
+      return Observable.of(this._tags);
+    } else if (this._tags_observable) {
+      // if `this._tags_observable` is set then the request is in
+      // progress return the `Observable` for the ongoing request
+      return this._tags_observable;
+    } else {
+      // create the request, store the `Observable` for subsequent
+      // subscribers
+      this._tags_observable = this._httpget(`${SETTINGS.CAOS_API_URL}/tags`)
+        .map((r: Response) => {
+          // when the cached data is available we don't need the
+          // `Observable` reference anymore
+          this._tags_observable = null;
+          this._tags = this.parse_tags(r.json().data);
+          return this._tags;})
+        .share() // make it shared so more than one subscriber can get
+                 // the result
+        .catch(this.handle_error);
+      return this._tags_observable;
+    }
+  }
+
+  private parse_tags(data: any): Tag[] {
+    return data.map(this.parse_tag);
+  }
+
+  private parse_tag(data: any): Tag {
+    return <Tag>({
+      key: data.key,
+      value: data.value,
+      extra: data.extra
+    });
   }
 
   projects(): Observable<Project[]> {
