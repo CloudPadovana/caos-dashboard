@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +22,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+//import { platformBrowser } from '@angular/platform-browser';
+
+import { AppModule } from './app.module';
+//import { AppModuleNgFactory } from './src/app/app.module.ngfactory';
 
 // INJECT PRODUCTION CODE
 
-import { AppModule } from './app.module';
-
 platformBrowserDynamic().bootstrapModule(AppModule);
+//platformBrowser().bootstrapModuleFactory(AppModuleNgFactory);

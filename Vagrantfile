@@ -3,74 +3,46 @@
 
 ######################################################################
 #
-# Filename: Vagrantfile
-# Created: 2016-07-25T09:10:57+0200
-# Time-stamp: <2016-10-20T15:44:55cest>
+# caos-dashboard - CAOS dashboard
+#
+# Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#
 # Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
-#
-# Copyright © 2016 by Fabrizio Chiarello
-#
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ######################################################################
 
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.provider "virtualbox" do |v|
-    v.memory = 1024
-    v.cpus = 2
-    v.linked_clone = true
+  config.vm.hostname = "caos-dashboard"
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
+
+  config.vm.provider :docker do |d|
+    d.has_ssh = true
+
+    d.build_dir = "./docker"
+    d.build_args = [ "-t", "caos-dashboard" ]
+
+    d.ports = [
+      # static HTTP server
+      '3333:3333',
+
+      # WebSocket for live reload
+      '35729:35729'
+    ]
   end
-
-  config.vm.box = "centos/7"
-
-  config.vm.synced_folder ".", "/vagrant", type: "rsync",
-                          rsync__exclude: [".git/", "node_modules/", "output/", "dist/"],
-                          rsync__auto: true,
-                          rsync__verbose: true
-
-  # static HTTP server
-  config.vm.network :forwarded_port, guest: 3333, host: 3333
-
-  # WebSocket for live reload
-  config.vm.network :forwarded_port, guest: 35729, host: 35729
-
-  config.vm.hostname = "dashboard.caos.vagrant.localhost"
-
-  $script = <<SCRIPT
-sed -i 's/AcceptEnv/# AcceptEnv/' /etc/ssh/sshd_config
-localectl set-locale "LANG=en_US.utf8"
-systemctl reload sshd.service
-
-echo "cd /vagrant" >> /home/vagrant/.bash_profile
-
-yum update -v -y
-yum install -v -y epel-release git zip wget
-
-# nodejs & co
-yum install -v -y gcc-c++ make
-
-rm -f nodesource-release-el7-1.noarch.rpm
-wget https://rpm.nodesource.com/pub_6.x/el/7/x86_64/nodesource-release-el7-1.noarch.rpm
-rpm -Uvh nodesource-release-el7-1.noarch.rpm
-yum install -v -y nodejs-6.9.1
-
-npm install yarn -g
-npm install gulp -g
-SCRIPT
-
-  config.vm.provision :shell, :inline => $script
 end

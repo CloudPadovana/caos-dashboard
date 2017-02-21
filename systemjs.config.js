@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,9 +33,10 @@
     'caos/': './dist/',
     'rxjs': './node_modules/rxjs',
     'reflect-metadata': './node_modules/reflect-metadata',
-    'ng2-bootstrap': './node_modules/ng2-bootstrap',
-    'ng2-popover': './node_modules/ng2-popover',
+
+    'ngx-bootstrap': './node_modules/ngx-bootstrap',
     'moment': './node_modules/moment',
+    'primeng': './node_modules/primeng',
     'd3': './node_modules/d3',
     'nvd3': './node_modules/nvd3',
     'ng2-nvd3': './node_modules/ng2-nvd3'
@@ -80,18 +81,21 @@
       defaultExtension: 'js'
     },
 
-    'ng2-bootstrap': {
-      main: 'bundles/ng2-bootstrap.js',
+    'ngx-bootstrap': {
+      format: 'cjs',
+      main: 'bundles/ngx-bootstrap.umd.js',
       defaultExtension: 'js'
     },
 
-    'ng2-popover': {
-      main: 'index.js',
+    'primeng': {
+      main: 'primeng.js',
       defaultExtension: 'js'
     },
+
   };
 
   var angular_pkgs = [
+    'animations',
     'common',
     'compiler',
     'core',
@@ -106,7 +110,11 @@
     map['@angular/' + pkgName] = 'npm:@angular/' + pkgName + '/bundles/' + pkgName + '.umd.js';
   });
 
+  map['@angular/platform-browser/animations'] = 'npm:@angular/platform-browser/bundles/platform-browser-animations.umd.js';
+  map['@angular/animations/browser'] = 'npm:@angular/animations/bundles/animations-browser.umd.js';
+
   var config = {
+    transpiler: false,
     map: map,
     packages: packages,
     paths: paths

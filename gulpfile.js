@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,10 +37,10 @@ const ts = require('gulp-typescript');
 const uglify = require('gulp-uglify');
 
 const SRC_DIR = './src';
-const APP_SRC_DIR = SRC_DIR + '/app';
-const ASSETS_DIR = SRC_DIR + '/assets';
-const PUG_DIR = SRC_DIR + '/pug';
-const STYLE_DIR = SRC_DIR + '/style';
+const SRC_APP_DIR = SRC_DIR + '/app';
+const SRC_ASSETS_DIR = SRC_DIR + '/assets';
+const SRC_PUG_DIR = SRC_DIR + '/pug';
+const SRC_STYLE_DIR = SRC_DIR + '/style';
 
 const OUTPUT_DIR = './output/';
 const OUTPUT_JS_DIR = OUTPUT_DIR + 'js/';
@@ -83,7 +83,7 @@ gulp.task('build:js', function() {
   ].join(' + ');
 
   return gulp.src(['typings/index.d.ts',
-                   APP_SRC_DIR + '/**/*.ts'
+                   SRC_APP_DIR + '/**/*.ts'
                   ])
     .pipe(gulpif(flags.production,
                  inject.replace('// INJECT PRODUCTION CODE',
@@ -91,9 +91,9 @@ gulp.task('build:js', function() {
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(ts_project(ts.reporter.fullReporter()))
     .on('error', function (error) {
-      console.log('Typescript compilation exited with ' + error);
+      //console.log('Typescript compilation exited with ' + error);
     }).js
-  // .pipe(debug({title: "Stream contents:", minimal: true}))
+    // .pipe(debug({title: "Stream contents:", minimal: true}))
     .pipe(gulpif(flags.production, uglify()))
     .pipe(gulpif(!flags.production, sourcemaps.write('.')))
     .pipe(gulp.dest(DIST_DIR))
@@ -112,7 +112,7 @@ gulp.task('build:js', function() {
 
 gulp.task('watch:js', ['build:js'], function() {
   var watcher = gulp.watch(['./systemjs.config.js',
-                            APP_SRC_DIR + '/**/*.ts'], ['build:js']);
+                            SRC_APP_DIR + '/**/*.ts'], ['build:js']);
 
   watcher.on('change', function (event) {
     console.log('Event ' + event.type + ' on path: ' + event.path);
@@ -132,7 +132,7 @@ gulp.task('build:css', function() {
     };
   }
 
-  return gulp.src(STYLE_DIR + '/style.scss')
+  return gulp.src(SRC_STYLE_DIR + '/style.scss')
     .pipe(sourcemaps.init())
     .pipe(sass(sass_opts)
           .on('error', sass.logError))
@@ -142,7 +142,7 @@ gulp.task('build:css', function() {
 });
 
 gulp.task('watch:css', ['build:css'], function() {
-  var watcher = gulp.watch(STYLE_DIR + '/**/*.scss', ['build:css']);
+  var watcher = gulp.watch(SRC_STYLE_DIR + '/**/*.scss', ['build:css']);
 
   watcher.on('change', function (event) {
     console.log('Event ' + event.type + ' on path: ' + event.path);
@@ -192,7 +192,7 @@ gulp.task('watch:assets', ['build:assets'], function() {
 });
 
 gulp.task('build:html:components', function() {
-  return gulp.src(APP_SRC_DIR + '/**/*.pug', { base: APP_SRC_DIR })
+  return gulp.src(SRC_APP_DIR + '/**/*.pug', { base: SRC_APP_DIR })
     .pipe(pug({
       doctype: 'html',
       pretty: !flags.production
@@ -203,7 +203,7 @@ gulp.task('build:html:components', function() {
 });
 
 gulp.task('build:html', function() {
-  return gulp.src(PUG_DIR + '/**/[^_]*.pug')
+  return gulp.src(SRC_PUG_DIR + '/**/[^_]*.pug')
     .pipe(pug({
       doctype: 'html',
       pretty: !flags.production
@@ -214,7 +214,7 @@ gulp.task('build:html', function() {
 });
 
 gulp.task('watch:html:components', ['build:html:components'], function() {
-  var watcher = gulp.watch(APP_SRC_DIR + '/**/*.pug', ['build:html:components']);
+  var watcher = gulp.watch(SRC_APP_DIR + '/**/*.pug', ['build:html:components']);
 
   watcher.on('change', function (event) {
     console.log('Event ' + event.type + ' on path: ' + event.path);
@@ -222,7 +222,7 @@ gulp.task('watch:html:components', ['build:html:components'], function() {
 });
 
 gulp.task('watch:html', ['build:html'], function() {
-  var watcher = gulp.watch(PUG_DIR + '/**/*.pug', ['build:html']);
+  var watcher = gulp.watch(SRC_PUG_DIR + '/**/*.pug', ['build:html']);
 
   watcher.on('change', function (event) {
     console.log('Event ' + event.type + ' on path: ' + event.path);
@@ -273,7 +273,9 @@ gulp.task('server', ['build'], function () {
         port: 35729},
       proxies: [{
         source: '/api/v1',
-        target: 'https://10.0.2.2:4000/api/v1',
+        //target: 'http://10.0.2.2:4000/api/v1',
+        target: 'http://172.17.0.1:4000/api/v1',
+        //target: 'https://10.0.2.2:4000/testing/api/v1',
         options: {
           headers: {
             'Access-Control-Allow-Origin': '*'}}

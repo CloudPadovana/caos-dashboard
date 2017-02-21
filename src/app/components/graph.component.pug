@@ -1,0 +1,54 @@
+//-
+//- caos-dashboard - CAOS dashboard
+//-
+//- Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+//-
+//- Licensed under the Apache License, Version 2.0 (the "License");
+//- you may not use this file except in compliance with the License.
+//- You may obtain a copy of the License at
+//-
+//-     http://www.apache.org/licenses/LICENSE-2.0
+//-
+//- Unless required by applicable law or agreed to in writing, software
+//- distributed under the License is distributed on an "AS IS" BASIS,
+//- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//- See the License for the specific language governing permissions and
+//- limitations under the License.
+//-
+//-
+//- Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
+//-
+
+.card
+  .card-header
+    .container
+      .row.justify-content-center
+        .col-3(*ngIf="show_set_selector")
+          label(for="set_selector") Graph:
+          p-dropdown#set_selector([options]="sets", (onChange)="selected_set=$event.value")
+        .col-3(*ngIf="show_daterange_selector")
+          label(for="daterange_selector") Date range:
+          daterange#daterange_selector((rangeChange)="date_range=$event")
+        .col-3(*ngIf="show_granularity_selector")
+          label(for="granularity_selector") Granularity:
+          p-dropdown#granularity_selector([options]="granularities", (onChange)="selected_granularity=$event.value")
+
+  .card-block
+    div(*ngIf="fetching")
+      .progress
+        .progress-bar([style.width.%]="fetching_percent")
+      .row.justify-content-center
+        | Loading data: {{ fetching_percent | number:'1.2-2' }}%
+
+    nvd3([options]="options", [data]="data")
+
+    .btn-toolbar(role="toolbar")
+      .btn-group.mr-2(role="group")
+        button.btn.btn-secondary(type="button", (click)="select_all()", tooltip="Click here to select all all series.") Select all
+        button.btn.btn-secondary(type="button", (click)="deselect_all()", tooltip="Click here to deselect all series.") Deselect all
+      // .btn-group(role="group")
+      //   button.btn.btn-secondary(type="button", (click)="downloader.download_CSV('data.csv')", tooltip="Download raw data in CSV format.")
+      //     | Download data
+      //     i.fa.fa-fw.fa-download
+
+    p To select a single project, <b>double click</b> on its marker.

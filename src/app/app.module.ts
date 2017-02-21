@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 import { NgModule, LOCALE_ID }  from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { SETTINGS } from './settings';
 import { CAOS_ROUTING, CAOS_ROUTING_PROVIDERS } from './app.routing';
@@ -34,21 +35,27 @@ import { AuthGuard } from './auth.guard';
 
 import { LoginComponent } from './login.component';
 import { DashboardComponent } from './dashboard.component';
+import { AccountingComponent } from './accounting.component';
+import { ProjectsComponent } from './projects.component';
+import { HypervisorsComponent } from './hypervisors.component';
 
 import { ComponentsModule } from './components/components.module';
-import { AccountingModule } from './accounting/accounting.module';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     DashboardComponent,
+    AccountingComponent,
+    ProjectsComponent,
+    HypervisorsComponent,
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
+
     CAOS_ROUTING,
     ComponentsModule,
-    AccountingModule,
   ],
   providers: [
     { provide: LOCALE_ID, useValue: SETTINGS.LOCALE },

@@ -1,7 +1,7 @@
 //-
 //- caos-dashboard - CAOS dashboard
 //-
-//- Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+//- Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //-
 //- Licensed under the Apache License, Version 2.0 (the "License");
 //- you may not use this file except in compliance with the License.
@@ -35,6 +35,11 @@ head
   script(src='js/env.js')
   script(src='js/bundle.js')
 
+  script(src="https://code.jquery.com/jquery-3.1.1.slim.min.js", integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n", crossorigin="anonymous")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js", integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb", crossorigin="anonymous")
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js", integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn", crossorigin="anonymous")
+
+  link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css", integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ", crossorigin="anonymous")
   link(rel='stylesheet' href='css/style.css')
 
 body
@@ -44,14 +49,16 @@ body
     var map = {
       'rxjs': 'npm:rxjs',
       'reflect-metadata': 'npm:reflect-metadata',
-      'ng2-bootstrap': 'npm:ng2-bootstrap',
-      'ng2-popover': 'npm:ng2-popover',
+
+      'ngx-bootstrap': 'npm:ngx-bootstrap',
+      'primeng': 'npm:primeng',
       'moment': 'npm:moment',
       'd3': 'npm:d3',
       'nvd3': 'npm:nvd3',
       'ng2-nvd3': 'npm:ng2-nvd3',
     };
     var angular_pkgs = [
+      'animations',
       'common',
       'compiler',
       'core',
@@ -65,23 +72,36 @@ body
     angular_pkgs.forEach(function(pkgName) {
       map['@angular/' + pkgName] = 'npm:@angular/' + pkgName + '/bundles/' + pkgName + '.umd.js';
     });
+    map['@angular/platform-browser/animations'] = 'npm:@angular/platform-browser/bundles/platform-browser-animations.umd.js';
+    map['@angular/animations/browser'] = 'npm:@angular/animations/bundles/animations-browser.umd.js';
 
     System.config({
+      transpiler: false,
       map: map,
       packages: {
-        caos: {},
+        caos: { defaultExtension: 'js' },
         rxjs: { defaultExtension: 'js' },
         'reflect-metadata': { main: 'Reflect.js', defaultExtension: 'js' },
+
         moment: { main: 'min/moment-with-locales.js', defaultExtension: 'js' },
-        d3: { main: 'd3.js', defaultExtension: 'js' },
+        d3: {
+          main: 'd3.js',
+          defaultExtension: 'js',
+          format: 'global'
+        },
         nvd3: {
           main: 'build/nv.d3.js',
           defaultExtension: 'js',
+          format: 'global',
           meta: { deps: 'd3' }
         },
-        'ng2-nvd3': { main: 'build/lib/ng2-nvd3.js', defaultExtension: 'js' },
-        'ng2-bootstrap': { defaultExtension: 'js' },
-        'ng2-popover': { main: 'index.js', defaultExtension: 'js' },
+        'ng2-nvd3': {
+          main: 'build/lib/ng2-nvd3.js',
+          defaultExtension: 'js',
+          meta: { deps: 'nvd3' }
+        },
+        'ngx-bootstrap': { main: 'bundles/ngx-bootstrap.umd.js', defaultExtension: 'js', format: 'cjs' },
+        'primeng': { main: 'primeng.js', defaultExtension: 'js' },
       }
     });
 

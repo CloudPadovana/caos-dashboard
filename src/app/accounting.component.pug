@@ -1,0 +1,52 @@
+//-
+//- caos-dashboard - CAOS dashboard
+//-
+//- Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+//-
+//- Licensed under the Apache License, Version 2.0 (the "License");
+//- you may not use this file except in compliance with the License.
+//- You may obtain a copy of the License at
+//-
+//-     http://www.apache.org/licenses/LICENSE-2.0
+//-
+//- Unless required by applicable law or agreed to in writing, software
+//- distributed under the License is distributed on an "AS IS" BASIS,
+//- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//- See the License for the specific language governing permissions and
+//- limitations under the License.
+//-
+//-
+//- Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
+//-
+
+h3 Accounting
+
+form.form-inline.form-group
+  label(for="metric_selector") Metric:
+  p-dropdown#metric_selector([options]="metrics", (onChange)="selected_metric=$event.value")
+
+  label(for="daterange_selector") Date range:
+  daterange#daterange_selector((rangeChange)="date_range=$event; update()")
+
+  label(for="granularity_selector") Granularity:
+  p-dropdown#granularity_selector([options]="granularities", (onChange)="selected_granularity=$event.value")
+
+graph([config]='graph_config', [date_range]="date_range", [show_daterange_selector]="false", [show_set_selector]="false", [show_granularity_selector]="false")
+
+hr
+
+h3 Aggregates from {{ date_range?.start | date: 'y-MM-dd HH:mm Z' }} to {{ date_range?.end | date: 'y-MM-dd HH:mm Z' }}
+
+p-dataTable(#dt, [value]="projects_with_overall", tableStyleClass="table table-bordered table-hover")
+  p-column(header='Name', field='name', [sortable]="true")
+    ng-template(let-col, let-rd="rowData", pTemplate="body")
+      span(pTooltip="{{ rd.metadata.description }}")
+        | {{ rd.name }}
+
+  p-column([header]='selected_metric.label + " [" + selected_metric.unit + "]"', field='aggregate_value', [sortable]="true")
+    ng-template(let-col, let-rd="rowData", pTemplate="body")
+      | {{ rd.aggregate_value | number:'1.2-2' }}
+
+  p-column(header='Percentage w.r.t overall', field='aggregate_overall_percent', [sortable]="true")
+    ng-template(let-col, let-rd="rowData", pTemplate="body")
+      | {{ rd.aggregate_overall_percent | percent:'1.2-2' }}

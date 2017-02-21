@@ -1,7 +1,7 @@
 //-
 //- caos-dashboard - CAOS dashboard
 //-
-//- Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+//- Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //-
 //- Licensed under the Apache License, Version 2.0 (the "License");
 //- you may not use this file except in compliance with the License.
@@ -19,9 +19,28 @@
 //- Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
 //-
 
-nav.navbar.navbar-dark.bg-inverse.navbar-fixed-top.topnav
-  .collapse.navbar-toggleable-xs.clearfix.text-center
-    a.navbar-brand(routerLink="/") Home
+nav.navbar.navbar-toggleable-sm.navbar-inverse.bg-inverse.fixed-top
+  button.navbar-toggler.navbar-toggler-right(type="button", data-toggle="collapse", data-target="#nb")
+    span.navbar-toggler-icon
+
+  a.navbar-brand(routerLink="/") Home
+
+  .collapse.navbar-collapse#nb
+    ul.navbar-nav.mr-auto
+      li.nav-item
+        a.nav-link(routerLink="projects", routerLinkActive="active")
+          i.fa.fa-fw.fa-users
+          | Projects
+
+      li.nav-item(routerLinkActive="active")
+        a.nav-link(routerLink="hypervisors")
+          i.fa.fa-fw.fa-microchip
+          | Hypervisors
+
+      li.nav-item(routerLinkActive="active")
+        a.nav-link(routerLink="accounting")
+          i.fa.fa-fw.fa-area-chart
+          | Accounting
 
     ul.nav.navbar-nav.pull-right
       li.nav-item
@@ -30,11 +49,5 @@ nav.navbar.navbar-dark.bg-inverse.navbar-fixed-top.topnav
           | Log out
 
 
-nav.sidebar
-  ul.list-group
-    a.list-group-item(routerLink="accounting", routerLinkActive="active")
-      i.fa.fa-fw.fa-area-chart
-      | Accounting
-
-.main-container
+.container-fluid.main-container
   router-outlet

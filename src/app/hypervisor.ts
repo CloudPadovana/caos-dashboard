@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,26 +21,50 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import moment from 'moment';
 
-import { AccountingService, DateRange } from './accounting.service';
+export const CAOS_HYPERVISOR_TAG_KEY = "hypervisor";
 
-@Component({
-  templateUrl: 'accounting/accounting.component.html'
-})
-export class AccountingComponent implements OnInit, OnDestroy {
-  daterange: DateRange;
+export interface IHypervisor {
+  hostname: string;
 
-  _subscription: Subscription;
-  constructor(private _accounting: AccountingService) {}
+  metadata: {
+    last_updated: Date;
 
-  ngOnInit() {
-    this._subscription = this._accounting.daterange$
-      .subscribe((d: DateRange) => this.daterange = d);
+    type: string;
+
+    status: string;
+    state: string;
+    cores: number;
+    ip: string;
+
+    disabled_reason: string;
+  }
+}
+
+export class Hypervisor implements IHypervisor {
+  hostname: string;
+
+  metadata: {
+    last_updated: Date;
+
+    type: string;
+
+    status: string;
+    state: string;
+    cores: number;
+    ip: string;
+
+    disabled_reason: string;
   }
 
-  ngOnDestroy() {
-    this._subscription.unsubscribe();
+  constructor(kwargs?: IHypervisor) {
+    if(kwargs) {
+      return Object.assign(this, kwargs);
+    }
+  }
+
+  get last_updated(): string {
+    return moment(this.metadata.last_updated).fromNow();
   }
 }

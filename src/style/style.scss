@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,33 +23,31 @@
 
 $topnav-background-color: #222;
 
+@import "primeng/resources/primeng";
+@import "primeng/resources/themes/bootstrap/theme";
+
 @import "bootstrap/scss/bootstrap";
 @import "font-awesome/scss/font-awesome";
 @import "nvd3/build/nv.d3";
 
 @import "./loader";
-@import "./topnav";
-@import "./sidebar";
+/* @import "./topnav"; */
+/* @import "./sidebar"; */
 @import "./login";
 @import "./range";
 
 .main-container {
-  margin: 50px 0 0 225px;
-  padding: 10px;
-  position: relative;
-  z-index: 1;
+  margin: 25px 0 0 0;
+  //padding: 50px;
+  /* position: relative; */
+  /* z-index: 1; */
+  padding: 3rem 1.5rem;
+  /*   padding-top: 3rem; */
+  /*   padding-right: 1.5rem; */
+  /*   padding-bottom: 3rem; */
+  /*   padding-left: 1.5rem; */
+  //text-align: center;
 }
-
-/* #toggle-sidebar { */
-/*     position: fixed; */
-/*     top: 0px; */
-/*     left: 5px; */
-/*     color: #FFF; */
-/*     background: #222; */
-/*     font-size: 23px; */
-/*     z-index: 3; */
-/*     display: none; */
-/* } */
 
 .btn:focus {
   outline: 3px auto #FFF;
@@ -74,6 +72,9 @@ a:hover {
   @include button-size($btn-padding-y-xs, $btn-padding-x-xs, $font-size-xs, $btn-border-radius-xs);
 }
 
+.progress {
+  background-color: #ccc;
+}
 
 // From http://stackoverflow.com/questions/26638215/how-to-replace-glyphicons-with-fontawesome-in-bootstrap-3-without-changing-html
 .glyphicon {
@@ -86,16 +87,24 @@ a:hover {
   &.glyphicon-chevron-right {
     @extend .fa-chevron-right;
   }
+
+  &.glyphicon-chevron-down {
+    @extend .fa-chevron-down;
+  }
+
+  &.glyphicon-chevron-up {
+    @extend .fa-chevron-up;
+  }
 }
 
-daterange-selector {
+#daterange {
   datepicker {
     z-index: $zindex-popover;
 
     datepicker-inner {
       .card {
         //min-width: 100%;
-        max-width: none;
+        //max-width: none;
       }
     }
 
@@ -103,38 +112,56 @@ daterange-selector {
     monthpicker,
     daypicker {
       .btn {
-        font-size: 70%;
+        //font-size: 70%;
       }
     }
   }
 
-  .popover, .popover-content {
-    z-index: $zindex-popover;
-    max-width: none;
-  }
+  /* .popover, .popover-content { */
+  /*   z-index: $zindex-popover; */
+  /*   max-width: none; */
+  /* } */
+
+
+  /* .popover .own-class { */
+  /*   max-width: none; */
+
+  /*   //overflow-y: auto; */
+  /*   //z-index:1000; */
+  /* } */
+
+  /* .row { */
+  /*   //max-width: 100%; */
+  /* } */
 }
 
-project-selector {
-  .project-tag {
-    //    @import "bootstrap/scss/mixins/border-radius";
-    border: $border-width solid;
-    border-color: $brand-primary;
-    @include border-radius($border-radius-sm);
 
-    display: inline-block;
-    padding: .25em .4em;
-    font-size: 75%;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .dropdown {
-    width: 200px;
-  }
-
-  .scrollable-menu {
-     height: auto;
-     max-height: 200px;
-     overflow-x: hidden;
-  }
+.popover {
+  z-index: $zindex-popover;
+  max-width: none;
 }
+
+/* project-selector { */
+/*   .project-tag { */
+/*     //    @import "bootstrap/scss/mixins/border-radius"; */
+/*     border: $border-width solid; */
+/*     border-color: $brand-primary; */
+/*     @include border-radius($border-radius-sm); */
+
+/*     display: inline-block; */
+/*     padding: .25em .4em; */
+/*     font-size: 75%; */
+/*     text-align: center; */
+/*     white-space: nowrap; */
+/*   } */
+
+/*   .dropdown { */
+/*     width: 200px; */
+/*   } */
+
+/*   .scrollable-menu { */
+/*      height: auto; */
+/*      max-height: 200px; */
+/*      overflow-x: hidden; */
+/*   } */
+/* } */

@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,24 +21,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { NgModule }  from '@angular/core';
+export const CAOS_DOMAIN_TAG_KEY = "domain";
 
-import { ComponentsModule } from '../components/components.module';
-import { AccountingComponentsModule } from './components/accounting-components.module';
+export interface IDomain {
+  id: string;
 
-import { AccountingService } from './accounting.service';
-import { AccountingComponent } from './accounting.component';
-
-@NgModule({
-  declarations: [
-    AccountingComponent,
-  ],
-  imports: [
-    ComponentsModule,
-    AccountingComponentsModule,
-  ],
-  providers: [
-    AccountingService,
-  ]
-})
-export class AccountingModule {}
+  metadata: {
+    name: string;
+    description: string;
+    enabled: boolean;
+    link: string;
+  }
+}

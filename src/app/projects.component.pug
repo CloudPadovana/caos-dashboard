@@ -1,0 +1,90 @@
+//-
+//- caos-dashboard - CAOS dashboard
+//-
+//- Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+//-
+//- Licensed under the Apache License, Version 2.0 (the "License");
+//- you may not use this file except in compliance with the License.
+//- You may obtain a copy of the License at
+//-
+//-     http://www.apache.org/licenses/LICENSE-2.0
+//-
+//- Unless required by applicable law or agreed to in writing, software
+//- distributed under the License is distributed on an "AS IS" BASIS,
+//- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//- See the License for the specific language governing permissions and
+//- limitations under the License.
+//-
+//-
+//- Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
+//-
+
+h3 Global Overview (usages over last hour)
+
+graph([config]='graph_config', [show_daterange_selector]="true", [show_set_selector]="true")
+
+.row
+  .col
+    .card
+      .card-block
+        h4.card-title Active instances
+        .progress
+          .progress-bar([style.width.%]="overall.vms_active_percent", [ngClass]="usage_class(overall.vms_active_percent)")
+            | {{ overall.vms_active_percent | number:'1.2-2' }}%
+        | {{ overall.vms_active }} of {{ overall.vms_total }}
+
+  .col
+    .card
+      .card-block
+        h4.card-title VCPU Usage [hours]
+        .progress
+          .progress-bar([style.width.%]="overall.vcpus_usage_percent", [ngClass]="usage_class(overall.vcpus_usage_percent)")
+            | {{ overall.vcpus_usage_percent | number:'1.2-2' }}%
+        | {{ overall.vcpus_usage / 3600 | number:'1.2-2' }} of {{ overall.vcpus_total }}
+
+  .col
+    .card
+      .card-block
+        h4.card-title VRAM Usage [GB]
+        .progress
+          .progress-bar([style.width.%]="overall.memory_usage_percent", [ngClass]="usage_class(overall.memory_usage_percent)")
+            | {{ overall.memory_usage_percent | number:'1.2-2' }}%
+        | {{ overall.memory_usage / 3600 / 1e9 | number:'1.2-2' }} of {{ overall.memory_total / 1e9 }}
+
+hr
+h3 Projects usages over last hour
+
+p-dataTable(#dt, [value]="projects", tableStyleClass="table", expandableRows="true")
+  p-column(expander="true", [style]="{'width':'32px'}")
+
+  p-column(header='Name', field='metadata.name', [sortable]="true")
+    ng-template(let-col, let-rd="rowData", pTemplate="body")
+      span(pTooltip="{{ rd.metadata.description }}")
+        | {{ rd.metadata.name }}
+
+  p-column(header='Last Updated', field='last_updated', [sortable]="true")
+
+  p-column(header="Instances")
+    ng-template(let-col, let-rd="rowData", pTemplate="body")
+      .progress
+        .progress-bar([style.width.%]="rd.vms_active_percent", [ngClass]="usage_class(rd.vms_active_percent)")
+          | {{ rd.vms_active_percent | number:'1.2-2' }}%
+      | {{ rd.vms_active }} of {{ rd.vms_total }}
+
+
+  p-column(header="VCPU Usage [hours]")
+    ng-template(let-col, let-rd="rowData", pTemplate="body")
+      .progress
+        .progress-bar([style.width.%]="rd.vcpus_usage_percent", [ngClass]="usage_class(rd.vcpus_usage_percent)")
+          | {{ rd.vcpus_usage_percent | number:'1.2-2' }}%
+      | {{ rd.vcpus_usage / 3600 | number:'1.2-2' }} of {{ rd.vcpus_total }}
+
+  p-column(header="VRAM Usage [GB]")
+    ng-template(let-col, let-rd="rowData", pTemplate="body")
+      .progress
+        .progress-bar([style.width.%]="rd.memory_usage_percent", [ngClass]="usage_class(rd.memory_usage_percent)")
+          | {{ rd.memory_usage_percent | number:'1.2-2' }}%
+      | {{ rd.memory_usage / 3600 / 1e9 | number:'1.2-2' }} of {{ rd.memory_total / 1e9 }}
+
+  ng-template(let-project, pTemplate="rowexpansion")
+    graph([config]='graph_config_for_project[project.id]')

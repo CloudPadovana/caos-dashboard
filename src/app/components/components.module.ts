@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,22 +27,41 @@ import { HttpModule  } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-import { Ng2BootstrapModule } from 'ng2-bootstrap/ng2-bootstrap';
-import { PopoverModule } from 'ng2-popover';
-
+import { Ng2BootstrapModule } from 'ngx-bootstrap';
+import * as d3 from 'd3';
+import 'nvd3';
 import { nvD3 } from 'ng2-nvd3';
+
+import { DateRangeComponent } from './daterange.component';
+import { GraphComponent } from './graph.component';
+
+import {
+  DataTableModule,
+  DropdownModule,
+  MultiSelectModule,
+  SelectButtonModule,
+  TooltipModule,
+} from 'primeng/primeng';
 
 @NgModule({
   declarations: [
     nvD3,
+
+    DateRangeComponent,
+    GraphComponent,
   ],
   imports: [
     CommonModule,
     HttpModule,
     FormsModule,
     RouterModule,
-    Ng2BootstrapModule,
-    PopoverModule,
+    Ng2BootstrapModule.forRoot(),
+
+    DataTableModule,
+    DropdownModule,
+    MultiSelectModule,
+    SelectButtonModule,
+    TooltipModule,
   ],
   exports: [
     CommonModule,
@@ -50,8 +69,16 @@ import { nvD3 } from 'ng2-nvd3';
     FormsModule,
     RouterModule,
     Ng2BootstrapModule,
-    PopoverModule,
     nvD3,
+
+    DataTableModule,
+    DropdownModule,
+    MultiSelectModule,
+    SelectButtonModule,
+    TooltipModule,
+
+    DateRangeComponent,
+    GraphComponent,
   ]
 })
 export class ComponentsModule {}

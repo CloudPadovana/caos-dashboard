@@ -1,7 +1,7 @@
 //-
 //- caos-dashboard - CAOS dashboard
 //-
-//- Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+//- Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //-
 //- Licensed under the Apache License, Version 2.0 (the "License");
 //- you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 //- Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
 //-
 
-.login-page.container-fluid
+.container-fluid.login-page
   .row
-    .col-xs-4
-    .col-xs-4
+    .col-md-4
+    .col-md-4
       h1 CAOS
 
       .alert.alert-danger(role="alert", *ngIf="error_message") {{ error_message }}
@@ -37,4 +37,3 @@
 
 
         button.btn(type="submit") Log in
-    .col-xs-4

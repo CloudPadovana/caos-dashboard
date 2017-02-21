@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ import { AuthGuard } from './auth.guard';
 import { LoginComponent } from './login.component';
 
 import { DashboardComponent } from './dashboard.component';
-import { AccountingComponent }  from './accounting/accounting.component';
+import { AccountingComponent }  from './accounting.component';
+import { ProjectsComponent } from './projects.component';
+import { HypervisorsComponent } from './hypervisors.component';
 
 const CAOS_ROUTES: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -37,8 +39,10 @@ const CAOS_ROUTES: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'accounting' },
+      { path: '', pathMatch: 'full', redirectTo: 'projects' },
 
+      { path: 'projects', component: ProjectsComponent },
+      { path: 'hypervisors', component: HypervisorsComponent },
       { path: 'accounting', component: AccountingComponent },
     ]
   },
