@@ -75,6 +75,14 @@ class Hypervisor extends BaseHypervisor implements IHypervisor {
   load_10m: number = 0;
   load_15m: number = 0;
 
+  constructor(kwargs?: IHypervisor) {
+    super(kwargs);
+
+    if(kwargs) {
+      return Object.assign(this, kwargs);
+    }
+  }
+
   get cpus_used_percent(): number {
     return this.vcpus_used / this.cpus_total * 100.0;
   }

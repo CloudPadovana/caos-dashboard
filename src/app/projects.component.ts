@@ -65,6 +65,14 @@ class Project extends BaseProject implements IProject {
   memory_total: number = 0;
   memory_usage: number = 0;
 
+  constructor(kwargs?: IProject) {
+    super(kwargs);
+
+    if(kwargs) {
+      return Object.assign(this, kwargs);
+    }
+  }
+
   get vcpus_usage_percent(): number {
     return this.vcpus_usage / 3600 / this.vcpus_total * 100.0;
   }
