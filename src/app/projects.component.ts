@@ -69,7 +69,7 @@ class Project extends BaseProject implements IProject {
     super(kwargs);
 
     if(kwargs) {
-      return Object.assign(this, kwargs);
+      return (<any>Object).assign(this, kwargs);
     }
   }
 

@@ -42,7 +42,7 @@ export class Metric implements IMetric {
 
   constructor(kwargs?: IMetric) {
     if(kwargs) {
-      return Object.assign(this, kwargs);
+      return (<any>Object).assign(this, kwargs);
     }
   }
 }
