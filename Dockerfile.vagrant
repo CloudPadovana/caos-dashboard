@@ -21,17 +21,19 @@
 #
 ######################################################################
 
-FROM buildpack-deps:jessie
+FROM buildpack-deps:stretch
 
 LABEL maintainer "Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>"
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get upgrade -y && \
     apt-get install --no-install-recommends -y \
             apt-transport-https \
             apt-utils \
             build-essential \
             curl \
             dnsutils \
+            git \
             lsb-release \
             net-tools \
             openssh-server \
@@ -55,18 +57,9 @@ RUN echo "vagrant:vagrant" | chpasswd
 # setup SUDO
 RUN echo "vagrant ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# provisioning
-RUN curl -sS https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
-    echo "deb https://deb.nodesource.com/node_7.x jessie main" > /etc/apt/sources.list.d/nodesource.list
-
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    apt-get install -y nodejs yarn
-
-RUN yarn global add gulp-cli
-
 RUN echo "cd /vagrant" >> /home/vagrant/.profile
 
-CMD ["/usr/sbin/sshd", "-D"]
+ENV LANG=C.UTF-8
+
+# Based on https://github.com/moby/moby/issues/2569#issuecomment-27973910
+CMD ["/bin/sh", "-c", "env | grep '^LANG\\|_' >> /etc/environment && /usr/sbin/sshd -D"]
