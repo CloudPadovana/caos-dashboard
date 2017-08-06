@@ -49,6 +49,7 @@ interface Series {
   key: string;
   values: Sample[];
   disabled: boolean;
+  strokeWidth: number;
 }
 
 export interface GraphTagConfig {
@@ -57,14 +58,141 @@ export interface GraphTagConfig {
 }
 
 export interface GraphSeriesConfig {
+  label(): string;
+  parse_data(data: any): Array<Sample>;
+  graphql_query(): string;
+  graphql_variables(): any;
+  graphql_from_variable_name(): string;
+  graphql_to_variable_name(): string;
+  graphql_granularity_variable_name(): string;
+}
+
+export interface IAggregateSeriesParams {
   label?: string;
   metric: Metrics.IMetric;
   period: number;
-  granularity?: number;
   tags?: GraphTagConfig[];
   tag?: GraphTagConfig;
   aggregate?: string;
   downsample?: string;
+  granularity?: number;
+}
+
+export class AggregateSeries implements GraphSeriesConfig {
+  params: IAggregateSeriesParams;
+
+  constructor(kwargs: IAggregateSeriesParams) {
+    this.params = kwargs;
+  }
+
+  label(): string {
+    return this.params.label || this.params.metric.label;
+  }
+
+  parse_data(data: any): Array<Sample> {
+    return data.aggregate.map(
+      (sample: Sample) => <Sample>({
+        ts: new Date(sample.unix_ts * 1000),
+        v: sample.v * this.params.metric.scale
+      }));
+  }
+
+  graphql_query(): string {
+    return `
+query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int, $function: AggregateFunction, $downsample: AggregateFunction) {
+  aggregate(series: $series, from: $from, to: $to, granularity: $granularity, function: $function, downsample: $downsample) {
+    unix_ts: unix_timestamp
+    v: value
+  }
+}`;
+  }
+
+  graphql_from_variable_name() { return "from"; }
+  graphql_to_variable_name() { return "to"; }
+  graphql_granularity_variable_name() { return "granularity"; }
+
+  graphql_variables(): {} {
+    return {
+      series: {
+        metric: {
+          name: this.params.metric.name
+        },
+        period: this.params.period,
+        tag: this.params.tag,
+        tags: this.params.tags,
+      },
+
+      function: this.params.aggregate || "SUM",
+      downsample: this.params.downsample || "NONE"
+    };
+  }
+}
+
+export interface IExpressionSeriesParams {
+  label?: string;
+  expression: string;
+  terms: { [name: string] : IAggregateSeriesParams };
+}
+
+export class ExpressionSeries implements GraphSeriesConfig {
+  params: IExpressionSeriesParams;
+
+  constructor(kwargs: IExpressionSeriesParams) {
+    this.params = kwargs;
+  }
+
+  label(): string {
+    return this.params.label;
+  }
+
+  parse_data(data: any): Array<Sample> {
+    return data.expression.map(
+      (sample: Sample) => <Sample>({
+        ts: new Date(sample.unix_ts * 1000),
+        v: sample.v // * this.params.metric.scale
+      }));
+  }
+
+  graphql_query(): string {
+    return `
+query($from: Datetime!, $to: Datetime!, $granularity: Int, $expression: String!, $terms: [ExpressionTerm]) {
+  expression(from: $from, to: $to, granularity: $granularity, expression: $expression, terms: $terms) {
+    unix_ts: unix_timestamp
+    v: value
+  }
+}`;
+  }
+
+  graphql_from_variable_name() { return "from"; }
+  graphql_to_variable_name() { return "to"; }
+  graphql_granularity_variable_name() { return "granularity"; }
+
+  graphql_variables(): {} {
+    let terms = [];
+    for(let k in this.params.terms) {
+      let t = this.params.terms[k];
+
+      terms.push({
+        name: k,
+
+        series: {
+          metric: {
+            name: t.metric.name
+          },
+          period: t.period,
+          tag: t.tag,
+          tags: t.tags,
+        },
+        function: t.aggregate || "SUM",
+        downsample: t.downsample || "NONE"
+      });
+    }
+
+    return {
+      expression: this.params.expression,
+      terms: terms
+    };
+  }
 }
 
 export interface GraphSetConfig {
@@ -86,7 +214,7 @@ const UTC_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
   selector: 'graph',
   templateUrl: 'components/graph.component.html'
 })
-export class GraphComponent {
+export class GraphComponent implements AfterViewInit {
   @ViewChild(nvD3) nvD3: nvD3;
   //downloader: AggregateDownloader;
 
@@ -127,6 +255,7 @@ export class GraphComponent {
 
   granularities: SelectItem[] = [];
   private _selected_granularity: moment.MomentInputObject;
+  @Input()
   set selected_granularity(g: moment.MomentInputObject) {
     this._selected_granularity = g;
     this.update();
@@ -175,6 +304,11 @@ export class GraphComponent {
     this.selected_granularity = this.granularities[0].value;
   }
 
+  ngAfterViewInit() {
+    // done here to avoid ExpressionChangedAfterItHasBeenCheckedError
+    this.fetching = undefined;
+  }
+
   update() {
     if(!this.config) { return };
     if(!this.selected_set) { return };
@@ -184,8 +318,13 @@ export class GraphComponent {
     this.fetch_data()
       .subscribe((data: Series[]) => {
         this.fetching = undefined;
+
+        // drop old data
         this.data.splice(0, this.data.length);
+
+        // store new data
         this.data = data;
+
         this.refresh_graph();
       });
   }
@@ -202,29 +341,12 @@ export class GraphComponent {
     let req: Observable<Series>;
 
     for(let s of series) {
-      let query = `
-query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int, $function: AggregateFunction, $downsample: AggregateFunction) {
-  aggregate(series: $series, from: $from, to: $to, granularity: $granularity, function: $function, downsample: $downsample) {
-    unix_ts: unix_timestamp
-    v: value
-  }
-}`;
+      let query = s.graphql_query();
 
-      let variables = {
-        from: UTC_FORMAT(this.date_range.start),
-        to: UTC_FORMAT(this.date_range.end),
-        series: {
-          metric: {
-            name: s.metric.name
-          },
-          period: s.period,
-          tag: s.tag,
-          tags: s.tags,
-        },
-        granularity: s.granularity || granularity,
-        function: s.aggregate || "SUM",
-        downsample: s.downsample || "NONE",
-      };
+      let variables = s.graphql_variables();
+      variables[s.graphql_from_variable_name()] = UTC_FORMAT(this.date_range.start);
+      variables[s.graphql_to_variable_name()] = UTC_FORMAT(this.date_range.end);
+      variables[s.graphql_granularity_variable_name()] = granularity;
 
       req = this._api.graphql_query<QueryResult>({
         query:  query,
@@ -236,12 +358,9 @@ query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int
 
           return <Series>({
             disabled: false,
-            key: s.label || s.metric.label,
-            values: data.aggregate.map(
-              (sample: Sample) => <Sample>({
-                ts: new Date(sample.unix_ts * 1000),
-                v: sample.v * s.metric.scale
-              }))
+            strokeWidth: 3,
+            key: s.label(),
+            values: s.parse_data(data)
           });
         });
 
@@ -276,13 +395,8 @@ query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int
 
   private update_chart_options() {
     let s = this.selected_set;
-    let metric =  s.series[0].metric;
-
     let chart = this.options.chart;
 
-    chart.yAxis.axisLabel = metric.unit;
-    chart.tooltip.valueFormatter = metric.value_formatter;
-    chart.yAxis.tickFormat = metric.tick_formatter;
   }
 
   time_format(): string {
@@ -355,7 +469,7 @@ query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int
       useInteractiveGuideline: false,
       interactive: true,
       tooltip: {
-        valueFormatter: function(d: any) {
+        valueFormatter: function(d: any, i: any) {
           return d3.format('.05s')(d);
         },
         headerFormatter: function (d: any) {

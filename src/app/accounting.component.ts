@@ -37,7 +37,7 @@ import {
 import { CAOS_HYPERVISOR_TAG_KEY } from './hypervisor';
 
 import { DateRange } from './components/daterange.component';
-import { GraphConfig } from './components/graph.component';
+import { GraphConfig, AggregateSeries, ExpressionSeries } from './components/graph.component';
 
 interface Aggregate {
   ts: Date;
@@ -252,46 +252,61 @@ export class AccountingComponent implements OnInit {
       ]
     });
 
-    cfg.sets[0].series.push({
+    cfg.sets[0].series.push(new AggregateSeries({
       label: "OVERALL",
       metric: metric,
       period: 3600,
       granularity: granularity,
       tag: {key: CAOS_PROJECT_TAG_KEY},
-    });
+      downsample: "SUM",
+      aggregate: "SUM"
+    }));
 
     switch(metric) {
     case Metrics.VM_CPU_TIME_USAGE:
-      cfg.sets[0].series.push({
+      cfg.sets[0].series.push(new ExpressionSeries({
         label: "TOTAL",
-        metric: Metrics.HYPERVISOR_CPUS_TOTAL,
-        period: 0,
-        granularity: granularity,
-        downsample: "AVG",
-        tag: {key: CAOS_HYPERVISOR_TAG_KEY},
-      });
+        expression: "x * GRANULARITY/3600",
+        terms: {
+          x: {
+            metric: Metrics.HYPERVISOR_CPUS_TOTAL,
+            period: 0,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            downsample: "AVG",
+            aggregate: "SUM"
+          }
+        }
+      }));
       break;
+
     case Metrics.VM_WALLCLOCK_TIME_USAGE:
-      cfg.sets[0].series.push({
+      cfg.sets[0].series.push(new ExpressionSeries({
         label: "TOTAL",
-        metric: Metrics.HYPERVISOR_VCPUS_TOTAL,
-        period: 0,
-        downsample: "AVG",
-        granularity: granularity,
-        tag: {key: CAOS_HYPERVISOR_TAG_KEY},
-      });
+        expression: "x * GRANULARITY/3600",
+        terms: {
+          x: {
+            metric: Metrics.HYPERVISOR_VCPUS_TOTAL,
+            period: 0,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            downsample: "AVG",
+            aggregate: "SUM"
+          }
+        }
+      }));
       break;
     }
 
     for(let p of this.projects) {
       cfg.sets[0].series.push(
-        {
+        new AggregateSeries({
           label: p.name,
           metric: metric,
           period: 3600,
           granularity: granularity,
-          tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
-        });
+          tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+          downsample: "SUM",
+          aggregate: "SUM"
+        }));
     }
 
     this.graph_config = cfg;

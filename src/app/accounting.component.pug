@@ -31,7 +31,7 @@ form.form-inline.form-group
   label(for="granularity_selector") Granularity:
   p-dropdown#granularity_selector([options]="granularities", (onChange)="selected_granularity=$event.value")
 
-graph([config]='graph_config', [date_range]="date_range", [show_daterange_selector]="false", [show_set_selector]="false", [show_granularity_selector]="false")
+graph([config]='graph_config', [date_range]="date_range", [show_daterange_selector]="false", [show_set_selector]="false", [show_granularity_selector]="false", [selected_granularity]="selected_granularity")
 
 hr
 
