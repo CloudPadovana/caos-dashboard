@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component, Input, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
@@ -119,14 +119,21 @@ export class GraphComponent implements AfterViewInit {
   set config(c: GraphConfig) {
     this._config = c;
     this.sets = [];
-    this._selected_set = undefined;
+    this.selected_set = undefined;
 
-    if(c && c.sets.length) {
-      for(let s of c.sets) {
-        this.sets.push({label: s.label, value: s});
-      }
-      this._selected_set = c.sets[0];
+    if(c && c.sets.length > 0) {
+      setTimeout(
+        () => {
+          this.sets = c.sets.map((s: GraphSetConfig) => <SelectItem>({
+            label: s.label,
+            value: s
+          }));
+
+          this.selected_set = c.sets[0];
+        }
+      );
     }
+
     this.update();
   }
   get config(): GraphConfig {
@@ -139,10 +146,13 @@ export class GraphComponent implements AfterViewInit {
 
   @Input() show_granularity_selector: boolean = true;
 
-  sets: SelectItem[] = [];
+  sets: SelectItem[];
   private _selected_set: GraphSetConfig;
+  @Output() on_set_selected = new EventEmitter<GraphSetConfig>();
+  @Input()
   set selected_set(c: GraphSetConfig) {
     this._selected_set = c;
+    this.on_set_selected.emit(this._selected_set);
     this.update();
   }
   get selected_set(): GraphSetConfig {
@@ -151,9 +161,11 @@ export class GraphComponent implements AfterViewInit {
 
   granularities: SelectItem[] = [];
   private _selected_granularity: moment.MomentInputObject;
+  @Output() on_granularity_selected = new EventEmitter<moment.MomentInputObject>();
   @Input()
   set selected_granularity(g: moment.MomentInputObject) {
     this._selected_granularity = g;
+    this.on_granularity_selected.emit(this._selected_granularity);
     this.update();
   }
   get selected_granularity(): moment.MomentInputObject {
@@ -179,9 +191,11 @@ export class GraphComponent implements AfterViewInit {
   }
 
   private _date_range: DateRange;
+  @Output() on_date_range_selected = new EventEmitter<DateRange>();
   @Input()
   set date_range(d: DateRange) {
     this._date_range = d;
+    this.on_date_range_selected.emit(this._date_range);
     this.update();
   }
   get date_range(): DateRange {
@@ -224,6 +238,10 @@ export class GraphComponent implements AfterViewInit {
     if(!this.selected_granularity) { return };
     if(!this.date_range) { return };
 
+    this.update_data();
+  }
+
+  update_data() {
     let series = this.selected_set.series;
     let granularity = moment.duration(this.selected_granularity).asSeconds();
 

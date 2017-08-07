@@ -24,7 +24,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/merge';
+import 'rxjs/add/observable/concat';
 
 import * as d3 from 'd3';
 const UTC_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
@@ -218,7 +218,7 @@ export class SeriesService {
       obs.push(req);
     }
 
-    return Observable.merge(...obs);
+    return Observable.concat(...obs);
   }
 
   parse_data(data: GraphQLQueryResult): Sample[] {

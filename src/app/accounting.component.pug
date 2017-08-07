@@ -21,32 +21,26 @@
 
 h3 Accounting
 
-form.form-inline.form-group
-  label(for="metric_selector") Metric:
-  p-dropdown#metric_selector([options]="metrics", (onChange)="selected_metric=$event.value")
+graph([config]='graph_config', (on_set_selected)="selected_set=$event; update_stats()", (on_date_range_selected)="date_range=$event; update_stats()")
 
-  label(for="daterange_selector") Date range:
-  daterange#daterange_selector((rangeChange)="date_range=$event; update()")
+h3 Aggregated data
+h5 from {{ date_range?.start | date: 'y-MM-dd HH:mm Z' }} to {{ date_range?.end | date: 'y-MM-dd HH:mm Z' }}
 
-  label(for="granularity_selector") Granularity:
-  p-dropdown#granularity_selector([options]="granularities", (onChange)="selected_granularity=$event.value")
+div(*ngIf="fetching_stats>=0")
+  .progress
+    .progress-bar([style.width.%]="fetching_stats_percent")
+  .row.justify-content-center
+    | Loading data: {{ fetching_stats_percent | number:'1.2-2' }}%
 
-graph([config]='graph_config', [date_range]="date_range", [show_daterange_selector]="false", [show_set_selector]="false", [show_granularity_selector]="false", [selected_granularity]="selected_granularity")
-
-hr
-
-h3 Aggregates from {{ date_range?.start | date: 'y-MM-dd HH:mm Z' }} to {{ date_range?.end | date: 'y-MM-dd HH:mm Z' }}
-
-p-dataTable(#dt, [value]="projects_with_overall", tableStyleClass="table table-bordered table-hover")
+p-dataTable(#dt, [value]="stats", tableStyleClass="table table-bordered table-hover")
   p-column(header='Name', field='name', [sortable]="true")
     ng-template(let-col, let-rd="rowData", pTemplate="body")
-      span(pTooltip="{{ rd.metadata.description }}")
-        | {{ rd.name }}
+      | {{ rd.name }}
 
-  p-column([header]='selected_metric.label + " [" + selected_metric.unit + "]"', field='aggregate_value', [sortable]="true")
+  p-column([header]='selected_set?.y_axis_label', field='value', [sortable]="true")
     ng-template(let-col, let-rd="rowData", pTemplate="body")
-      | {{ rd.aggregate_value | number:'1.2-2' }}
+      | {{ rd.value | number:'1.2-2' }}
 
-  p-column(header='Percentage w.r.t overall', field='aggregate_overall_percent', [sortable]="true")
+  p-column(header='Percentage w.r.t overall', field='overall_percent', [sortable]="true")
     ng-template(let-col, let-rd="rowData", pTemplate="body")
-      | {{ rd.aggregate_overall_percent | percent:'1.2-2' }}
+      | {{ rd.overall_percent | percent:'1.2-2' }}
