@@ -59,6 +59,8 @@ export interface GraphTagConfig {
 
 export interface GraphSeriesConfig {
   label(): string;
+  tooltip_value_formatter?(v: number): string;
+
   parse_data(data: any): Array<Sample>;
   graphql_query(): string;
   graphql_variables(): any;
@@ -69,6 +71,8 @@ export interface GraphSeriesConfig {
 
 export interface IAggregateSeriesParams {
   label?: string;
+  tooltip_value_formatter?(v: number): string;
+
   metric: Metrics.IMetric;
   period: number;
   tags?: GraphTagConfig[];
@@ -87,6 +91,14 @@ export class AggregateSeries implements GraphSeriesConfig {
 
   label(): string {
     return this.params.label || this.params.metric.label;
+  }
+
+  tooltip_value_formatter(v: number): string {
+    if (this.params.tooltip_value_formatter) {
+      return this.params.tooltip_value_formatter(v);
+    } else {
+      return this.params.metric.value_formatter(v);
+    }
   }
 
   parse_data(data: any): Array<Sample> {
@@ -197,6 +209,9 @@ query($from: Datetime!, $to: Datetime!, $granularity: Int, $expression: String!,
 
 export interface GraphSetConfig {
   label: string;
+  y_axis_label: string;
+  y_axis_tick_formatter?(v: number): string;
+
   series: GraphSeriesConfig[];
 }
 
@@ -414,6 +429,20 @@ export class GraphComponent implements AfterViewInit {
     let s = this.selected_set;
     let chart = this.options.chart;
 
+    chart.yAxis.axisLabel = s.y_axis_label;
+
+    if (s.y_axis_tick_formatter) {
+      chart.yAxis.tickFormat = s.y_axis_tick_formatter;
+    }
+
+    chart.tooltip.valueFormatter = (d: any, i: any): string => {
+      let s = this.selected_set;
+      if (s.series[i].tooltip_value_formatter) {
+        return s.series[i].tooltip_value_formatter(d);
+      } else {
+        return d3.format('.05s')(d);
+      }
+    }
   }
 
   time_format(): string {
@@ -486,9 +515,7 @@ export class GraphComponent implements AfterViewInit {
       useInteractiveGuideline: false,
       interactive: true,
       tooltip: {
-        valueFormatter: function(d: any, i: any) {
-          return d3.format('.05s')(d);
-        },
+        valueFormatter: function(d: any, i: any) { return d; },
         headerFormatter: function (d: any) {
           return d3.time.format("%a %b %d %H:%M %Y %Z")(new Date(d));
         }

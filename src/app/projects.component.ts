@@ -189,6 +189,8 @@ export class ProjectsComponent implements OnInit {
     sets: [
       {
         label: "CPU Time",
+        y_axis_label: "hours",
+
         series: [
           new AggregateSeries({
             metric: Metrics.VM_CPU_TIME_USAGE,
@@ -212,6 +214,8 @@ export class ProjectsComponent implements OnInit {
       },
       {
         label: "Wallclock Time",
+        y_axis_label: "hours",
+
         series: [
           new AggregateSeries({
             metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
@@ -235,6 +239,8 @@ export class ProjectsComponent implements OnInit {
       },
       {
         label: "CPU Efficiency",
+        y_axis_label: "%",
+
         series: [
           new ExpressionSeries({
             expression: "x / y * 100",
@@ -268,6 +274,8 @@ export class ProjectsComponent implements OnInit {
         sets: [
           {
             label: "CPU Time",
+            y_axis_label: "hours",
+
             series: [
               new AggregateSeries({
                 metric: Metrics.VM_CPU_TIME_USAGE,
@@ -278,6 +286,8 @@ export class ProjectsComponent implements OnInit {
           },
           {
             label: "Wallclock Time",
+            y_axis_label: "hours",
+
             series: [
               new AggregateSeries({
                 metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
@@ -300,6 +310,8 @@ export class ProjectsComponent implements OnInit {
           },
           {
             label: "CPU Efficiency",
+            y_axis_label: "%",
+
             series: [
               new ExpressionSeries({
                 expression: "x / y * 100",
