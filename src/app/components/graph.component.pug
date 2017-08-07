@@ -32,6 +32,11 @@
         .col-3(*ngIf="show_granularity_selector")
           label(for="granularity_selector") Granularity:
           p-dropdown#granularity_selector([options]="granularities", (onChange)="selected_granularity=$event.value")
+        .col-3
+          .dropdown
+            button.btn.btn-secondary.dropdown-toggle(type="button", [popover]="settings_popover", placement="bottom", container="body", #pop="bs-popover")
+              i.fa.fa-fw.fa-wrench
+              | Settings
 
   .card-block
     div(*ngIf="fetching")
@@ -52,3 +57,11 @@
       //     i.fa.fa-fw.fa-download
 
     p Click on legend entries to cycle their visibility. To select a single series, double click on the legend entry.
+
+
+ng-template(#settings_popover)
+  .container-fluid
+    .row
+      .col-12
+        label(for="linewidth_selector") Linewidth:
+        p-dropdown#linewidth_selector([options]="linewidths", (onChange)="selected_linewidth=$event.value")

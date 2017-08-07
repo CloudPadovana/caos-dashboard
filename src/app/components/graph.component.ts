@@ -264,6 +264,16 @@ export class GraphComponent implements AfterViewInit {
     return this._selected_granularity;
   }
 
+  linewidths: SelectItem[] = [];
+  private _selected_linewidth: number;
+  set selected_linewidth(n: number) {
+    this._selected_linewidth = n;
+    this.refresh_graph();
+  }
+  get selected_linewidth(): number {
+    return this._selected_linewidth;
+  }
+
   data: Series[] = [];
   fetching: number;
   get fetching_percent(): number {
@@ -284,6 +294,9 @@ export class GraphComponent implements AfterViewInit {
 
   constructor(private _api: ApiService) {
     //this.downloader = new AggregateDownloader();
+
+    this.linewidths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      .map((n: number) => {return { label: `${n}`, value: n} });
 
     this.granularities = [
       {
@@ -358,7 +371,7 @@ export class GraphComponent implements AfterViewInit {
 
           return <Series>({
             disabled: false,
-            strokeWidth: 3,
+            strokeWidth: this.selected_linewidth,
             key: s.label(),
             values: s.parse_data(data)
           });
@@ -373,6 +386,10 @@ export class GraphComponent implements AfterViewInit {
   refresh_graph() {
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
+
+    this.data.forEach((cur: Series, index: number, array: Series[]) => {
+      array[index].strokeWidth = this.selected_linewidth;
+    });
 
     this.update_chart_options();
     this.nvD3.updateWithOptions(this.options);
