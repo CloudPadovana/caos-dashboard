@@ -24,7 +24,6 @@
 import { Component, Input, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/forkJoin';
 
 import { SelectItem } from 'primeng/primeng';
 
@@ -32,65 +31,47 @@ import * as d3 from 'd3';
 import { nvD3 } from 'ng2-nvd3';
 import moment from 'moment';
 
-import { ApiService } from '../api.service';
 import { DateRange, DateRangeComponent } from './daterange.component';
 //import { AggregateDownloader } from '../aggregate-downloader';
-import * as Metrics from '../metrics';
+
+import {
+  SeriesService,
+
+  Sample,
+  SeriesConfig,
+  SeriesData,
+
+  IAggregateSeriesParams,
+  AggregateSeriesConfig,
+
+  IExpressionSeriesParams,
+  ExpressionSeriesConfig,
+
+  Metrics
+} from '../series.service';
 export { Metrics };
 
-interface Sample {
-  ts: Date;
-  unix_ts: number;
-  v: number;
-}
-
-interface Series {
+interface GraphSeries {
   // nvd3 REQUIRES this type of struct
-  key: string;
   values: Sample[];
+  key: string;
   disabled: boolean;
   strokeWidth: number;
 }
 
-export interface GraphTagConfig {
-  key: string;
-  value?: string;
-}
-
-export interface GraphSeriesConfig {
-  label(): string;
+export interface GraphSeriesConfig extends SeriesConfig {
   tooltip_value_formatter?(v: number): string;
-
-  parse_data(data: any): Array<Sample>;
-  graphql_query(): string;
-  graphql_variables(): any;
-  graphql_from_variable_name(): string;
-  graphql_to_variable_name(): string;
-  graphql_granularity_variable_name(): string;
 }
 
-export interface IAggregateSeriesParams {
-  label?: string;
+export interface IGraphAggregateSeriesParams extends IAggregateSeriesParams {
   tooltip_value_formatter?(v: number): string;
-
-  metric: Metrics.IMetric;
-  period: number;
-  tags?: GraphTagConfig[];
-  tag?: GraphTagConfig;
-  aggregate?: string;
-  downsample?: string;
-  granularity?: number;
 }
 
-export class AggregateSeries implements GraphSeriesConfig {
-  params: IAggregateSeriesParams;
+export class GraphAggregateSeriesConfig extends AggregateSeriesConfig implements GraphSeriesConfig {
+  params: IGraphAggregateSeriesParams;
 
-  constructor(kwargs: IAggregateSeriesParams) {
-    this.params = kwargs;
-  }
-
-  label(): string {
-    return this.params.label || this.params.metric.label;
+  constructor(kwargs: IGraphAggregateSeriesParams) {
+    super(kwargs);
   }
 
   tooltip_value_formatter(v: number): string {
@@ -100,110 +81,16 @@ export class AggregateSeries implements GraphSeriesConfig {
       return this.params.metric.value_formatter(v);
     }
   }
-
-  parse_data(data: any): Array<Sample> {
-    return data.aggregate.map(
-      (sample: Sample) => <Sample>({
-        ts: new Date(sample.unix_ts * 1000),
-        v: sample.v * this.params.metric.scale
-      }));
-  }
-
-  graphql_query(): string {
-    return `
-query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int, $function: AggregateFunction, $downsample: AggregateFunction) {
-  aggregate(series: $series, from: $from, to: $to, granularity: $granularity, function: $function, downsample: $downsample) {
-    unix_ts: unix_timestamp
-    v: value
-  }
-}`;
-  }
-
-  graphql_from_variable_name() { return "from"; }
-  graphql_to_variable_name() { return "to"; }
-  graphql_granularity_variable_name() { return "granularity"; }
-
-  graphql_variables(): {} {
-    return {
-      series: {
-        metric: {
-          name: this.params.metric.name
-        },
-        period: this.params.period,
-        tag: this.params.tag,
-        tags: this.params.tags,
-      },
-
-      function: this.params.aggregate || "SUM",
-      downsample: this.params.downsample || "NONE"
-    };
-  }
 }
 
-export interface IExpressionSeriesParams {
-  label?: string;
-  expression: string;
-  terms: { [name: string] : IAggregateSeriesParams };
+export interface IGraphExpressionSeriesParams extends IExpressionSeriesParams {
 }
 
-export class ExpressionSeries implements GraphSeriesConfig {
-  params: IExpressionSeriesParams;
+export class GraphExpressionSeriesConfig extends ExpressionSeriesConfig implements GraphSeriesConfig {
+  params: IGraphExpressionSeriesParams;
 
-  constructor(kwargs: IExpressionSeriesParams) {
-    this.params = kwargs;
-  }
-
-  label(): string {
-    return this.params.label;
-  }
-
-  parse_data(data: any): Array<Sample> {
-    return data.expression.map(
-      (sample: Sample) => <Sample>({
-        ts: new Date(sample.unix_ts * 1000),
-        v: sample.v // * this.params.metric.scale
-      }));
-  }
-
-  graphql_query(): string {
-    return `
-query($from: Datetime!, $to: Datetime!, $granularity: Int, $expression: String!, $terms: [ExpressionTerm]) {
-  expression(from: $from, to: $to, granularity: $granularity, expression: $expression, terms: $terms) {
-    unix_ts: unix_timestamp
-    v: value
-  }
-}`;
-  }
-
-  graphql_from_variable_name() { return "from"; }
-  graphql_to_variable_name() { return "to"; }
-  graphql_granularity_variable_name() { return "granularity"; }
-
-  graphql_variables(): {} {
-    let terms = [];
-    for(let k in this.params.terms) {
-      let t = this.params.terms[k];
-
-      terms.push({
-        name: k,
-
-        series: {
-          metric: {
-            name: t.metric.name
-          },
-          period: t.period,
-          tag: t.tag,
-          tags: t.tags,
-        },
-        function: t.aggregate || "SUM",
-        downsample: t.downsample || "NONE"
-      });
-    }
-
-    return {
-      expression: this.params.expression,
-      terms: terms
-    };
+  constructor(kwargs: IGraphExpressionSeriesParams) {
+    super(kwargs);
   }
 }
 
@@ -218,12 +105,6 @@ export interface GraphSetConfig {
 export interface GraphConfig {
   sets: GraphSetConfig[];
 }
-
-interface QueryResult {
-  aggregate: Sample[];
-}
-
-const UTC_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
 
 @Component({
   selector: 'graph',
@@ -289,7 +170,7 @@ export class GraphComponent implements AfterViewInit {
     return this._selected_linewidth;
   }
 
-  data: Series[] = [];
+  data: GraphSeries[] = [];
   fetching: number;
   get fetching_percent(): number {
     if(!this.fetching) { return 0 };
@@ -307,7 +188,7 @@ export class GraphComponent implements AfterViewInit {
     return this._date_range;
   }
 
-  constructor(private _api: ApiService) {
+  constructor(private _series: SeriesService) {
     //this.downloader = new AggregateDownloader();
 
     this.linewidths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -343,66 +224,41 @@ export class GraphComponent implements AfterViewInit {
     if(!this.selected_granularity) { return };
     if(!this.date_range) { return };
 
-    this.fetch_data()
-      .subscribe((data: Series[]) => {
-        this.fetching = undefined;
-
-        // drop old data
-        this.data.splice(0, this.data.length);
-
-        // store new data
-        this.data = data;
-
-        this.refresh_graph();
-      });
-  }
-
-  private fetch_data(): Observable<Series[]> {
     let series = this.selected_set.series;
-
     let granularity = moment.duration(this.selected_granularity).asSeconds();
 
     this.fetching = 0;
     let increment: number = 1/series.length;
 
-    let obs: Array< Observable<Series> > = [];
-    let req: Observable<Series>;
+    // drop old data
+    this.data.splice(0, this.data.length);
 
-    for(let s of series) {
-      let query = s.graphql_query();
-
-      let variables = s.graphql_variables();
-      variables[s.graphql_from_variable_name()] = UTC_FORMAT(this.date_range.start);
-      variables[s.graphql_to_variable_name()] = UTC_FORMAT(this.date_range.end);
-      variables[s.graphql_granularity_variable_name()] = granularity;
-
-      req = this._api.graphql_query<QueryResult>({
-        query:  query,
-        variables: variables
-      })
-        .map(({ data }) => data)
-        .map((data: QueryResult) => {
+    this._series.query(series, this.date_range.start, this.date_range.end, granularity)
+      .map((s: SeriesData) => <GraphSeries>({
+        values: s.samples,
+        disabled: false,
+        strokeWidth: this.selected_linewidth,
+        key: s.config.label,
+      }))
+      .subscribe(
+        (g: GraphSeries) => {
           this.fetching += increment;
-
-          return <Series>({
-            disabled: false,
-            strokeWidth: this.selected_linewidth,
-            key: s.label(),
-            values: s.parse_data(data)
-          });
-        });
-
-      obs.push(req)
-    }
-
-    return Observable.forkJoin(obs);
+          // store new data
+          this.data.push(g);
+        },
+        () => { },
+        () => {
+          this.fetching = undefined;
+          this.refresh_graph();
+        }
+      );
   }
 
   refresh_graph() {
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
 
-    this.data.forEach((cur: Series, index: number, array: Series[]) => {
+    this.data.forEach((cur: GraphSeries, index: number, array: GraphSeries[]) => {
       array[index].strokeWidth = this.selected_linewidth;
     });
 
@@ -416,12 +272,12 @@ export class GraphComponent implements AfterViewInit {
   }
 
   select_all() {
-    this.data.forEach((s: Series) => s.disabled = false);
+    this.data.forEach((s: GraphSeries) => s.disabled = false);
     this.refresh_graph();
   }
 
   deselect_all() {
-    this.data.forEach((s: Series) => s.disabled = true);
+    this.data.forEach((s: GraphSeries) => s.disabled = true);
     this.refresh_graph();
   }
 

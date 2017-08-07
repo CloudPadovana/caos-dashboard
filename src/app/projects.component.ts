@@ -40,7 +40,12 @@ import {
 import { CAOS_HYPERVISOR_TAG_KEY } from './hypervisor';
 
 import { DateRange } from './components/daterange.component';
-import { GraphConfig, Metrics, AggregateSeries, ExpressionSeries } from './components/graph.component';
+import {
+  GraphConfig,
+  Metrics,
+  GraphAggregateSeriesConfig,
+  GraphExpressionSeriesConfig
+} from './components/graph.component';
 
 interface IProject extends IBaseProject {
   vcpus_total: number;
@@ -192,12 +197,12 @@ export class ProjectsComponent implements OnInit {
         y_axis_label: "hours",
 
         series: [
-          new AggregateSeries({
+          new GraphAggregateSeriesConfig({
             metric: Metrics.VM_CPU_TIME_USAGE,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
           }),
-          new ExpressionSeries({
+          new GraphExpressionSeriesConfig({
             label: "TOTAL",
             expression: "x * GRANULARITY/3600",
             terms: {
@@ -217,12 +222,12 @@ export class ProjectsComponent implements OnInit {
         y_axis_label: "hours",
 
         series: [
-          new AggregateSeries({
+          new GraphAggregateSeriesConfig({
             metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
           }),
-          new ExpressionSeries({
+          new GraphExpressionSeriesConfig({
             label: "TOTAL",
             expression: "x * GRANULARITY/3600",
             terms: {
@@ -242,7 +247,7 @@ export class ProjectsComponent implements OnInit {
         y_axis_label: "%",
 
         series: [
-          new ExpressionSeries({
+          new GraphExpressionSeriesConfig({
             expression: "x / y * 100",
             terms: {
               x: {
@@ -277,7 +282,7 @@ export class ProjectsComponent implements OnInit {
             y_axis_label: "hours",
 
             series: [
-              new AggregateSeries({
+              new GraphAggregateSeriesConfig({
                 metric: Metrics.VM_CPU_TIME_USAGE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
@@ -289,12 +294,12 @@ export class ProjectsComponent implements OnInit {
             y_axis_label: "hours",
 
             series: [
-              new AggregateSeries({
+              new GraphAggregateSeriesConfig({
                 metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
               }),
-              new ExpressionSeries({
+              new GraphExpressionSeriesConfig({
                 expression: "x * GRANULARITY/3600",
                 terms: {
                   x: {
@@ -313,7 +318,7 @@ export class ProjectsComponent implements OnInit {
             y_axis_label: "%",
 
             series: [
-              new ExpressionSeries({
+              new GraphExpressionSeriesConfig({
                 expression: "x / y * 100",
                 terms: {
                   x: {

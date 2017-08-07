@@ -37,7 +37,11 @@ import {
 import { CAOS_HYPERVISOR_TAG_KEY } from './hypervisor';
 
 import { DateRange } from './components/daterange.component';
-import { GraphConfig, AggregateSeries, ExpressionSeries } from './components/graph.component';
+import {
+  GraphConfig,
+  GraphAggregateSeriesConfig,
+  GraphExpressionSeriesConfig,
+} from './components/graph.component';
 
 interface Aggregate {
   ts: Date;
@@ -252,7 +256,7 @@ export class AccountingComponent implements OnInit {
       ]
     });
 
-    cfg.sets[0].series.push(new AggregateSeries({
+    cfg.sets[0].series.push(new GraphAggregateSeriesConfig({
       label: "OVERALL",
       metric: metric,
       period: 3600,
@@ -264,7 +268,7 @@ export class AccountingComponent implements OnInit {
 
     switch(metric) {
     case Metrics.VM_CPU_TIME_USAGE:
-      cfg.sets[0].series.push(new ExpressionSeries({
+      cfg.sets[0].series.push(new GraphExpressionSeriesConfig({
         label: "TOTAL",
         expression: "x * GRANULARITY/3600",
         terms: {
@@ -280,7 +284,7 @@ export class AccountingComponent implements OnInit {
       break;
 
     case Metrics.VM_WALLCLOCK_TIME_USAGE:
-      cfg.sets[0].series.push(new ExpressionSeries({
+      cfg.sets[0].series.push(new GraphExpressionSeriesConfig({
         label: "TOTAL",
         expression: "x * GRANULARITY/3600",
         terms: {
@@ -298,7 +302,7 @@ export class AccountingComponent implements OnInit {
 
     for(let p of this.projects) {
       cfg.sets[0].series.push(
-        new AggregateSeries({
+        new GraphAggregateSeriesConfig({
           label: p.name,
           metric: metric,
           period: 3600,
