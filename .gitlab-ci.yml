@@ -1,0 +1,127 @@
+################################################################################
+#
+# caos-dashboard - CAOS dashboard
+#
+# Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#
+# Author: Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>
+#
+################################################################################
+
+image: node:8.2
+
+stages:
+  - prepare
+  - test
+  - release
+  - docker
+
+variables: &variables
+  CI_DEBUG_TRACE: "false"
+
+cache:
+  paths:
+    - node_modules
+
+prepare:
+  stage: prepare
+  variables:
+    <<: *variables
+  script:
+    - ci-tools/prepare.sh
+
+tslint:
+  stage: test
+  dependencies:
+    - prepare
+  variables:
+    <<: *variables
+  before_script:
+    - ci-tools/prepare.sh
+  script:
+    - gulp tslint
+  allow_failure: true
+
+.release_template: &release_template
+  stage: release
+  dependencies:
+    - prepare
+  variables: &release_template_variables
+    <<: *variables
+  before_script:
+    - ci-tools/prepare.sh
+  script:
+    - ci-tools/release-build.sh
+
+release:build:
+  <<: *release_template
+  variables:
+    <<: *release_template_variables
+    DO_PROD_BUILD: "false"
+  artifacts:
+    paths:
+      - releases/caos_dashboard-$(ci-tools/git-semver.sh).tar.gz
+    expire_in: 1 day
+  except:
+    - master
+
+release:master:
+  <<: *release_template
+  variables:
+    <<: *release_template_variables
+    DO_PROD_BUILD: "true"
+  artifacts:
+    paths:
+      - releases/caos_dashboard-$(ci-tools/git-semver.sh).tar.gz
+  only:
+    - master
+
+.docker_template: &docker_template
+  image: docker:stable
+  stage: docker
+  services:
+    - docker:stable-dind
+  tags:
+    - docker-dind
+  variables: &docker_template_variables
+    <<: *variables
+    DOCKER_DRIVER: vfs
+  before_script:
+    - docker info
+    - apk add --no-cache bash git
+  script:
+    - ci-tools/docker-build.sh
+
+docker:build:
+  <<: *docker_template
+  variables:
+    <<: *docker_template_variables
+  dependencies:
+    - release:build
+  except:
+    - master
+    - tags
+
+docker:master:
+  <<: *docker_template
+  variables:
+    <<: *docker_template_variables
+    DO_DOCKER_PUSH: "true"
+  dependencies:
+    - release:master
+  only:
+    - master
+    - tags

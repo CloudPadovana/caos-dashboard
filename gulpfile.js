@@ -34,6 +34,7 @@ const server = require('gulp-server-livereload');
 const sourcemaps = require('gulp-sourcemaps');
 const system_builder = require('systemjs-builder');
 const ts = require('gulp-typescript');
+const tslint = require("gulp-tslint");
 const uglify = require('gulp-uglify');
 
 const SRC_DIR = './src';
@@ -82,9 +83,7 @@ gulp.task('build:js', function() {
     'caos/bootstrap'
   ].join(' + ');
 
-  return gulp.src(['typings/index.d.ts',
-                   SRC_APP_DIR + '/**/*.ts'
-                  ])
+  return gulp.src([SRC_APP_DIR + '/**/*.ts'])
     .pipe(gulpif(flags.production,
                  inject.replace('// INJECT PRODUCTION CODE',
                                 "import { enableProdMode } from '@angular/core'; enableProdMode();")))
@@ -250,6 +249,15 @@ gulp.task('watch', [
   watcher.on('change', function (event) {
     console.log('Event ' + event.type + ' on path: ' + event.path);
   });
+});
+
+gulp.task("tslint", [], () => {
+  gulp.src([SRC_APP_DIR + '/**/*.ts'])
+    .pipe(tslint())
+    .pipe(tslint.report({
+      emitError: false,
+      summarizeFailureOutput: true
+    }));
 });
 
 gulp.task('dev', ['watch', 'server']);
