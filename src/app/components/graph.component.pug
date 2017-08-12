@@ -21,20 +21,21 @@
 
 .card
   .card-header
-    .container
-      .row.justify-content-center
-        .col-3(*ngIf="show_set_selector")
-          label(for="set_selector") Graph:
-          p-dropdown#set_selector([options]="sets", (onChange)="selected_set=$event.value")
-        .col-3(*ngIf="show_daterange_selector")
-          label(for="daterange_selector") Date range:
-          daterange#daterange_selector((rangeChange)="date_range=$event")
-        .col-3(*ngIf="show_granularity_selector")
-          label(for="granularity_selector") Granularity:
-          p-dropdown#granularity_selector([options]="granularities", (onChange)="selected_granularity=$event.value")
+    .d-flex.justify-content-between
+      .p-2(*ngIf="show_set_selector")
+        p-dropdown([options]="sets", (onChange)="selected_set=$event.value")
+      .p-2(*ngIf="show_daterange_selector")
+        daterange((rangeChange)="date_range=$event")
+      .p-2(*ngIf="show_granularity_selector")
+        | Granularity:
+        p-dropdown([options]="granularities", (onChange)="selected_granularity=$event.value")
+      .p-2.dropdown
+        button.btn.btn-secondary.dropdown-toggle(type="button", [popover]="settings_popover", placement="bottom", container="body", #pop="bs-popover")
+          i.fa.fa-fw.fa-wrench
+          | Settings
 
   .card-block
-    div(*ngIf="fetching")
+    div(*ngIf="fetching>=0")
       .progress
         .progress-bar([style.width.%]="fetching_percent")
       .row.justify-content-center
@@ -52,3 +53,11 @@
       //     i.fa.fa-fw.fa-download
 
     p Click on legend entries to cycle their visibility. To select a single series, double click on the legend entry.
+
+
+ng-template(#settings_popover)
+  .container-fluid
+    .row
+      .col-12
+        label(for="linewidth_selector") Linewidth:
+        p-dropdown#linewidth_selector([options]="linewidths", (onChange)="selected_linewidth=$event.value")

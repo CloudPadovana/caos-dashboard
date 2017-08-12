@@ -27,22 +27,47 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.hostname = "caos-dashboard"
-  config.ssh.username = "vagrant"
-  config.ssh.password = "vagrant"
+  config.vm.define "caos-dashboard", primary: true do |dashboard|
+    dashboard.vm.hostname = "caos-dashboard"
+    dashboard.ssh.username = "vagrant"
+    dashboard.ssh.password = "vagrant"
 
-  config.vm.provider :docker do |d|
-    d.has_ssh = true
+    dashboard.vm.provider :docker do |d|
+      d.name = "caos-dashboard"
+      d.has_ssh = true
+      d.build_dir = "."
+      d.dockerfile = "Dockerfile.vagrant"
+      d.build_args = [ "-t", "vagrant-caos-dashboard" ]
+      d.create_args = [ ]
 
-    d.build_dir = "./docker"
-    d.build_args = [ "-t", "caos-dashboard" ]
+      d.ports = [
+        # static HTTP server
+        '3333:3333',
 
-    d.ports = [
-      # static HTTP server
-      '3333:3333',
+        # WebSocket for live reload
+        '35729:35729'
+      ]
+    end
 
-      # WebSocket for live reload
-      '35729:35729'
-    ]
+    $script = <<~SCRIPT
+      curl -sS https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
+        echo "deb https://deb.nodesource.com/node_7.x jessie main" > /etc/apt/sources.list.d/nodesource.list
+
+      curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+        echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+
+      DEBIAN_FRONTEND=noninteractive apt-get update && \
+        apt-get install -y nodejs yarn
+
+      yarn global add gulp-cli
+    SCRIPT
+
+    dashboard.vm.provision :shell, privileged: true, inline: $script
+
+    $script = <<~SCRIPT
+      yarn
+    SCRIPT
+
+    dashboard.vm.provision :shell, privileged: false, inline: $script
   end
 end

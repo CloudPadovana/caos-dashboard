@@ -58,7 +58,7 @@ export class Project implements IProject {
 
   constructor(kwargs?: IProject) {
     if(kwargs) {
-      return Object.assign(this, kwargs);
+      return (<any>Object).assign(this, kwargs);
     }
   }
 

@@ -32,6 +32,7 @@ import { AppComponent } from './app.component';
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { SeriesService } from './series.service';
 
 import { LoginComponent } from './login.component';
 import { DashboardComponent } from './dashboard.component';
@@ -62,7 +63,8 @@ import { ComponentsModule } from './components/components.module';
     CAOS_ROUTING_PROVIDERS,
     ApiService,
     AuthService,
-    AuthGuard
+    AuthGuard,
+    SeriesService,
   ],
   bootstrap: [AppComponent]
 })

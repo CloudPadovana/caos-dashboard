@@ -60,7 +60,7 @@ export class Hypervisor implements IHypervisor {
 
   constructor(kwargs?: IHypervisor) {
     if(kwargs) {
-      return Object.assign(this, kwargs);
+      return (<any>Object).assign(this, kwargs);
     }
   }
 

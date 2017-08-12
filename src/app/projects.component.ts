@@ -40,7 +40,12 @@ import {
 import { CAOS_HYPERVISOR_TAG_KEY } from './hypervisor';
 
 import { DateRange } from './components/daterange.component';
-import { GraphConfig, Metrics } from './components/graph.component';
+import {
+  GraphConfig,
+  Metrics,
+  GraphAggregateSeriesConfig,
+  GraphExpressionSeriesConfig
+} from './components/graph.component';
 
 interface IProject extends IBaseProject {
   vcpus_total: number;
@@ -69,7 +74,7 @@ class Project extends BaseProject implements IProject {
     super(kwargs);
 
     if(kwargs) {
-      return Object.assign(this, kwargs);
+      return (<any>Object).assign(this, kwargs);
     }
   }
 
@@ -189,38 +194,81 @@ export class ProjectsComponent implements OnInit {
     sets: [
       {
         label: "CPU Time",
+        y_axis_label: "hours",
+
         series: [
-          {
+          new GraphAggregateSeriesConfig({
             metric: Metrics.VM_CPU_TIME_USAGE,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
-          },
-          {
+          }),
+          new GraphExpressionSeriesConfig({
             label: "TOTAL",
-            metric: Metrics.HYPERVISOR_CPUS_TOTAL,
-            period: 0,
-            downsample: "AVG",
-            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
-          }
+            expression: "x * GRANULARITY/3600",
+            terms: {
+              x: {
+                metric: Metrics.HYPERVISOR_CPUS_TOTAL,
+                period: 0,
+                tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+                downsample: "AVG",
+                aggregate: "SUM"
+              }
+            }
+          })
         ]
       },
       {
         label: "Wallclock Time",
+        y_axis_label: "hours",
+
         series: [
-          {
+          new GraphAggregateSeriesConfig({
             metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
-          },
-          {
+          }),
+          new GraphExpressionSeriesConfig({
             label: "TOTAL",
-            metric: Metrics.HYPERVISOR_VCPUS_TOTAL,
-            period: 0,
-            downsample: "AVG",
-            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
-          }
+            expression: "x * GRANULARITY/3600",
+            terms: {
+              x: {
+                metric: Metrics.HYPERVISOR_VCPUS_TOTAL,
+                period: 0,
+                tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+                downsample: "AVG",
+                aggregate: "SUM"
+              }
+            }
+          })
         ]
-      }
+      },
+      {
+        label: "CPU Efficiency",
+        y_axis_label: "%",
+
+        series: [
+          new GraphExpressionSeriesConfig({
+            expression: "x / y * 100",
+            terms: {
+              x: {
+                metric: Metrics.VM_CPU_TIME_USAGE,
+                period: 3600,
+                tag: {key: CAOS_PROJECT_TAG_KEY},
+                aggregate: "SUM",
+                downsample: "SUM"
+              },
+              y: {
+                metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
+                period: 3600,
+                tag: {key: CAOS_PROJECT_TAG_KEY},
+                aggregate: "SUM",
+                downsample: "SUM"
+              },
+            }
+          })
+        ]
+      },
+
     ]
   });
 
@@ -231,30 +279,66 @@ export class ProjectsComponent implements OnInit {
         sets: [
           {
             label: "CPU Time",
+            y_axis_label: "hours",
+
             series: [
-              {
+              new GraphAggregateSeriesConfig({
                 metric: Metrics.VM_CPU_TIME_USAGE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
-              }
+              })
             ]
           },
           {
             label: "Wallclock Time",
+            y_axis_label: "hours",
+
             series: [
-              {
+              new GraphAggregateSeriesConfig({
                 metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
-              },
-              {
-                metric: Metrics.QUOTA_VCPUS,
-                period: 0,
-                downsample: "AVG",
-                tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
-              }
+              }),
+              new GraphExpressionSeriesConfig({
+                expression: "x * GRANULARITY/3600",
+                terms: {
+                  x: {
+                    metric: Metrics.QUOTA_VCPUS,
+                    period: 0,
+                    downsample: "AVG",
+                    aggregate: "SUM",
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
+                  }
+                }
+              })
             ]
-          }
+          },
+          {
+            label: "CPU Efficiency",
+            y_axis_label: "%",
+
+            series: [
+              new GraphExpressionSeriesConfig({
+                expression: "x / y * 100",
+                terms: {
+                  x: {
+                    metric: Metrics.VM_CPU_TIME_USAGE,
+                    period: 3600,
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                    aggregate: "NONE",
+                    downsample: "SUM"
+                  },
+                  y: {
+                    metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
+                    period: 3600,
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                    aggregate: "NONE",
+                    downsample: "SUM"
+                  },
+                }
+              })
+            ]
+          },
         ]
       });
 

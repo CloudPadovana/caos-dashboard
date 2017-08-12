@@ -79,7 +79,7 @@ class Hypervisor extends BaseHypervisor implements IHypervisor {
     super(kwargs);
 
     if(kwargs) {
-      return Object.assign(this, kwargs);
+      return (<any>Object).assign(this, kwargs);
     }
   }
 

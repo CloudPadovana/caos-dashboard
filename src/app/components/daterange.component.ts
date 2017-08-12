@@ -31,7 +31,7 @@ export interface DateRange {
 
 export interface DurationPreset {
   label: string;
-  duration: moment.MomentInput;
+  duration: moment.DurationInputObject;
 }
 
 interface DateRangePreset extends DurationPreset {
@@ -39,7 +39,7 @@ interface DateRangePreset extends DurationPreset {
   starting: moment.unitOfTime.StartOf;
 
   // how much to go back in time
-  backward: moment.MomentInput;
+  backward: moment.DurationInputObject;
 }
 
 const PRESETS: DateRangePreset[] = [

@@ -21,10 +21,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component, Input, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/forkJoin';
 
 import { SelectItem } from 'primeng/primeng';
 
@@ -32,43 +31,74 @@ import * as d3 from 'd3';
 import { nvD3 } from 'ng2-nvd3';
 import moment from 'moment';
 
-import { ApiService } from '../api.service';
 import { DateRange, DateRangeComponent } from './daterange.component';
 //import { AggregateDownloader } from '../aggregate-downloader';
-import * as Metrics from '../metrics';
+
+import {
+  SeriesService,
+
+  Sample,
+  SeriesConfig,
+  SeriesData,
+
+  IAggregateSeriesParams,
+  AggregateSeriesConfig,
+
+  IExpressionSeriesParams,
+  ExpressionSeriesConfig,
+
+  Metrics
+} from '../series.service';
 export { Metrics };
 
-interface Sample {
-  ts: Date;
-  unix_ts: number;
-  v: number;
-}
-
-interface Series {
+interface GraphSeries {
   // nvd3 REQUIRES this type of struct
-  key: string;
   values: Sample[];
-  disabled: boolean;
-}
-
-export interface GraphTagConfig {
   key: string;
-  value?: string;
+  disabled: boolean;
+  strokeWidth: number;
 }
 
-export interface GraphSeriesConfig {
-  label?: string;
-  metric: Metrics.IMetric;
-  period: number;
-  granularity?: number;
-  tags?: GraphTagConfig[];
-  tag?: GraphTagConfig;
-  aggregate?: string;
-  downsample?: string;
+export interface GraphSeriesConfig extends SeriesConfig {
+  tooltip_value_formatter?(v: number): string;
+}
+
+export interface IGraphAggregateSeriesParams extends IAggregateSeriesParams {
+  tooltip_value_formatter?(v: number): string;
+}
+
+export class GraphAggregateSeriesConfig extends AggregateSeriesConfig implements GraphSeriesConfig {
+  params: IGraphAggregateSeriesParams;
+
+  constructor(kwargs: IGraphAggregateSeriesParams) {
+    super(kwargs);
+  }
+
+  tooltip_value_formatter(v: number): string {
+    if (this.params.tooltip_value_formatter) {
+      return this.params.tooltip_value_formatter(v);
+    } else {
+      return this.params.metric.value_formatter(v);
+    }
+  }
+}
+
+export interface IGraphExpressionSeriesParams extends IExpressionSeriesParams {
+}
+
+export class GraphExpressionSeriesConfig extends ExpressionSeriesConfig implements GraphSeriesConfig {
+  params: IGraphExpressionSeriesParams;
+
+  constructor(kwargs: IGraphExpressionSeriesParams) {
+    super(kwargs);
+  }
 }
 
 export interface GraphSetConfig {
   label: string;
+  y_axis_label: string;
+  y_axis_tick_formatter?(v: number): string;
+
   series: GraphSeriesConfig[];
 }
 
@@ -76,17 +106,11 @@ export interface GraphConfig {
   sets: GraphSetConfig[];
 }
 
-interface QueryResult {
-  aggregate: Sample[];
-}
-
-const UTC_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
-
 @Component({
   selector: 'graph',
   templateUrl: 'components/graph.component.html'
 })
-export class GraphComponent {
+export class GraphComponent implements AfterViewInit {
   @ViewChild(nvD3) nvD3: nvD3;
   //downloader: AggregateDownloader;
 
@@ -95,14 +119,21 @@ export class GraphComponent {
   set config(c: GraphConfig) {
     this._config = c;
     this.sets = [];
-    this._selected_set = undefined;
+    this.selected_set = undefined;
 
-    if(c && c.sets.length) {
-      for(let s of c.sets) {
-        this.sets.push({label: s.label, value: s});
-      }
-      this._selected_set = c.sets[0];
+    if(c && c.sets.length > 0) {
+      setTimeout(
+        () => {
+          this.sets = c.sets.map((s: GraphSetConfig) => <SelectItem>({
+            label: s.label,
+            value: s
+          }));
+
+          this.selected_set = c.sets[0];
+        }
+      );
     }
+
     this.update();
   }
   get config(): GraphConfig {
@@ -115,10 +146,13 @@ export class GraphComponent {
 
   @Input() show_granularity_selector: boolean = true;
 
-  sets: SelectItem[] = [];
+  sets: SelectItem[];
   private _selected_set: GraphSetConfig;
+  @Output() on_set_selected = new EventEmitter<GraphSetConfig>();
+  @Input()
   set selected_set(c: GraphSetConfig) {
     this._selected_set = c;
+    this.on_set_selected.emit(this._selected_set);
     this.update();
   }
   get selected_set(): GraphSetConfig {
@@ -127,15 +161,28 @@ export class GraphComponent {
 
   granularities: SelectItem[] = [];
   private _selected_granularity: moment.MomentInputObject;
+  @Output() on_granularity_selected = new EventEmitter<moment.MomentInputObject>();
+  @Input()
   set selected_granularity(g: moment.MomentInputObject) {
     this._selected_granularity = g;
+    this.on_granularity_selected.emit(this._selected_granularity);
     this.update();
   }
   get selected_granularity(): moment.MomentInputObject {
     return this._selected_granularity;
   }
 
-  data: Series[] = [];
+  linewidths: SelectItem[] = [];
+  private _selected_linewidth: number;
+  set selected_linewidth(n: number) {
+    this._selected_linewidth = n;
+    this.refresh_graph();
+  }
+  get selected_linewidth(): number {
+    return this._selected_linewidth;
+  }
+
+  data: GraphSeries[] = [];
   fetching: number;
   get fetching_percent(): number {
     if(!this.fetching) { return 0 };
@@ -144,17 +191,22 @@ export class GraphComponent {
   }
 
   private _date_range: DateRange;
+  @Output() on_date_range_selected = new EventEmitter<DateRange>();
   @Input()
   set date_range(d: DateRange) {
     this._date_range = d;
+    this.on_date_range_selected.emit(this._date_range);
     this.update();
   }
   get date_range(): DateRange {
     return this._date_range;
   }
 
-  constructor(private _api: ApiService) {
+  constructor(private _series: SeriesService) {
     //this.downloader = new AggregateDownloader();
+
+    this.linewidths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      .map((n: number) => {return { label: `${n}`, value: n} });
 
     this.granularities = [
       {
@@ -175,85 +227,58 @@ export class GraphComponent {
     this.selected_granularity = this.granularities[0].value;
   }
 
+  ngAfterViewInit() {
+    // done here to avoid ExpressionChangedAfterItHasBeenCheckedError
+    this.fetching = undefined;
+  }
+
   update() {
     if(!this.config) { return };
     if(!this.selected_set) { return };
     if(!this.selected_granularity) { return };
     if(!this.date_range) { return };
 
-    this.fetch_data()
-      .subscribe((data: Series[]) => {
-        this.fetching = undefined;
-        this.data.splice(0, this.data.length);
-        this.data = data;
-        this.refresh_graph();
-      });
+    this.update_data();
   }
 
-  private fetch_data(): Observable<Series[]> {
+  update_data() {
     let series = this.selected_set.series;
-
     let granularity = moment.duration(this.selected_granularity).asSeconds();
 
     this.fetching = 0;
     let increment: number = 1/series.length;
 
-    let obs: Array< Observable<Series> > = [];
-    let req: Observable<Series>;
+    // drop old data
+    this.data.splice(0, this.data.length);
 
-    for(let s of series) {
-      let query = `
-query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int, $function: AggregateFunction, $downsample: AggregateFunction) {
-  aggregate(series: $series, from: $from, to: $to, granularity: $granularity, function: $function, downsample: $downsample) {
-    unix_ts: unix_timestamp
-    v: value
-  }
-}`;
-
-      let variables = {
-        from: UTC_FORMAT(this.date_range.start),
-        to: UTC_FORMAT(this.date_range.end),
-        series: {
-          metric: {
-            name: s.metric.name
-          },
-          period: s.period,
-          tag: s.tag,
-          tags: s.tags,
-        },
-        granularity: s.granularity || granularity,
-        function: s.aggregate || "SUM",
-        downsample: s.downsample || "NONE",
-      };
-
-      req = this._api.graphql_query<QueryResult>({
-        query:  query,
-        variables: variables
-      })
-        .map(({ data }) => data)
-        .map((data: QueryResult) => {
+    this._series.query(series, this.date_range.start, this.date_range.end, granularity)
+      .map((s: SeriesData) => <GraphSeries>({
+        values: s.samples,
+        disabled: false,
+        strokeWidth: this.selected_linewidth,
+        key: s.config.label,
+      }))
+      .subscribe(
+        (g: GraphSeries) => {
           this.fetching += increment;
-
-          return <Series>({
-            disabled: false,
-            key: s.label || s.metric.label,
-            values: data.aggregate.map(
-              (sample: Sample) => <Sample>({
-                ts: new Date(sample.unix_ts * 1000),
-                v: sample.v * s.metric.scale
-              }))
-          });
-        });
-
-      obs.push(req)
-    }
-
-    return Observable.forkJoin(obs);
+          // store new data
+          this.data.push(g);
+        },
+        () => { },
+        () => {
+          this.fetching = undefined;
+          this.refresh_graph();
+        }
+      );
   }
 
   refresh_graph() {
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
+
+    this.data.forEach((cur: GraphSeries, index: number, array: GraphSeries[]) => {
+      array[index].strokeWidth = this.selected_linewidth;
+    });
 
     this.update_chart_options();
     this.nvD3.updateWithOptions(this.options);
@@ -265,24 +290,33 @@ query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int
   }
 
   select_all() {
-    this.data.forEach((s: Series) => s.disabled = false);
+    this.data.forEach((s: GraphSeries) => s.disabled = false);
     this.refresh_graph();
   }
 
   deselect_all() {
-    this.data.forEach((s: Series) => s.disabled = true);
+    this.data.forEach((s: GraphSeries) => s.disabled = true);
     this.refresh_graph();
   }
 
   private update_chart_options() {
     let s = this.selected_set;
-    let metric =  s.series[0].metric;
-
     let chart = this.options.chart;
 
-    chart.yAxis.axisLabel = metric.unit;
-    chart.tooltip.valueFormatter = metric.value_formatter;
-    chart.yAxis.tickFormat = metric.tick_formatter;
+    chart.yAxis.axisLabel = s.y_axis_label;
+
+    if (s.y_axis_tick_formatter) {
+      chart.yAxis.tickFormat = s.y_axis_tick_formatter;
+    }
+
+    chart.tooltip.valueFormatter = (d: any, i: any): string => {
+      let s = this.selected_set;
+      if (s.series[i].tooltip_value_formatter) {
+        return s.series[i].tooltip_value_formatter(d);
+      } else {
+        return d3.format('.05s')(d);
+      }
+    }
   }
 
   time_format(): string {
@@ -355,9 +389,7 @@ query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int
       useInteractiveGuideline: false,
       interactive: true,
       tooltip: {
-        valueFormatter: function(d: any) {
-          return d3.format('.05s')(d);
-        },
+        valueFormatter: function(d: any, i: any) { return d; },
         headerFormatter: function (d: any) {
           return d3.time.format("%a %b %d %H:%M %Y %Z")(new Date(d));
         }
