@@ -27,6 +27,7 @@ stages:
   - prepare
   - test
   - release
+  - docker
 
 variables: &variables
   CI_DEBUG_TRACE: "false"
@@ -87,3 +88,40 @@ release:master:
       - releases/caos_dashboard-$(ci-tools/git-semver.sh).tar.gz
   only:
     - master
+
+.docker_template: &docker_template
+  image: docker:stable
+  stage: docker
+  services:
+    - docker:stable-dind
+  tags:
+    - docker-dind
+  variables: &docker_template_variables
+    <<: *variables
+    DOCKER_DRIVER: vfs
+  before_script:
+    - docker info
+    - apk add --no-cache bash git
+  script:
+    - ci-tools/docker-build.sh
+
+docker:build:
+  <<: *docker_template
+  variables:
+    <<: *docker_template_variables
+  dependencies:
+    - release:build
+  except:
+    - master
+    - tags
+
+docker:master:
+  <<: *docker_template
+  variables:
+    <<: *docker_template_variables
+    DO_DOCKER_PUSH: "true"
+  dependencies:
+    - release:master
+  only:
+    - master
+    - tags
