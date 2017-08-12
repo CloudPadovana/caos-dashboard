@@ -25,6 +25,7 @@ image: node:8.2
 
 stages:
   - prepare
+  - test
   - release
 
 variables: &variables
@@ -40,6 +41,18 @@ prepare:
     <<: *variables
   script:
     - ci-tools/prepare.sh
+
+tslint:
+  stage: test
+  dependencies:
+    - prepare
+  variables:
+    <<: *variables
+  before_script:
+    - ci-tools/prepare.sh
+  script:
+    - gulp tslint
+  allow_failure: true
 
 .release_template: &release_template
   stage: release
