@@ -2,6 +2,7 @@
 !LICENSE
 !README.md
 !gulpfile.js
+!nginx.conf.template
 !package.json
 !releases
 !src
