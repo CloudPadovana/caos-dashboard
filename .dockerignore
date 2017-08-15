@@ -1,6 +1,7 @@
 *
 !LICENSE
 !README.md
+!env.js.template
 !gulpfile.js
 !nginx.conf.template
 !package.json

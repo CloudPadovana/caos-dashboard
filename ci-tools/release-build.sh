@@ -48,5 +48,4 @@ else
 fi
 
 say_yellow  "Creating release file"
-mv -v output caos-dashboard
-tar cvfz ${RELEASES_DIR}/caos_dashboard-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz caos-dashboard
+tar cvfz ${RELEASES_DIR}/caos_dashboard-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz -C output .
