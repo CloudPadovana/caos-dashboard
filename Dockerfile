@@ -37,4 +37,4 @@ ENV CAOS_DASHBOARD_TSDB_HOST=localhost
 ENV CAOS_DASHBOARD_TSDB_PORT=4000
 ENV CAOS_DASHBOARD_BASE=/
 
-CMD [ "/bin/bash", "-c", "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && envsubst < /env.js.template > /caos-dashboard/js/env.js && nginx -g 'daemon off;'" ]
+CMD [ "/bin/bash", "-c", "envsubst '\\${CAOS_DASHBOARD_TSDB_HOST} \\${CAOS_DASHBOARD_TSDB_PORT} \\${CAOS_DASHBOARD_BASE}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && envsubst < /env.js.template > /caos-dashboard/js/env.js && nginx -g 'daemon off;'" ]
