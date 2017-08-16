@@ -1,6 +1,7 @@
 *
 !LICENSE
 !README.md
+!entrypoint.sh
 !env.js.template
 !gulpfile.js
 !nginx.conf.template

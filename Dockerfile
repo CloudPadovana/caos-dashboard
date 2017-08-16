@@ -25,8 +25,9 @@ FROM nginx:1.13
 
 LABEL maintainer "Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>"
 
-COPY nginx.conf.template /etc/nginx/nginx.conf.template
+COPY nginx.conf.template /
 COPY env.js.template /
+COPY entrypoint.sh /
 
 ARG RELEASE_FILE
 ADD $RELEASE_FILE /caos-dashboard
@@ -35,6 +36,6 @@ ENV LANG=C.UTF-8
 
 ENV CAOS_DASHBOARD_TSDB_HOST=localhost
 ENV CAOS_DASHBOARD_TSDB_PORT=4000
-ENV CAOS_DASHBOARD_BASE=/
+ENV CAOS_DASHBOARD_BASE_NAME=
 
-CMD [ "/bin/bash", "-c", "envsubst '\\${CAOS_DASHBOARD_TSDB_HOST} \\${CAOS_DASHBOARD_TSDB_PORT} \\${CAOS_DASHBOARD_BASE}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && envsubst < /env.js.template > /caos-dashboard/js/env.js && nginx -g 'daemon off;'" ]
+ENTRYPOINT [ "/entrypoint.sh" ]
