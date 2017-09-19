@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,5 +25,5 @@ var CaosSettings = {
   LOCALE: 'it-IT',
 
   // CAOS API url
-  CAOS_API_URL: 'https://localhost:3333/api/v1',
+  CAOS_API_URL: 'https://localhost:4200/api/v1',
 };
