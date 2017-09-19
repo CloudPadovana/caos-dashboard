@@ -29,7 +29,7 @@ import { SelectItem } from 'primeng/primeng';
 
 import * as d3 from 'd3';
 import { nvD3 } from 'ng2-nvd3';
-import moment from 'moment';
+import * as moment from 'moment';
 
 import { DateRange, DateRangeComponent } from './daterange.component';
 //import { AggregateDownloader } from '../aggregate-downloader';

@@ -53,7 +53,7 @@ import {
   Sample,
 } from './series.service';
 
-import moment from 'moment';
+import * as moment from 'moment';
 
 interface IProject extends IBaseProject { }
 

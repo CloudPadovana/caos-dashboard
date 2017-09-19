@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import moment from 'moment';
+import * as moment from 'moment';
 
 export const CAOS_PROJECT_TAG_KEY = "project";
 

@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, AfterViewChecked } from '@angular/core';
-import moment from 'moment';
+import * as moment from 'moment';
 
 export interface DateRange {
   start: Date;
