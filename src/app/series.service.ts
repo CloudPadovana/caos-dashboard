@@ -57,27 +57,31 @@ export interface SeriesConfig {
   graphql_granularity_variable_name: string;
 }
 
-export interface IAggregateSeriesParams {
+interface IBaseSeriesParams {
   label?: string;
-
   metric: Metrics.IMetric;
-  period: number;
-  tags?: TagConfig[];
-  tag?: TagConfig;
-  aggregate?: string;
-  downsample?: string;
-  granularity?: number;
 }
 
-export class AggregateSeriesConfig implements SeriesConfig {
-  params: IAggregateSeriesParams;
+abstract class BaseSeriesConfig<T extends IBaseSeriesParams> implements SeriesConfig {
+  graphql_from_variable_name = "from";
+  graphql_to_variable_name = "to";
+  graphql_granularity_variable_name = "granularity";
 
-  constructor(kwargs: IAggregateSeriesParams) {
-    this.params = kwargs;
+  _params: T;
+
+  constructor(kwargs: T) {
+    this._params = kwargs;
   }
 
+  abstract get graphql_variables(): any;
+  graphql_query = "";
+
   get label(): string {
-    return this.params.label || this.params.metric.label;
+    return this._params.label;
+  }
+
+  protected get params(): T {
+    return this._params;
   }
 
   transform(samples: Sample[]): Sample[] {
@@ -88,6 +92,25 @@ export class AggregateSeriesConfig implements SeriesConfig {
         v: sample.v * this.params.metric.scale
       }));
   }
+}
+
+export interface IAggregateSeriesParams extends IBaseSeriesParams {
+  period: number;
+  tags?: TagConfig[];
+  tag?: TagConfig;
+  aggregate?: string;
+  downsample?: string;
+  granularity?: number;
+}
+
+export class AggregateSeriesConfig extends BaseSeriesConfig<IAggregateSeriesParams> {
+  constructor(kwargs: IAggregateSeriesParams) {
+    super(kwargs);
+  }
+
+  get label(): string {
+    return this.params.label || this.params.metric.label;
+  }
 
   graphql_query = `
 query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int, $function: AggregateFunction, $downsample: AggregateFunction) {
@@ -96,10 +119,6 @@ query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int
     v: value
   }
 }`;
-
-  graphql_from_variable_name = "from";
-  graphql_to_variable_name = "to";
-  graphql_granularity_variable_name = "granularity";
 
   get graphql_variables() {
     return {
@@ -118,25 +137,14 @@ query($series: SeriesGroup!, $from: Datetime!, $to: Datetime!, $granularity: Int
   }
 }
 
-export interface IExpressionSeriesParams {
-  label?: string;
+export interface IExpressionSeriesParams extends IBaseSeriesParams {
   expression: string;
   terms: { [name: string] : IAggregateSeriesParams };
 }
 
-export class ExpressionSeriesConfig implements SeriesConfig {
-  params: IExpressionSeriesParams;
-
+export class ExpressionSeriesConfig extends BaseSeriesConfig<IExpressionSeriesParams> {
   constructor(kwargs: IExpressionSeriesParams) {
-    this.params = kwargs;
-  }
-
-  get label(): string {
-    return this.params.label;
-  }
-
-  transform(samples: Sample[]): Sample[] {
-    return samples;
+    super(kwargs);
   }
 
   graphql_query = `
@@ -146,10 +154,6 @@ query($from: Datetime!, $to: Datetime!, $granularity: Int, $expression: String!,
     v: value
   }
 }`;
-
-  graphql_from_variable_name = "from";
-  graphql_to_variable_name = "to";
-  graphql_granularity_variable_name = "granularity";
 
   get graphql_variables() {
     let terms = [];

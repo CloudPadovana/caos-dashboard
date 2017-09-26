@@ -47,6 +47,13 @@ export class Metric implements IMetric {
   }
 }
 
+export const IDENTITY = new Metric({
+  name: "",
+  label: "",
+  unit: "",
+  scale: 1,
+});
+
 export const VM_CPU_TIME_USAGE = new Metric({
   name: "cpu",
   label: "CPU Time",

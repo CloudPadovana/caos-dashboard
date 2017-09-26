@@ -204,6 +204,7 @@ export class ProjectsComponent implements OnInit {
           }),
           new GraphExpressionSeriesConfig({
             label: "TOTAL",
+            metric: Metrics.IDENTITY,
             expression: "x * GRANULARITY/3600",
             terms: {
               x: {
@@ -229,6 +230,7 @@ export class ProjectsComponent implements OnInit {
           }),
           new GraphExpressionSeriesConfig({
             label: "TOTAL",
+            metric: Metrics.IDENTITY,
             expression: "x * GRANULARITY/3600",
             terms: {
               x: {
@@ -248,6 +250,7 @@ export class ProjectsComponent implements OnInit {
 
         series: [
           new GraphExpressionSeriesConfig({
+            metric: Metrics.IDENTITY,
             expression: "x / y * 100",
             terms: {
               x: {
@@ -300,6 +303,7 @@ export class ProjectsComponent implements OnInit {
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
               }),
               new GraphExpressionSeriesConfig({
+                metric: Metrics.IDENTITY,
                 expression: "x * GRANULARITY/3600",
                 terms: {
                   x: {
@@ -319,6 +323,7 @@ export class ProjectsComponent implements OnInit {
 
             series: [
               new GraphExpressionSeriesConfig({
+                metric: Metrics.IDENTITY,
                 expression: "x / y * 100",
                 terms: {
                   x: {

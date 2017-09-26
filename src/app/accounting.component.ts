@@ -221,6 +221,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "TOTAL",
+      metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
         x: {
@@ -262,6 +263,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "TOTAL",
+      metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
         x: {
@@ -294,6 +296,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "OVERALL",
+      metric: Metrics.IDENTITY,
       expression: "x / y * 100",
       terms: {
         x: {
@@ -316,6 +319,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
     for(let p of this.projects) {
       cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
         label: p.name,
+        metric: Metrics.IDENTITY,
         expression: "x / y * 100",
         terms: {
           x: {
