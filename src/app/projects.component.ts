@@ -278,7 +278,34 @@ export class ProjectsComponent implements OnInit {
           })
         ]
       },
+      {
+        label: "Instances",
 
+        series: [
+          new GraphAggregateSeriesConfig({
+            metric: Metrics.VM_COUNT_ACTIVE,
+            period: 3600,
+            tag: {key: CAOS_PROJECT_TAG_KEY},
+            downsample: "AVG",
+            aggregate: "SUM"
+          }),
+          new GraphAggregateSeriesConfig({
+            metric: Metrics.VM_COUNT_DELETED,
+            period: 3600,
+            tag: {key: CAOS_PROJECT_TAG_KEY},
+            downsample: "AVG",
+            aggregate: "SUM"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "QUOTA",
+            metric: Metrics.QUOTA_INSTANCES,
+            period: 0,
+            tag: {key: CAOS_PROJECT_TAG_KEY},
+            downsample: "AVG",
+            aggregate: "SUM"
+          })
+        ]
+      },
     ]
   });
 
@@ -342,6 +369,34 @@ export class ProjectsComponent implements OnInit {
                     downsample: "SUM"
                   },
                 }
+              })
+            ]
+          },
+          {
+            label: "Instances",
+
+            series: [
+              new GraphAggregateSeriesConfig({
+                metric: Metrics.VM_COUNT_ACTIVE,
+                period: 3600,
+                tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                downsample: "AVG",
+                aggregate: "SUM"
+
+              }),
+              new GraphAggregateSeriesConfig({
+                metric: Metrics.VM_COUNT_DELETED,
+                period: 3600,
+                tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                downsample: "AVG",
+                aggregate: "SUM"
+              }),
+              new GraphAggregateSeriesConfig({
+                metric: Metrics.QUOTA_INSTANCES,
+                period: 0,
+                tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                downsample: "AVG",
+                aggregate: "SUM"
               })
             ]
           },

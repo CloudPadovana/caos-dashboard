@@ -115,7 +115,7 @@ export const VM_MEMORY_USAGE = new Metric({
 
 export const VM_COUNT_ACTIVE = new Metric({
   name: "vms.active",
-  label: "",
+  label: "Active instances",
   raw_unit: "",
   display_unit: "",
   scale: 1,
@@ -123,7 +123,7 @@ export const VM_COUNT_ACTIVE = new Metric({
 
 export const VM_COUNT_DELETED = new Metric({
   name: "vms.deleted",
-  label: "",
+  label: "Deleted instances",
   raw_unit: "",
   display_unit: "",
   scale: 1,
@@ -154,7 +154,7 @@ export const QUOTA_CPUS = new Metric({
 
 export const QUOTA_INSTANCES = new Metric({
   name: "quota.instances",
-  label: "",
+  label: "Instances quota",
   raw_unit: "",
   display_unit: "",
   scale: 1,
