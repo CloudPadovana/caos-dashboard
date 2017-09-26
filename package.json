@@ -2,7 +2,7 @@
   "name": "caos-dashboard",
   "description": "CAOS dashboard",
   "author": "Fabrizio Chiarello <fabrizio.chiarello@pd.infn.it>",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
