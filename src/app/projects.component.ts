@@ -193,7 +193,7 @@ export class ProjectsComponent implements OnInit {
   graph_config: GraphConfig = <GraphConfig>({
     sets: [
       {
-        label: "CPU Time",
+        label: "CPU",
         y_axis_label: "hours",
 
         series: [
@@ -203,7 +203,7 @@ export class ProjectsComponent implements OnInit {
             tag: {key: CAOS_PROJECT_TAG_KEY},
           }),
           new GraphExpressionSeriesConfig({
-            label: "TOTAL",
+            label: "TOTAL CPUs",
             metric: Metrics.IDENTITY,
             expression: "x * GRANULARITY/3600",
             terms: {
@@ -215,21 +215,14 @@ export class ProjectsComponent implements OnInit {
                 aggregate: "SUM"
               }
             }
-          })
-        ]
-      },
-      {
-        label: "Wallclock Time",
-        y_axis_label: "hours",
-
-        series: [
+          }),
           new GraphAggregateSeriesConfig({
             metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
           }),
           new GraphExpressionSeriesConfig({
-            label: "TOTAL",
+            label: "TOTAL VCPUs",
             metric: Metrics.IDENTITY,
             expression: "x * GRANULARITY/3600",
             terms: {
@@ -239,6 +232,20 @@ export class ProjectsComponent implements OnInit {
                 tag: {key: CAOS_HYPERVISOR_TAG_KEY},
                 downsample: "AVG",
                 aggregate: "SUM"
+              }
+            }
+          }),
+          new GraphExpressionSeriesConfig({
+            label: "Quota",
+            metric: Metrics.IDENTITY,
+            expression: "x * GRANULARITY/3600",
+            terms: {
+              x: {
+                metric: Metrics.QUOTA_VCPUS,
+                period: 0,
+                downsample: "AVG",
+                aggregate: "SUM",
+                tag: {key: CAOS_PROJECT_TAG_KEY}
               }
             }
           })
@@ -281,7 +288,7 @@ export class ProjectsComponent implements OnInit {
       let cfg = <GraphConfig>({
         sets: [
           {
-            label: "CPU Time",
+            label: "CPU",
             y_axis_label: "hours",
 
             series: [
@@ -289,20 +296,14 @@ export class ProjectsComponent implements OnInit {
                 metric: Metrics.VM_CPU_TIME_USAGE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
-              })
-            ]
-          },
-          {
-            label: "Wallclock Time",
-            y_axis_label: "hours",
-
-            series: [
+              }),
               new GraphAggregateSeriesConfig({
                 metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
               }),
               new GraphExpressionSeriesConfig({
+                label: "Quota",
                 metric: Metrics.IDENTITY,
                 expression: "x * GRANULARITY/3600",
                 terms: {
