@@ -31,15 +31,26 @@ export_version_vars
 
 docker_login
 
-CAOS_DASHBOARD_DOCKER_IMAGE_TAG=${CI_REGISTRY_IMAGE}:${CAOS_DASHBOARD_RELEASE_GIT_VERSION}-test
+CAOS_DASHBOARD_DOCKER_IMAGE_TAG=${CI_REGISTRY_IMAGE}:${CAOS_DASHBOARD_RELEASE_GIT_VERSION}
 
-say_yellow  "Building docker container"
-docker build \
-       --tag ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG} \
-       --build-arg RELEASE_FILE="releases/caos_dashboard-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz" \
-       --pull=true .
+say_yellow  "Pulling docker container"
+docker pull ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG}-test
 
-if [ "${DO_DOCKER_PUSH}" == true ] ; then
-    say_yellow "Pushing container"
-    docker push ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG}
-fi
+say_yellow  "Running docker container"
+docker run -d --name caos-dashboard-test \
+       -e CAOS_DASHBOARD_BASE_NAME=some-base-name \
+       ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG}-test
+caos_dashboard_ip=$(docker inspect caos-dashboard-test --format '{{ .NetworkSettings.IPAddress }}')
+
+sleep 10
+
+docker logs caos-dashboard-test
+
+say_yellow  "Running tests"
+docker run --rm \
+       -v "$PWD":/test \
+       -w /test \
+       alpine:3.6 /bin/sh -c "apk add --no-cache curl && curl -v http://${caos_dashboard_ip}:80/some-base-name"
+
+say_yellow  "Cleanup"
+docker rm -f caos-dashboard-test

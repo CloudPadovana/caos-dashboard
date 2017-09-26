@@ -27,7 +27,9 @@ stages:
   - prepare
   - test
   - release
-  - docker
+  - docker-build
+  - docker-test
+  - docker-release
 
 variables: &variables
   CI_DEBUG_TRACE: "false"
@@ -65,16 +67,15 @@ tslint:
     - ci-tools/prepare.sh
   script:
     - ci-tools/release-build.sh
+  artifacts:
+    paths:
+      - releases/caos_dashboard-$(ci-tools/git-semver.sh).tar.gz
 
-release:build:
+release:dev:
   <<: *release_template
   variables:
     <<: *release_template_variables
     DO_PROD_BUILD: "false"
-  artifacts:
-    paths:
-      - releases/caos_dashboard-$(ci-tools/git-semver.sh).tar.gz
-    expire_in: 1 day
   except:
     - master
 
@@ -83,45 +84,59 @@ release:master:
   variables:
     <<: *release_template_variables
     DO_PROD_BUILD: "true"
-  artifacts:
-    paths:
-      - releases/caos_dashboard-$(ci-tools/git-semver.sh).tar.gz
   only:
     - master
 
 .docker_template: &docker_template
   image: docker:stable
-  stage: docker
   services:
     - docker:stable-dind
   tags:
     - docker-dind
   variables: &docker_template_variables
     <<: *variables
-    DOCKER_DRIVER: vfs
+    DO_DOCKER_LOGIN: "true"
   before_script:
     - docker info
     - apk add --no-cache bash git
-  script:
-    - ci-tools/docker-build.sh
 
-docker:build:
+.docker_build_template: &docker_build_template
   <<: *docker_template
-  variables:
-    <<: *docker_template_variables
-  dependencies:
-    - release:build
-  except:
-    - master
-    - tags
-
-docker:master:
-  <<: *docker_template
+  stage: docker-build
   variables:
     <<: *docker_template_variables
     DO_DOCKER_PUSH: "true"
+  script:
+    - ci-tools/docker-build.sh
+
+docker-build:dev:
+  <<: *docker_build_template
+  dependencies:
+    - release:dev
+  except:
+    - master
+
+docker-build:master:
+  <<: *docker_build_template
   dependencies:
     - release:master
+  only:
+    - master
+
+docker-test:
+  <<: *docker_template
+  stage: docker-test
+  script:
+    - ci-tools/docker-test.sh
+
+docker-release:
+  <<: *docker_template
+  stage: docker-release
+  variables:
+    <<: *docker_template_variables
+    DO_DOCKER_PUSH: "true"
+  script:
+    - ci-tools/docker-release.sh
   only:
     - master
     - tags

@@ -252,10 +252,11 @@ gulp.task('watch', [
 });
 
 gulp.task("tslint", [], () => {
-  gulp.src([SRC_APP_DIR + '/**/*.ts'])
+  return gulp.src([SRC_APP_DIR + '/**/*.ts'])
     .pipe(tslint())
     .pipe(tslint.report({
-      emitError: false,
+      emitError: true,
+      allowWarnings: true,
       summarizeFailureOutput: true
     }));
 });
