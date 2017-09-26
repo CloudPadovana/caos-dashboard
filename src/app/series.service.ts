@@ -89,7 +89,7 @@ abstract class BaseSeriesConfig<T extends IBaseSeriesParams> implements SeriesCo
       (sample: Sample) => <Sample>({
         ...sample,
 
-        v: sample.v * this.params.metric.scale
+        v: this.params.metric.scale_value(sample.v)
       }));
   }
 }
