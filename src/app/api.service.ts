@@ -51,7 +51,7 @@ export interface Tag {
 
 export interface GraphqlQueryResult<T> {
   data: T;
-  errors: any[];
+  errors: any;
 }
 
 export const DATE_FORMAT = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ");
@@ -85,12 +85,15 @@ export class ApiService {
   private _graphql(body: any): Observable<Response> {
     return this._httppost(`${SETTINGS.CAOS_API_URL}/graphql`, body)
       .map((r: Response) => r.json())
-      .catch(this.handle_error);
+      .catch((error: any) => this.handle_graphql_errors(error, body));
   }
 
   graphql_query<T>(body: {query: string, variables?: {}}): Observable<GraphqlQueryResult<T>> {
     return this._graphql(body)
-      .map((data: any) => {return <GraphqlQueryResult<T>>(data)});
+      .map((json_data: any) =>  <GraphqlQueryResult<T>>({
+        data: <T>(json_data.data || {}),
+        errors: json_data.errors || []
+      }));
   }
 
   status(): Observable<Status> {
@@ -122,15 +125,26 @@ export class ApiService {
     this._token = token;
   }
 
-  private handle_error(error: any) {
-    let msg: string;
-
+  private error_message(error: any): string {
     if(error instanceof Response) {
-      msg = `${error.status}: ${error.statusText}`
+      return `${error.status}: ${error.statusText}`
     } else {
-      msg = error.message ? error.message : (error.status ? `${error.status} - ${error.statusText}` : 'Server error');
+      return error.message ? error.message : (error.status ? `${error.status} - ${error.statusText}` : 'Server error');
     }
+  }
+
+  private handle_error(error: any) {
+    let msg = this.error_message(error);
 
     return Observable.throw(msg);
+  }
+
+  private handle_graphql_errors(error: any, body: any) {
+    let msg = this.error_message(error);
+    let query = body.query ? JSON.stringify(body.query) : "no query";
+    let variables = body.variables ? JSON.stringify(body.variables) : "no variables";
+
+    console.error(`GRAPHQL error: "${msg}", query: ${query}, variables: ${variables}`);
+    return Observable.of({});
   }
 }

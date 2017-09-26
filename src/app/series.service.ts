@@ -214,8 +214,9 @@ export class SeriesService {
         variables: variables
       })
         .map(({ data }) => data)
-        .map((data: GraphQLQueryResult) => <SeriesData>({
-          samples: s.transform(this.parse_data(data)),
+        .map((data: GraphQLQueryResult) => this.parse_samples(data))
+        .map((samples: Sample[]) => <SeriesData>({
+          samples: s.transform(samples),
           config: s,
         }));
 
@@ -225,8 +226,10 @@ export class SeriesService {
     return Observable.concat(...obs);
   }
 
-  parse_data(data: GraphQLQueryResult): Sample[] {
-    return data.samples.map(
+  parse_samples(data: GraphQLQueryResult): Sample[] {
+    let samples = data.samples || [];
+
+    return samples.map(
       (sample: Sample) => <Sample>({
         ts: new Date(sample.unix_ts * 1000),
         v: sample.v,
