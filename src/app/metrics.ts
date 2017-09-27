@@ -108,7 +108,7 @@ export const VM_DISK_USAGE = new Metric({
 
 export const VM_MEMORY_USAGE = new Metric({
   name: "vm.memory.usage",
-  label: "",
+  label: "VRAM usage",
   raw_unit: "B",
   display_unit: "GB",
 });
@@ -131,7 +131,7 @@ export const VM_COUNT_DELETED = new Metric({
 
 export const QUOTA_MEMORY = new Metric({
   name: "quota.memory",
-  label: "",
+  label: "VRAM quota",
   raw_unit: "B",
   display_unit: "GB",
 });

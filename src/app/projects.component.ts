@@ -240,6 +240,27 @@ export class ProjectsComponent implements OnInit {
             }
           }),
           new GraphExpressionSeriesConfig({
+            label: "VRAM",
+            metric: Metrics.IDENTITY,
+            expression: "x / 3600 / ( y * GRANULARITY / 3600 ) * 100",
+            terms: {
+              x: {
+                metric: Metrics.VM_MEMORY_USAGE,
+                period: 3600,
+                tag: {key: CAOS_PROJECT_TAG_KEY},
+                downsample: "SUM",
+                aggregate: "SUM"
+              },
+              y: {
+                metric: Metrics.QUOTA_MEMORY,
+                period: 0,
+                downsample: "AVG",
+                aggregate: "SUM",
+                tag: {key: CAOS_PROJECT_TAG_KEY}
+              },
+            }
+          }),
+          new GraphExpressionSeriesConfig({
             label: "Instances",
             metric: Metrics.IDENTITY,
             expression: "x / y * 100",
@@ -376,6 +397,41 @@ export class ProjectsComponent implements OnInit {
           })
         ]
       },
+      {
+        label: "VRAM",
+        y_axis_label: "GB",
+
+        series: [
+          new GraphExpressionSeriesConfig({
+            label: "VRAM usage",
+            metric: Metrics.IDENTITY,
+            expression: "x /3600 / 10^9",
+            terms: {
+              x: {
+                metric: Metrics.VM_MEMORY_USAGE,
+                period: 3600,
+                tag: {key: CAOS_PROJECT_TAG_KEY},
+                downsample: "SUM",
+                aggregate: "SUM",
+              }
+            }
+          }),
+          new GraphExpressionSeriesConfig({
+            label: "Quota",
+            metric: Metrics.IDENTITY,
+            expression: "x * GRANULARITY/3600 / 10^9",
+            terms: {
+              x: {
+                metric: Metrics.QUOTA_MEMORY,
+                period: 0,
+                downsample: "AVG",
+                aggregate: "SUM",
+                tag: {key: CAOS_PROJECT_TAG_KEY}
+              }
+            }
+          })
+        ]
+      },
     ]
   });
 
@@ -424,6 +480,27 @@ export class ProjectsComponent implements OnInit {
                   },
                   y: {
                     metric: Metrics.QUOTA_VCPUS,
+                    period: 0,
+                    downsample: "AVG",
+                    aggregate: "NONE",
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
+                  },
+                }
+              }),
+              new GraphExpressionSeriesConfig({
+                label: "VRAM",
+                metric: Metrics.IDENTITY,
+                expression: "x / 3600 / ( y * GRANULARITY / 3600 ) * 100",
+                terms: {
+                  x: {
+                    metric: Metrics.VM_MEMORY_USAGE,
+                    period: 3600,
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                    downsample: "SUM",
+                    aggregate: "NONE"
+                  },
+                  y: {
+                    metric: Metrics.QUOTA_MEMORY,
                     period: 0,
                     downsample: "AVG",
                     aggregate: "NONE",
@@ -537,6 +614,41 @@ export class ProjectsComponent implements OnInit {
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
                 downsample: "AVG",
                 aggregate: "SUM"
+              })
+            ]
+          },
+          {
+            label: "VRAM",
+            y_axis_label: "GB",
+
+            series: [
+              new GraphExpressionSeriesConfig({
+                label: "VRAM usage",
+                metric: Metrics.IDENTITY,
+                expression: "x /3600 / 10^9",
+                terms: {
+                  x: {
+                    metric: Metrics.VM_MEMORY_USAGE,
+                    period: 3600,
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                    downsample: "SUM",
+                    aggregate: "NONE",
+                  }
+                }
+              }),
+              new GraphExpressionSeriesConfig({
+                label: "Quota",
+                metric: Metrics.IDENTITY,
+                expression: "x * GRANULARITY/3600 / 10^9",
+                terms: {
+                  x: {
+                    metric: Metrics.QUOTA_MEMORY,
+                    period: 0,
+                    downsample: "AVG",
+                    aggregate: "SUM",
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
+                  }
+                }
               })
             ]
           },
