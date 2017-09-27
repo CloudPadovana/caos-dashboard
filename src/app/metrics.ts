@@ -94,7 +94,7 @@ export const VM_CPU_EFFICIENCY = new Metric({
 
 export const VM_VCPUS_USAGE = new Metric({
   name: "vm.vcpus.usage",
-  label: "",
+  label: "VCPUs usage",
   raw_unit: "s",
   display_unit: "h",
 });

@@ -219,6 +219,27 @@ export class ProjectsComponent implements OnInit {
             }
           }),
           new GraphExpressionSeriesConfig({
+            label: "VCPU",
+            metric: Metrics.IDENTITY,
+            expression: "x / 3600 / ( y * GRANULARITY / 3600 ) * 100",
+            terms: {
+              x: {
+                metric: Metrics.VM_VCPUS_USAGE,
+                period: 3600,
+                tag: {key: CAOS_PROJECT_TAG_KEY},
+                downsample: "SUM",
+                aggregate: "SUM"
+              },
+              y: {
+                metric: Metrics.QUOTA_VCPUS,
+                period: 0,
+                downsample: "AVG",
+                aggregate: "SUM",
+                tag: {key: CAOS_PROJECT_TAG_KEY}
+              },
+            }
+          }),
+          new GraphExpressionSeriesConfig({
             label: "Instances",
             metric: Metrics.IDENTITY,
             expression: "x / y * 100",
@@ -386,6 +407,27 @@ export class ProjectsComponent implements OnInit {
                     tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
                     downsample: "SUM",
                     aggregate: "NONE"
+                  },
+                }
+              }),
+              new GraphExpressionSeriesConfig({
+                label: "VCPU",
+                metric: Metrics.IDENTITY,
+                expression: "x / 3600 / ( y * GRANULARITY / 3600 ) * 100",
+                terms: {
+                  x: {
+                    metric: Metrics.VM_VCPUS_USAGE,
+                    period: 3600,
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                    downsample: "SUM",
+                    aggregate: "NONE"
+                  },
+                  y: {
+                    metric: Metrics.QUOTA_VCPUS,
+                    period: 0,
+                    downsample: "AVG",
+                    aggregate: "NONE",
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
                   },
                 }
               }),
