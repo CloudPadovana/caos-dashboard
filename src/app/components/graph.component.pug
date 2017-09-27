@@ -23,7 +23,7 @@
   .card-header
     .d-flex.justify-content-between
       .p-2(*ngIf="show_set_selector")
-        p-dropdown([options]="sets", (onChange)="selected_set=$event.value")
+        p-dropdown([options]="sets", (onChange)="selected_set=$event.value", [autoWidth]="true", [style]="{'width': '100%'}")
       .p-2(*ngIf="show_daterange_selector")
         daterange((rangeChange)="date_range=$event")
       .p-2(*ngIf="show_granularity_selector")

@@ -22,12 +22,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 import * as d3 from 'd3';
+import * as mathjs from 'mathjs';
 
 export interface IMetric {
   name: string;
   label: string;
-  unit: string;
-  scale: number;
+  raw_unit: string;
+  display_unit: string;
+  scale?: number;
+  scale_value?(v: number): number;
   value_formatter?(v: number): string;
   tick_formatter?(v: number): string;
 }
@@ -35,9 +38,19 @@ export interface IMetric {
 export class Metric implements IMetric {
   name: string;
   label: string;
-  unit: string;
-  scale: number = 1;
-  value_formatter = (v: number) => { return d3.format('.05s')(v) + ' ' + this.unit; };
+  raw_unit: string;
+  display_unit: string;
+  scale?: number;
+
+  scale_value = (v: number) => {
+    if (this.scale) {
+      return v * this.scale;
+    } else {
+      return mathjs.unit(v, this.raw_unit).toNumber(this.display_unit);
+    }
+  };
+
+  value_formatter = (v: number) => { return d3.format('.05s')(v) + ' ' + this.display_unit; };
   tick_formatter = (v: number) => { return d3.format('.02s')(v); };
 
   constructor(kwargs?: IMetric) {
@@ -47,24 +60,33 @@ export class Metric implements IMetric {
   }
 }
 
+export const IDENTITY = new Metric({
+  name: "",
+  label: "",
+  raw_unit: "",
+  display_unit: "",
+  scale: 1,
+});
+
 export const VM_CPU_TIME_USAGE = new Metric({
   name: "cpu",
   label: "CPU Time",
-  unit: "hours",
-  scale: 1/3600,
+  raw_unit: "s",
+  display_unit: "h",
 });
 
 export const VM_WALLCLOCK_TIME_USAGE = new Metric({
   name: "wallclocktime",
   label: "Wall Clock Time",
-  unit: "hours",
-  scale: 1/3600,
+  raw_unit: "s",
+  display_unit: "h",
 });
 
 export const VM_CPU_EFFICIENCY = new Metric({
   name: "cpu.efficiency",
   label: "CPU Efficiency",
-  unit: "%",
+  raw_unit: "%",
+  display_unit: "%",
   scale: 1,
   value_formatter: (v: number) => { return d3.format('.02%')(v); },
   tick_formatter: (v: number) => { return d3.format('.01%')(v); },
@@ -72,182 +94,197 @@ export const VM_CPU_EFFICIENCY = new Metric({
 
 export const VM_VCPUS_USAGE = new Metric({
   name: "vm.vcpus.usage",
-  label: "",
-  unit: "hours",
-  scale: 1/3600,
+  label: "VCPUs usage",
+  raw_unit: "s",
+  display_unit: "h",
 });
 
 export const VM_DISK_USAGE = new Metric({
   name: "vm.disk.usage",
   label: "",
-  unit: "TB",
-  scale: 1/1e12,
+  raw_unit: "B",
+  display_unit: "TB",
 });
 
 export const VM_MEMORY_USAGE = new Metric({
   name: "vm.memory.usage",
-  label: "",
-  unit: "GB",
-  scale: 1/1e9,
+  label: "VRAM usage",
+  raw_unit: "B",
+  display_unit: "GB",
 });
 
 export const VM_COUNT_ACTIVE = new Metric({
   name: "vms.active",
-  label: "",
-  unit: "",
+  label: "Active instances",
+  raw_unit: "",
+  display_unit: "",
   scale: 1,
 });
 
 export const VM_COUNT_DELETED = new Metric({
   name: "vms.deleted",
-  label: "",
-  unit: "",
+  label: "Deleted instances",
+  raw_unit: "",
+  display_unit: "",
   scale: 1,
 });
 
 export const QUOTA_MEMORY = new Metric({
   name: "quota.memory",
-  label: "",
-  unit: "GB",
-  scale: 1/1e9,
+  label: "VRAM quota",
+  raw_unit: "B",
+  display_unit: "GB",
 });
 
 export const QUOTA_VCPUS = new Metric({
   name: "quota.vcpus",
   label: "VCPUs quota",
-  unit: "vcpus",
+  raw_unit: "vcpus",
+  display_unit: "vcpus",
   scale: 1,
 });
 
 export const QUOTA_CPUS = new Metric({
   name: "quota.cpus",
   label: "",
-  unit: "cpus",
+  raw_unit: "cpus",
+  display_unit: "cpus",
   scale: 1,
 });
 
 export const QUOTA_INSTANCES = new Metric({
   name: "quota.instances",
-  label: "",
-  unit: "",
+  label: "Instances quota",
+  raw_unit: "",
+  display_unit: "",
   scale: 1,
 });
 
 export const HYPERVISOR_STATUS = new Metric({
   name: "hypervisor.status",
   label: "",
-  unit: "",
+  raw_unit: "",
+  display_unit: "",
   scale: 1,
 });
 
 export const HYPERVISOR_STATE = new Metric({
   name: "hypervisor.state",
   label: "",
-  unit: "",
+  raw_unit: "",
+  display_unit: "",
   scale: 1,
 });
 
 export const HYPERVISOR_CPUS_TOTAL = new Metric({
   name: "hypervisor.cpus.total",
   label: "",
-  unit: "cpus",
+  raw_unit: "cpus",
+  display_unit: "cpus",
   scale: 1,
 });
 
 export const HYPERVISOR_VCPUS_TOTAL = new Metric({
   name: "hypervisor.vcpus.total",
   label: "",
-  unit: "vcpus",
+  raw_unit: "vcpus",
+  display_unit: "vcpus",
   scale: 1,
 });
 
 export const HYPERVISOR_VCPUS_USED = new Metric({
   name: "hypervisor.vcpus.used",
   label: "",
-  unit: "vcpus",
+  raw_unit: "vcpus",
+  display_unit: "vcpus",
   scale: 1,
 });
 
 export const HYPERVISOR_RAM_TOTAL = new Metric({
   name: "hypervisor.ram.total",
   label: "",
-  unit: "GB",
-  scale: 1/1e9,
+  raw_unit: "B",
+  display_unit: "GB",
 });
 
 export const HYPERVISOR_MEMORY_TOTAL = new Metric({
   name: "hypervisor.memory.total",
   label: "",
-  unit: "GB",
-  scale: 1/1e9,
+  raw_unit: "B",
+  display_unit: "GB",
 });
 
 export const HYPERVISOR_MEMORY_USED = new Metric({
   name: "hypervisor.memory.used",
   label: "",
-  unit: "GB",
-  scale: 1/1e9,
+  raw_unit: "B",
+  display_unit: "GB",
 });
 
 export const HYPERVISOR_RUNNING_VMS = new Metric({
   name: "hypervisor.vms.running",
   label: "",
-  unit: "vms",
+  raw_unit: "vms",
+  display_unit: "vms",
   scale: 1,
 });
 
 export const HYPERVISOR_WORKLOAD = new Metric({
   name: "hypervisor.workload",
   label: "",
-  unit: "",
+  raw_unit: "",
+  display_unit: "",
   scale: 1,
 });
 
 export const HYPERVISOR_LOAD_5m = new Metric({
   name: "hypervisor.load.5m",
   label: "",
-  unit: "%",
+  raw_unit: "%",
+  display_unit: "%",
   scale: 1,
 });
 
 export const HYPERVISOR_LOAD_10m = new Metric({
   name: "hypervisor.load.10m",
   label: "",
-  unit: "%",
+  raw_unit: "%",
+  display_unit: "%",
   scale: 1,
 });
 
 export const HYPERVISOR_LOAD_15m = new Metric({
   name: "hypervisor.load.15m",
   label: "",
-  unit: "%",
+  raw_unit: "%",
+  display_unit: "%",
   scale: 1,
 });
 
 export const HYPERVISOR_DISK_TOTAL = new Metric({
   name: "hypervisor.disk.total",
   label: "",
-  unit: "TB",
-  scale: 1/1e12,
+  raw_unit: "B",
+  display_unit: "TB",
 });
 
 export const HYPERVISOR_DISK_USED = new Metric({
   name: "hypervisor.disk.used",
   label: "",
-  unit: "TB",
-  scale: 1/1e12,
+  raw_unit: "B",
+  display_unit: "TB",
 });
 
 export const HYPERVISOR_DISK_FREE = new Metric({
   name: "hypervisor.disk.free",
   label: "",
-  unit: "TB",
-  scale: 1/1e12,
+  raw_unit: "B",
+  display_unit: "TB",
 });
 
 export const HYPERVISOR_DISK_FREE_LEAST = new Metric({
   name: "hypervisor.disk.free.least",
   label: "",
-  unit: "TB",
-  scale: 1/1e12,
+  raw_unit: "B",
+  display_unit: "TB",
 });

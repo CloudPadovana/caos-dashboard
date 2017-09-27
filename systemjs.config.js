@@ -38,6 +38,7 @@
     'moment': './node_modules/moment',
     'primeng': './node_modules/primeng',
     'd3': './node_modules/d3',
+    'mathjs': './node_modules/mathjs',
     'nvd3': './node_modules/nvd3',
     'ng2-nvd3': './node_modules/ng2-nvd3'
   };
@@ -66,6 +67,12 @@
 
     'd3': {
       main: 'd3.js',
+      defaultExtension: 'js',
+      format: 'global'
+    },
+
+    'mathjs': {
+      main: 'dist/math.js',
       defaultExtension: 'js',
       format: 'global'
     },

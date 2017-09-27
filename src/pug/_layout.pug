@@ -54,6 +54,7 @@ body
       'primeng': 'npm:primeng',
       'moment': 'npm:moment',
       'd3': 'npm:d3',
+      'mathjs': 'npm:mathjs',
       'nvd3': 'npm:nvd3',
       'ng2-nvd3': 'npm:ng2-nvd3',
     };
@@ -86,6 +87,11 @@ body
         moment: { main: 'min/moment-with-locales.js', defaultExtension: 'js' },
         d3: {
           main: 'd3.js',
+          defaultExtension: 'js',
+          format: 'global'
+        },
+        mathjs: {
+          main: 'dist/math.js',
           defaultExtension: 'js',
           format: 'global'
         },
