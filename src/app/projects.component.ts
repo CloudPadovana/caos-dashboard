@@ -398,6 +398,43 @@ export class ProjectsComponent implements OnInit {
         ]
       },
       {
+        label: "VCPU",
+        y_axis_label: "vcpus",
+
+        series: [
+          new GraphExpressionSeriesConfig({
+            label: "used",
+            metric: Metrics.IDENTITY,
+            expression: "x / GRANULARITY",
+            terms: {
+              x: {
+                metric: Metrics.VM_VCPUS_USAGE,
+                period: 3600,
+                tag: {key: CAOS_PROJECT_TAG_KEY},
+                downsample: "SUM",
+                aggregate: "SUM"
+              }
+            }
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "TOTAL VCPUs",
+            metric: Metrics.HYPERVISOR_VCPUS_TOTAL,
+            period: 0,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            downsample: "AVG",
+            aggregate: "SUM"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "Quota",
+            metric: Metrics.QUOTA_VCPUS,
+            period: 0,
+            downsample: "AVG",
+            aggregate: "SUM",
+            tag: {key: CAOS_PROJECT_TAG_KEY}
+          })
+        ]
+      },
+      {
         label: "VRAM",
         y_axis_label: "GB",
 
@@ -614,6 +651,35 @@ export class ProjectsComponent implements OnInit {
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
                 downsample: "AVG",
                 aggregate: "SUM"
+              })
+            ]
+          },
+          {
+            label: "VCPU",
+            y_axis_label: "vcpus",
+
+            series: [
+              new GraphExpressionSeriesConfig({
+                label: "used",
+                metric: Metrics.IDENTITY,
+                expression: "x / GRANULARITY",
+                terms: {
+                  x: {
+                    metric: Metrics.VM_VCPUS_USAGE,
+                    period: 3600,
+                    tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
+                    downsample: "SUM",
+                    aggregate: "SUM"
+                  }
+                }
+              }),
+              new GraphAggregateSeriesConfig({
+                label: "Quota",
+                metric: Metrics.QUOTA_VCPUS,
+                period: 0,
+                downsample: "AVG",
+                aggregate: "SUM",
+                tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
               })
             ]
           },
