@@ -157,10 +157,10 @@ export class AccountingComponent implements OnInit, AfterViewInit {
     // drop old data
     this.stats = [];
 
-    let overall = NaN;
+    let overall: number = 0;
     this._series.query(series, this.date_range.start, this.date_range.end, granularity)
       .map((s: SeriesData) => {
-        let value = NaN;
+        let value: number = 0;
 
         if (s.samples && s.samples.length > 0) {
           value = s.samples[0].v;
@@ -173,7 +173,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
         return <StatsSeries>({
           value: value,
           name: s.config.label,
-          overall_percent: NaN
+          overall_percent: 0
         });
       })
       .subscribe(
