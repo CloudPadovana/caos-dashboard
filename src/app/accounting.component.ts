@@ -220,7 +220,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
     }));
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
-      label: "TOTAL",
+      label: "BARE",
       metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
@@ -228,6 +228,36 @@ export class AccountingComponent implements OnInit, AfterViewInit {
           metric: Metrics.HYPERVISOR_CPUS_TOTAL,
           period: 0,
           tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+          downsample: "AVG",
+          aggregate: "SUM"
+        }
+      }
+    }));
+
+    cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
+      label: "VCPU",
+      metric: Metrics.IDENTITY,
+      expression: "x * GRANULARITY/3600",
+      terms: {
+        x: {
+          metric: Metrics.HYPERVISOR_VCPUS_TOTAL,
+          period: 0,
+          tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+          downsample: "AVG",
+          aggregate: "SUM"
+        }
+      }
+    }));
+
+    cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
+      label: "QUOTA",
+      metric: Metrics.IDENTITY,
+      expression: "x * GRANULARITY/3600",
+      terms: {
+        x: {
+          metric: Metrics.QUOTA_VCPUS,
+          period: 0,
+          tag: {key: CAOS_PROJECT_TAG_KEY},
           downsample: "AVG",
           aggregate: "SUM"
         }
@@ -262,7 +292,22 @@ export class AccountingComponent implements OnInit, AfterViewInit {
     }));
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
-      label: "TOTAL",
+      label: "BARE",
+      metric: Metrics.IDENTITY,
+      expression: "x * GRANULARITY/3600",
+      terms: {
+        x: {
+          metric: Metrics.HYPERVISOR_CPUS_TOTAL,
+          period: 0,
+          tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+          downsample: "AVG",
+          aggregate: "SUM"
+        }
+      }
+    }));
+
+    cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
+      label: "VCPU",
       metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
@@ -270,6 +315,21 @@ export class AccountingComponent implements OnInit, AfterViewInit {
           metric: Metrics.HYPERVISOR_VCPUS_TOTAL,
           period: 0,
           tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+          downsample: "AVG",
+          aggregate: "SUM"
+        }
+      }
+    }));
+
+    cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
+      label: "QUOTA",
+      metric: Metrics.IDENTITY,
+      expression: "x * GRANULARITY/3600",
+      terms: {
+        x: {
+          metric: Metrics.QUOTA_VCPUS,
+          period: 0,
+          tag: {key: CAOS_PROJECT_TAG_KEY},
           downsample: "AVG",
           aggregate: "SUM"
         }
