@@ -36,7 +36,7 @@ graph([config]='graph_config', [show_daterange_selector]="true", [show_set_selec
   .col
     .card
       .card-block
-        h4.card-title VCPU Usage [hours]
+        h4.card-title VCPUs
         .progress
           .progress-bar([style.width.%]="overall.vcpus_usage_percent", [ngClass]="usage_class(overall.vcpus_usage_percent)")
             | {{ overall.vcpus_usage_percent | number:'1.2-2' }}%
@@ -72,7 +72,7 @@ p-dataTable(#dt, [value]="projects", tableStyleClass="table", expandableRows="tr
       | {{ rd.vms_active }} of {{ rd.vms_total }}
 
 
-  p-column(header="VCPU Usage [hours]")
+  p-column(header="VCPUs")
     ng-template(let-col, let-rd="rowData", pTemplate="body")
       .progress
         .progress-bar([style.width.%]="rd.vcpus_usage_percent", [ngClass]="usage_class(rd.vcpus_usage_percent)")
