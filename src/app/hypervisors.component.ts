@@ -289,6 +289,31 @@ export class HypervisorsComponent implements OnInit {
           }),
         ]
       },
+      {
+        label: "Load",
+        y_axis_label: "%",
+
+        series: [
+          new GraphAggregateSeriesConfig({
+            label: "5min",
+            ...Series.HYPERVISOR_LOAD_5m,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "AVG"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "10min",
+            ...Series.HYPERVISOR_LOAD_10m,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "AVG"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "15min",
+            ...Series.HYPERVISOR_LOAD_15m,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "AVG"
+          }),
+        ]
+      },
     ]
   });
 
@@ -365,6 +390,31 @@ export class HypervisorsComponent implements OnInit {
                 aggregate: "SUM"
               }),
             ]
+          },
+          {
+            label: "Load",
+            y_axis_label: "%",
+
+            series: [
+              new GraphAggregateSeriesConfig({
+                label: "5min",
+                ...Series.HYPERVISOR_LOAD_5m,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "AVG"
+              }),
+              new GraphAggregateSeriesConfig({
+                label: "10min",
+                ...Series.HYPERVISOR_LOAD_10m,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "AVG"
+              }),
+              new GraphAggregateSeriesConfig({
+                label: "15min",
+                ...Series.HYPERVISOR_LOAD_15m,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "AVG"
+              }),
+            ],
           },
         ]
       });

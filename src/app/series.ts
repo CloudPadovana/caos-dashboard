@@ -71,3 +71,21 @@ export const HYPERVISOR_WORKLOAD = {
   period: 0,
   downsample: "AVG",
 };
+
+export const HYPERVISOR_LOAD_5m = {
+  metric: Metrics.HYPERVISOR_LOAD_5m,
+  period: 0,
+  downsample: "AVG",
+};
+
+export const HYPERVISOR_LOAD_10m = {
+  metric: Metrics.HYPERVISOR_LOAD_10m,
+  period: 0,
+  downsample: "AVG",
+};
+
+export const HYPERVISOR_LOAD_15m = {
+  metric: Metrics.HYPERVISOR_LOAD_15m,
+  period: 0,
+  downsample: "AVG",
+};
