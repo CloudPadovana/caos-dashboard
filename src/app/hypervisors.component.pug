@@ -96,7 +96,9 @@ graph([config]='graph_config', [show_daterange_selector]="true", [show_set_selec
 hr
 h3 Hypervisors
 
-p-dataTable(#dt, [value]="hypervisors", tableStyleClass="table")
+p-dataTable(#dt, [value]="hypervisors", tableStyleClass="table", expandableRows="true")
+  p-column(expander="true", [style]="{'width':'32px'}")
+
   p-column(header='Name', field='hostname', [sortable]="true")
   p-column(header='Last Updated', field='last_updated', [sortable]="true")
   p-column(header='State / Status')
@@ -155,3 +157,7 @@ p-dataTable(#dt, [value]="hypervisors", tableStyleClass="table")
           .progress
             .progress-bar([style.width.%]="rd.load_15m", [ngClass]="usage_class(rd.load_15m)")
               | {{ rd.load_15m | number:'1.2-2' }}%
+
+
+  ng-template(let-hypervisor, pTemplate="rowexpansion")
+    graph([config]='graph_config_for_hypervisor[hypervisor.hostname]')

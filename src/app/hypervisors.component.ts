@@ -185,6 +185,7 @@ export class HypervisorsComponent implements OnInit {
           this.hypervisors = data.hypervisors.map(
             (h: IHypervisor) => new Hypervisor(h));
 
+          this.build_graph_configs();
           this.compute_total();
         });
   }
@@ -290,4 +291,85 @@ export class HypervisorsComponent implements OnInit {
       },
     ]
   });
+
+  graph_config_for_hypervisor: { [key: string]: GraphConfig } = {};
+  build_graph_configs() {
+    for(let h of this.hypervisors) {
+      let cfg = <GraphConfig>({
+        sets: [
+          {
+            label: "CPU",
+            y_axis_label: "vcpus",
+
+            series: [
+              new GraphAggregateSeriesConfig({
+                label: "Used VCPUs",
+                ...Series.HYPERVISOR_VCPUS_USED,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "SUM"
+              }),
+              new GraphAggregateSeriesConfig({
+                label: "VCPUs",
+                ...Series.HYPERVISOR_VCPUS_TOTAL,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "SUM"
+              }),
+              new GraphAggregateSeriesConfig({
+                label: "CPUs",
+                ...Series.HYPERVISOR_CPUS_TOTAL,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "SUM"
+              }),
+            ]
+          },
+          {
+            label: "RAM",
+            y_axis_label: "GB",
+
+            series: [
+              new GraphAggregateSeriesConfig({
+                label: "Used VRAM",
+                ...Series.HYPERVISOR_MEMORY_USED,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "SUM"
+              }),
+              new GraphAggregateSeriesConfig({
+                label: "VRAM",
+                ...Series.HYPERVISOR_MEMORY_TOTAL,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "SUM"
+              }),
+              new GraphAggregateSeriesConfig({
+                label: "RAM",
+                ...Series.HYPERVISOR_RAM_TOTAL,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "SUM"
+              }),
+            ]
+          },
+          {
+            label: "Instances",
+            y_axis_label: "",
+
+            series: [
+              new GraphAggregateSeriesConfig({
+                label: "Running",
+                ...Series.HYPERVISOR_RUNNING_VMS,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "SUM"
+              }),
+              new GraphAggregateSeriesConfig({
+                label: "Workload",
+                ...Series.HYPERVISOR_WORKLOAD,
+                tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
+                aggregate: "SUM"
+              }),
+            ]
+          },
+        ]
+      });
+
+      this.graph_config_for_hypervisor[h.hostname] = cfg;
+    }
+  }
 }
