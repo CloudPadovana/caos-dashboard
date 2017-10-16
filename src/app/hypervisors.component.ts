@@ -32,6 +32,15 @@ import {
   Hypervisor as BaseHypervisor,
 } from './hypervisor';
 
+import { DateRange } from './components/daterange.component';
+import {
+  GraphConfig,
+  Metrics,
+  Series,
+  GraphAggregateSeriesConfig,
+  GraphExpressionSeriesConfig
+} from './components/graph.component';
+
 interface IHypervisor extends IBaseHypervisor {
   cpus_total: number;
   vcpus_total: number;
@@ -207,4 +216,78 @@ export class HypervisorsComponent implements OnInit {
       return acc;
       }, this.total);
   }
+
+  graph_config: GraphConfig = <GraphConfig>({
+    sets: [
+      {
+        label: "CPU",
+        y_axis_label: "vcpus",
+
+        series: [
+          new GraphAggregateSeriesConfig({
+            label: "Used VCPUs",
+            ...Series.HYPERVISOR_VCPUS_USED,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "SUM"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "VCPUs",
+            ...Series.HYPERVISOR_VCPUS_TOTAL,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "SUM"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "CPUs",
+            ...Series.HYPERVISOR_CPUS_TOTAL,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "SUM"
+          }),
+        ]
+      },
+      {
+        label: "RAM",
+        y_axis_label: "GB",
+
+        series: [
+          new GraphAggregateSeriesConfig({
+            label: "Used VRAM",
+            ...Series.HYPERVISOR_MEMORY_USED,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "SUM"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "VRAM",
+            ...Series.HYPERVISOR_MEMORY_TOTAL,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "SUM"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "RAM",
+            ...Series.HYPERVISOR_RAM_TOTAL,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "SUM"
+          }),
+        ]
+      },
+      {
+        label: "Instances",
+        y_axis_label: "",
+
+        series: [
+          new GraphAggregateSeriesConfig({
+            label: "Running",
+            ...Series.HYPERVISOR_RUNNING_VMS,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "SUM"
+          }),
+          new GraphAggregateSeriesConfig({
+            label: "Workload",
+            ...Series.HYPERVISOR_WORKLOAD,
+            tag: {key: CAOS_HYPERVISOR_TAG_KEY},
+            aggregate: "SUM"
+          }),
+        ]
+      },
+    ]
+  });
 }

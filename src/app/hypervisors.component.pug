@@ -91,6 +91,8 @@ h3 Global Overview
             | {{ total.ram_used_percent | number:'1.2-2' }}%
         | {{ total.memory_used / 1e9 | number:'1.2-2' }} of {{ total.ram_total / 1e9 | number:'1.2-2' }}
 
+graph([config]='graph_config', [show_daterange_selector]="true", [show_set_selector]="true")
+
 hr
 h3 Hypervisors
 
