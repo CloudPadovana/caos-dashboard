@@ -31,15 +31,13 @@ export_version_vars
 
 docker_login
 
-CAOS_DASHBOARD_DOCKER_IMAGE_TAG=${CI_REGISTRY_IMAGE}:${CAOS_DASHBOARD_RELEASE_GIT_VERSION}
-
 say_yellow  "Pulling docker container"
-docker pull ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG}-test
+docker pull ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG}
 
 say_yellow  "Running docker container"
 docker run -d --name caos-dashboard-test \
        -e CAOS_DASHBOARD_BASE_NAME=some-base-name \
-       ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG}-test
+       ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG}
 caos_dashboard_ip=$(docker inspect caos-dashboard-test --format '{{ .NetworkSettings.IPAddress }}')
 
 sleep 10
