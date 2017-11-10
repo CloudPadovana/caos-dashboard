@@ -30,8 +30,6 @@ import { ApiService, Status } from './api.service';
 
 @Injectable()
 export class AuthService {
-  private _token: string;
-
   constructor(private _api: ApiService) {
     let token = sessionStorage.getItem('token');
     if (token) {
@@ -61,7 +59,6 @@ export class AuthService {
 
   logout() {
     sessionStorage.removeItem('token');
-    this._token = null;
     this._api.set_token(null);
   }
 }
