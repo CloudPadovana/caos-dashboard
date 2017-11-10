@@ -24,6 +24,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { SETTINGS } from './settings';
 import { AuthService } from './auth.service';
 
 @Component({
@@ -32,6 +33,7 @@ import { AuthService } from './auth.service';
 })
 
 export class LoginComponent {
+  readonly site_name: string = SETTINGS.CAOS_SITE_NAME;
   username: string;
   password: string;
   error_message: string = '';

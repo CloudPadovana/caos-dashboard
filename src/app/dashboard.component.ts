@@ -24,6 +24,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { SETTINGS } from './settings';
 import { AuthService } from './auth.service';
 
 @Component({
@@ -37,5 +38,13 @@ export class DashboardComponent {
   logout() {
     this._auth.logout();
     this._router.navigate(['/login']);
+  }
+
+  get site_name(): string {
+    if(SETTINGS.CAOS_SITE_NAME) {
+      return SETTINGS.CAOS_SITE_NAME;
+    } else {
+      return "Home";
+    }
   }
 }
