@@ -27,18 +27,28 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 
 import { ApiService, Status } from './api.service';
+import { SETTINGS } from './settings';
+import { b64EncodeUnicode } from './utils';
 
 @Injectable()
 export class AuthService {
+  private _token_key: string;
+
   constructor(private _api: ApiService) {
-    let token = sessionStorage.getItem('token');
+    this._token_key = this.build_key("token");
+
+    let token = sessionStorage.getItem(this._token_key);
     if (token) {
       this.set_token(token);
     }
   }
 
+  private build_key(key: string): string {
+    return b64EncodeUnicode(`${SETTINGS.CAOS_SITE_NAME}_${key}`);
+  }
+
   private set_token(token: string) {
-    sessionStorage.setItem('token', token);
+    sessionStorage.setItem(this._token_key, token);
     this._api.set_token(token);
   }
 
@@ -58,7 +68,7 @@ export class AuthService {
   }
 
   logout() {
-    sessionStorage.removeItem('token');
+    sessionStorage.removeItem(this._token_key);
     this._api.set_token(null);
   }
 }
