@@ -46,6 +46,7 @@ export interface TagConfig {
 
 export interface SeriesConfig {
   label: string;
+  description: string;
 
   transform(samples: Sample[]): Sample[];
 
@@ -59,6 +60,8 @@ export interface SeriesConfig {
 
 interface IBaseSeriesParams {
   label?: string;
+  description?: string;
+
   metric: Metrics.IMetric;
 }
 
@@ -78,6 +81,13 @@ abstract class BaseSeriesConfig<T extends IBaseSeriesParams> implements SeriesCo
 
   get label(): string {
     return this._params.label;
+  }
+
+  get description(): string {
+    if(this._params.description) {
+      return this._params.description;
+    }
+    return "";
   }
 
   protected get params(): T {
