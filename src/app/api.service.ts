@@ -99,7 +99,7 @@ export class ApiService {
   status(): Observable<Status> {
     return this._httpget(`${SETTINGS.CAOS_API_URL}/status`)
       .map((r: Response) => this.parse_status(r.json().data))
-      .catch(this.handle_error);
+      .catch((err: any) => this.handle_error(err));
   }
 
   private parse_status(data: any): Status {
@@ -118,7 +118,7 @@ export class ApiService {
 
     return this.__http.post(`${SETTINGS.CAOS_API_URL}/token`, params)
       .map((r: Response) => r.json().data.token)
-      .catch(this.handle_error);
+      .catch((err: any) => this.handle_error(err));
   }
 
   set_token(token: string) {
