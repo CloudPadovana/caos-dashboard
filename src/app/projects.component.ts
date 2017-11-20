@@ -198,12 +198,15 @@ export class ProjectsComponent implements OnInit {
 
         series: [
           new GraphAggregateSeriesConfig({
+            label: "CPU Time",
+            description: "CPU time consumed over the specified granularity.",
             metric: Metrics.VM_CPU_TIME_USAGE,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
           }),
           new GraphExpressionSeriesConfig({
             label: "TOTAL CPUs",
+            description: "Total CPU time available (physical cores).",
             metric: Metrics.IDENTITY,
             expression: "x * GRANULARITY/3600",
             terms: {
@@ -217,12 +220,15 @@ export class ProjectsComponent implements OnInit {
             }
           }),
           new GraphAggregateSeriesConfig({
+            label: "Wall Clock Time",
+            description: "VCPU time consumed over the specified granularity.",
             metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
           }),
           new GraphExpressionSeriesConfig({
             label: "TOTAL VCPUs",
+            description: "Total VCPU time available (taking overcommitment into account).",
             metric: Metrics.IDENTITY,
             expression: "x * GRANULARITY/3600",
             terms: {
@@ -237,6 +243,7 @@ export class ProjectsComponent implements OnInit {
           }),
           new GraphExpressionSeriesConfig({
             label: "Quota",
+            description: "Total VCPU time available as given by quota.",
             metric: Metrics.IDENTITY,
             expression: "x * GRANULARITY/3600",
             terms: {
@@ -257,6 +264,8 @@ export class ProjectsComponent implements OnInit {
 
         series: [
           new GraphExpressionSeriesConfig({
+            label: "CPU Efficiency",
+            description: "Ratio between CPU Time and Wall Clock Time.",
             metric: Metrics.IDENTITY,
             expression: "x / y * 100",
             terms: {
@@ -283,6 +292,8 @@ export class ProjectsComponent implements OnInit {
 
         series: [
           new GraphAggregateSeriesConfig({
+            label: "Active VMs",
+            description: "Number of active VMs",
             metric: Metrics.VM_COUNT_ACTIVE,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
@@ -290,6 +301,8 @@ export class ProjectsComponent implements OnInit {
             aggregate: "SUM"
           }),
           new GraphAggregateSeriesConfig({
+            label: "Deleted VMs",
+            description: "Number of deleted VMs",
             metric: Metrics.VM_COUNT_DELETED,
             period: 3600,
             tag: {key: CAOS_PROJECT_TAG_KEY},
@@ -297,7 +310,8 @@ export class ProjectsComponent implements OnInit {
             aggregate: "SUM"
           }),
           new GraphAggregateSeriesConfig({
-            label: "QUOTA",
+            label: "Quota",
+            description: "Total VMs available as given by quota.",
             metric: Metrics.QUOTA_INSTANCES,
             period: 0,
             tag: {key: CAOS_PROJECT_TAG_KEY},
@@ -312,7 +326,8 @@ export class ProjectsComponent implements OnInit {
 
         series: [
           new GraphExpressionSeriesConfig({
-            label: "used",
+            label: "Used VCPUs",
+            description: "Number of used VCPUs",
             metric: Metrics.IDENTITY,
             expression: "x / GRANULARITY",
             terms: {
@@ -327,6 +342,7 @@ export class ProjectsComponent implements OnInit {
           }),
           new GraphAggregateSeriesConfig({
             label: "TOTAL VCPUs",
+            description: "Total VCPUs available (taking overcommitment into account).",
             metric: Metrics.HYPERVISOR_VCPUS_TOTAL,
             period: 0,
             tag: {key: CAOS_HYPERVISOR_TAG_KEY},
@@ -335,6 +351,7 @@ export class ProjectsComponent implements OnInit {
           }),
           new GraphAggregateSeriesConfig({
             label: "Quota",
+            description: "Total VCPUs available as given by quota.",
             metric: Metrics.QUOTA_VCPUS,
             period: 0,
             downsample: "AVG",
@@ -483,17 +500,22 @@ export class ProjectsComponent implements OnInit {
 
             series: [
               new GraphAggregateSeriesConfig({
+                label: "CPU Time",
+                description: "CPU time consumed over the specified granularity.",
                 metric: Metrics.VM_CPU_TIME_USAGE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
               }),
               new GraphAggregateSeriesConfig({
+                label: "Wall Clock Time",
+                description: "VCPU time consumed over the specified granularity.",
                 metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
               }),
               new GraphExpressionSeriesConfig({
                 label: "Quota",
+                description: "Total VCPU time available as given by quota.",
                 metric: Metrics.IDENTITY,
                 expression: "x * GRANULARITY/3600",
                 terms: {
@@ -514,6 +536,8 @@ export class ProjectsComponent implements OnInit {
 
             series: [
               new GraphExpressionSeriesConfig({
+                label: "CPU Efficiency",
+                description: "Ratio between CPU Time and Wall Clock Time.",
                 metric: Metrics.IDENTITY,
                 expression: "x / y * 100",
                 terms: {
@@ -540,14 +564,17 @@ export class ProjectsComponent implements OnInit {
 
             series: [
               new GraphAggregateSeriesConfig({
+                label: "Active VMs",
+                description: "Number of active VMs",
                 metric: Metrics.VM_COUNT_ACTIVE,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
                 downsample: "AVG",
                 aggregate: "SUM"
-
               }),
               new GraphAggregateSeriesConfig({
+                label: "Deleted VMs",
+                description: "Number of deleted VMs",
                 metric: Metrics.VM_COUNT_DELETED,
                 period: 3600,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
@@ -555,6 +582,8 @@ export class ProjectsComponent implements OnInit {
                 aggregate: "SUM"
               }),
               new GraphAggregateSeriesConfig({
+                label: "Quota",
+                description: "Total VMs available as given by quota.",
                 metric: Metrics.QUOTA_INSTANCES,
                 period: 0,
                 tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}],
@@ -569,7 +598,8 @@ export class ProjectsComponent implements OnInit {
 
             series: [
               new GraphExpressionSeriesConfig({
-                label: "used",
+                label: "Used VCPUs",
+                description: "Number of used VCPUs",
                 metric: Metrics.IDENTITY,
                 expression: "x / GRANULARITY",
                 terms: {
@@ -584,6 +614,7 @@ export class ProjectsComponent implements OnInit {
               }),
               new GraphAggregateSeriesConfig({
                 label: "Quota",
+                description: "Total VCPUs available as given by quota.",
                 metric: Metrics.QUOTA_VCPUS,
                 period: 0,
                 downsample: "AVG",
