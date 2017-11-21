@@ -30,7 +30,7 @@ import { RouterModule } from '@angular/router';
 import { Ng2BootstrapModule } from 'ngx-bootstrap';
 import * as d3 from 'd3';
 import 'nvd3';
-import { nvD3 } from 'ng2-nvd3';
+import { NvD3Module } from 'ng2-nvd3';
 
 import { DateRangeComponent } from './daterange.component';
 import { GraphComponent } from './graph.component';
@@ -45,8 +45,6 @@ import {
 
 @NgModule({
   declarations: [
-    nvD3,
-
     DateRangeComponent,
     GraphComponent,
   ],
@@ -56,6 +54,7 @@ import {
     FormsModule,
     RouterModule,
     Ng2BootstrapModule.forRoot(),
+    NvD3Module,
 
     DataTableModule,
     DropdownModule,
@@ -69,7 +68,6 @@ import {
     FormsModule,
     RouterModule,
     Ng2BootstrapModule,
-    nvD3,
 
     DataTableModule,
     DropdownModule,
