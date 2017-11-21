@@ -27,7 +27,10 @@ import { HttpModule  } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-import { Ng2BootstrapModule } from 'ngx-bootstrap';
+import { DatepickerModule } from 'ngx-bootstrap/datepicker';
+import { PopoverModule } from 'ngx-bootstrap/popover';
+import { TimepickerModule } from 'ngx-bootstrap/timepicker';
+
 import * as d3 from 'd3';
 import 'nvd3';
 import { NvD3Module } from 'ng2-nvd3';
@@ -53,7 +56,11 @@ import {
     HttpModule,
     FormsModule,
     RouterModule,
-    Ng2BootstrapModule.forRoot(),
+
+    DatepickerModule.forRoot(),
+    PopoverModule.forRoot(),
+    TimepickerModule.forRoot(),
+
     NvD3Module,
 
     DataTableModule,
@@ -67,7 +74,10 @@ import {
     HttpModule,
     FormsModule,
     RouterModule,
-    Ng2BootstrapModule,
+
+    DatepickerModule,
+    PopoverModule,
+    TimepickerModule,
 
     DataTableModule,
     DropdownModule,
