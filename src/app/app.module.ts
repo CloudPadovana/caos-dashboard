@@ -25,6 +25,11 @@ import { NgModule, LOCALE_ID }  from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { registerLocaleData } from '@angular/common';
+import localeIt from '@angular/common/locales/it';
+
+registerLocaleData(localeIt);
+
 import { SETTINGS } from './settings';
 import { CAOS_ROUTING, CAOS_ROUTING_PROVIDERS } from './app.routing';
 
