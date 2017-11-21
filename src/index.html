@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"></html>
+<head>
+  <base href="/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width, maximum-scale=1.0, user-scalable=no">
+  <title>CAOS - Control Application for OpenStack</title>
+  <script src="js/vendor/shim.min.js"></script>
+  <script src="js/vendor/zone.min.js"></script>
+  <script src="js/vendor/system.js"></script>
+  <script src="js/env.js"></script>
+  <script src="js/bundle.js"></script>
+  <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <app>
+    <div class="loader">Loading...</div>
+  </app>
+  <script>
+    var map = {
+      'rxjs': 'npm:rxjs',
+      'reflect-metadata': 'npm:reflect-metadata',
+    
+      'ngx-bootstrap': 'npm:ngx-bootstrap',
+      'primeng': 'npm:primeng',
+      'moment': 'npm:moment',
+      'd3': 'npm:d3',
+      'mathjs': 'npm:mathjs',
+      'nvd3': 'npm:nvd3',
+      'ng2-nvd3': 'npm:ng2-nvd3',
+    };
+    var angular_pkgs = [
+      'animations',
+      'common',
+      'compiler',
+      'core',
+      'forms',
+      'http',
+      'platform-browser',
+      'platform-browser-dynamic',
+      'router'
+    ];
+    
+    angular_pkgs.forEach(function(pkgName) {
+      map['@angular/' + pkgName] = 'npm:@angular/' + pkgName + '/bundles/' + pkgName + '.umd.js';
+    });
+    map['@angular/platform-browser/animations'] = 'npm:@angular/platform-browser/bundles/platform-browser-animations.umd.js';
+    map['@angular/animations/browser'] = 'npm:@angular/animations/bundles/animations-browser.umd.js';
+    
+    System.config({
+      transpiler: false,
+      map: map,
+      packages: {
+        caos: { defaultExtension: 'js' },
+        rxjs: { defaultExtension: 'js' },
+        'reflect-metadata': { main: 'Reflect.js', defaultExtension: 'js' },
+    
+        moment: { main: 'min/moment-with-locales.js', defaultExtension: 'js' },
+        d3: {
+          main: 'd3.js',
+          defaultExtension: 'js',
+          format: 'global'
+        },
+        mathjs: {
+          main: 'dist/math.js',
+          defaultExtension: 'js',
+          format: 'global'
+        },
+        nvd3: {
+          main: 'build/nv.d3.js',
+          defaultExtension: 'js',
+          format: 'global',
+          meta: { deps: 'd3' }
+        },
+        'ng2-nvd3': {
+          main: 'build/lib/ng2-nvd3.js',
+          defaultExtension: 'js',
+          meta: { deps: 'nvd3' }
+        },
+        'ngx-bootstrap': { main: 'bundles/ngx-bootstrap.umd.js', defaultExtension: 'js', format: 'cjs' },
+        'primeng': { main: 'primeng.js', defaultExtension: 'js' },
+      }
+    });
+    
+    System.import('caos/bootstrap')
+      .catch(function(err) { console.error(err); });
+  </script>
+</body>

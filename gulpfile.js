@@ -28,7 +28,6 @@ const debug = require('gulp-debug');
 const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const inject = require('gulp-inject-string');
-const pug = require('gulp-pug');
 const sass = require('gulp-sass');
 const server = require('gulp-server-livereload');
 const sourcemaps = require('gulp-sourcemaps');
@@ -40,7 +39,6 @@ const uglify = require('gulp-uglify');
 const SRC_DIR = './src';
 const SRC_APP_DIR = SRC_DIR + '/app';
 const SRC_ASSETS_DIR = SRC_DIR + '/assets';
-const SRC_PUG_DIR = SRC_DIR + '/pug';
 const SRC_STYLE_DIR = SRC_DIR + '/style';
 
 const OUTPUT_DIR = './output/';
@@ -190,58 +188,15 @@ gulp.task('watch:assets', ['build:assets'], function() {
   });
 });
 
-gulp.task('build:html:components', function() {
-  return gulp.src(SRC_APP_DIR + '/**/*.pug', { base: SRC_APP_DIR })
-    .pipe(pug({
-      doctype: 'html',
-      pretty: !flags.production
-    }))
-    .on('error', gutil.log)
-    .pipe(debug({title: "Stream contents:", minimal: true}))
-    .pipe(gulp.dest(OUTPUT_DIR));
-});
-
-gulp.task('build:html', function() {
-  return gulp.src(SRC_PUG_DIR + '/**/[^_]*.pug')
-    .pipe(pug({
-      doctype: 'html',
-      pretty: !flags.production
-    }))
-    .on('error', gutil.log)
-    .pipe(debug({title: "Stream contents:", minimal: true}))
-    .pipe(gulp.dest(OUTPUT_DIR));
-});
-
-gulp.task('watch:html:components', ['build:html:components'], function() {
-  var watcher = gulp.watch(SRC_APP_DIR + '/**/*.pug', ['build:html:components']);
-
-  watcher.on('change', function (event) {
-    console.log('Event ' + event.type + ' on path: ' + event.path);
-  });
-});
-
-gulp.task('watch:html', ['build:html'], function() {
-  var watcher = gulp.watch(SRC_PUG_DIR + '/**/*.pug', ['build:html']);
-
-  watcher.on('change', function (event) {
-    console.log('Event ' + event.type + ' on path: ' + event.path);
-  });
-});
-
-
 gulp.task('build', [
   'build:assets',
   'build:css',
-  'build:html',
-  'build:html:components',
   'build:js',
 ]);
 
 gulp.task('watch', [
   'watch:assets',
   'watch:css',
-  'watch:html',
-  'watch:html:components',
   'watch:js'
 ], function() {
   var watcher = gulp.watch('gulpfile.js', ['build']);
