@@ -1,29 +1,19 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "target": "es5",
-    "lib": [ "dom", "dom.iterable", "es2015", "es2015.iterable" ],
-    "module": "system",
-    "moduleResolution": "node",
-    "diagnostics": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
     "declaration": false,
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "noFallthroughCasesInSwitch": false,
-    "noResolve": false,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitUseStrict": false,
-    "noLib": false,
-    "pretty": true,
-    "removeComments": true,
-    "sourceMap": true,
-    "inlineSources": true
-  },
-  "exclude": [
-    "node_modules",
-    "src"
-  ],
-  "compileOnSave": false
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "dom"
+    ]
+  }
 }

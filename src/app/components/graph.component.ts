@@ -108,7 +108,7 @@ export interface GraphConfig {
 
 @Component({
   selector: 'graph',
-  templateUrl: 'components/graph.component.html'
+  templateUrl: 'graph.component.html'
 })
 export class GraphComponent implements AfterViewInit {
   @ViewChild(nvD3) nvD3: nvD3;

@@ -91,7 +91,7 @@ const PRESETS: DateRangePreset[] = [
 
 @Component({
   selector: 'daterange',
-  templateUrl: 'components/daterange.component.html'
+  templateUrl: 'daterange.component.html'
 })
 export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewChecked {
   private start_date: Date;
