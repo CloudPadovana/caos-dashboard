@@ -3,11 +3,9 @@
 !README.md
 !entrypoint.sh
 !env.js.template
-!gulpfile.js
 !nginx.conf.template
 !package.json
 !releases
 !src
-!systemjs.config.js
 !tsconfig.json
 !yarn.lock

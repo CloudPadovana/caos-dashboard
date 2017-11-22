@@ -41,11 +41,11 @@ fi
 
 if [ "${DO_PROD_BUILD}" == true ] ; then
     say_yellow "Building production release"
-    gulp production build
+    ng build --verbose --target=production
 else
     say_yellow "Building release"
-    gulp build
+    ng build --verbose
 fi
 
 say_yellow  "Creating release file"
-tar cvfz ${RELEASES_DIR}/caos_dashboard-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz -C output .
+tar cvfz ${RELEASES_DIR}/caos_dashboard-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz -C dist .

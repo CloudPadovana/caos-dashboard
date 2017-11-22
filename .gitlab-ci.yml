@@ -54,7 +54,7 @@ tslint:
   before_script:
     - ci-tools/prepare.sh
   script:
-    - gulp tslint
+    - ng lint
   allow_failure: true
 
 .release_template: &release_template

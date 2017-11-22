@@ -48,7 +48,7 @@ say_yellow  "Running tests"
 docker run --rm \
        -v "$PWD":/test \
        -w /test \
-       alpine:3.6 /bin/sh -c "apk add --no-cache curl && curl -v http://${caos_dashboard_ip}:80/some-base-name"
+       alpine:3.6 /bin/sh -c "apk add --no-cache curl && curl -v -L http://${caos_dashboard_ip}:80/some-base-name"
 
 say_yellow  "Cleanup"
 docker rm -f caos-dashboard-test
