@@ -34,7 +34,7 @@ docker_login
 say_yellow  "Building docker container"
 docker build \
        --tag ${CAOS_DASHBOARD_DOCKER_IMAGE_TAG} \
-       --build-arg RELEASE_FILE="releases/caos_dashboard-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz" \
+       --build-arg RELEASE_FILE="releases/caos_dashboard-${BUILD_TARGET}-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz" \
        --pull=true .
 
 if [ "${DO_DOCKER_PUSH}" == true ] ; then

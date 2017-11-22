@@ -67,25 +67,24 @@ tslint:
     - ci-tools/prepare.sh
   script:
     - ci-tools/release-build.sh
-  artifacts:
-    paths:
-      - releases/caos_dashboard-$(ci-tools/git-semver.sh).tar.gz
 
 release:dev:
   <<: *release_template
   variables:
     <<: *release_template_variables
-    DO_PROD_BUILD: "false"
-  except:
-    - master
+    BUILD_TARGET: development
+  artifacts:
+    paths:
+      - releases/caos_dashboard-${BUILD_TARGET}-$(ci-tools/git-semver.sh).tar.gz
 
 release:master:
   <<: *release_template
   variables:
     <<: *release_template_variables
-    DO_PROD_BUILD: "true"
-  only:
-    - master
+    BUILD_TARGET: production
+  artifacts:
+    paths:
+      - releases/caos_dashboard-${BUILD_TARGET}-$(ci-tools/git-semver.sh).tar.gz
 
 .docker_template: &docker_template
   image: docker:stable
@@ -103,7 +102,7 @@ release:master:
 .docker_build_template: &docker_build_template
   <<: *docker_template
   stage: docker-build
-  variables:
+  variables: &docker_build_template_variables
     <<: *docker_template_variables
     DO_DOCKER_PUSH: "true"
   script:
@@ -113,6 +112,9 @@ docker-build:dev:
   <<: *docker_build_template
   dependencies:
     - release:dev
+  variables:
+    <<: *docker_build_template_variables
+    BUILD_TARGET: development
   except:
     - master
 
@@ -120,6 +122,9 @@ docker-build:master:
   <<: *docker_build_template
   dependencies:
     - release:master
+  variables:
+    <<: *docker_build_template_variables
+    BUILD_TARGET: production
   only:
     - master
 
