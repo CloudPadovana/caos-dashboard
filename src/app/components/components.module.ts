@@ -27,6 +27,7 @@ import { HttpModule  } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { DatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
@@ -57,6 +58,7 @@ import {
     FormsModule,
     RouterModule,
 
+    CollapseModule.forRoot(),
     DatepickerModule.forRoot(),
     PopoverModule.forRoot(),
     TimepickerModule.forRoot(),
@@ -75,6 +77,7 @@ import {
     FormsModule,
     RouterModule,
 
+    CollapseModule,
     DatepickerModule,
     PopoverModule,
     TimepickerModule,

@@ -1,6 +1,10 @@
-<nav class="navbar navbar-toggleable-sm navbar-inverse bg-inverse fixed-top">
-  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#nb"><span class="navbar-toggler-icon"></span></button><a class="navbar-brand" routerLink="/">Home</a>
-  <div class="collapse navbar-collapse" id="nb">
+<nav class="navbar navbar-dark bg-dark navbar-expand-sm fixed-top">
+  <a class="navbar-brand" routerLink="/">Home</a>
+  <button class="navbar-toggler" type="button" (click)="isCollapsed = !isCollapsed">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" [collapse]="isCollapsed">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item"><a class="nav-link" routerLink="projects" routerLinkActive="active"><i class="fa fa-fw fa-users"></i>Projects</a></li>
       <li class="nav-item" routerLinkActive="active"><a class="nav-link" routerLink="hypervisors"><i class="fa fa-fw fa-microchip"></i>Hypervisors</a></li>
