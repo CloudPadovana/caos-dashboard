@@ -134,7 +134,7 @@ export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewCheck
     return this.is_daterange_same(d, r);
   }
 
-  private describe_daterange(d: DateRange): string {
+  describe_daterange(d: DateRange): string {
     if(!d) { return "" }
 
     // Check for presets
