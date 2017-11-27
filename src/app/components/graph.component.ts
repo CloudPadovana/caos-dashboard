@@ -51,6 +51,9 @@ import {
 } from '../series.service';
 export { Metrics };
 
+import * as Series from '../series';
+export { Series };
+
 interface GraphSeries {
   // nvd3 REQUIRES this type of struct
   values: Sample[];
