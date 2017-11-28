@@ -24,6 +24,8 @@
 var CaosSettings = {
   LOCALE: 'it-IT',
 
+  CAOS_SITE_NAME: 'caos',
+
   // CAOS API url
   CAOS_API_URL: 'https://localhost:4200/api/v1',
 };

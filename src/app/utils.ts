@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,30 +21,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+// Adapted from https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#The_Unicode_Problem
 
-import { SETTINGS } from './settings';
-import { AuthService } from './auth.service';
-
-@Component({
-  templateUrl: 'dashboard.component.html'
-})
-export class DashboardComponent {
-  navbarCollapsed: boolean = false;
-
-  constructor(private _router: Router, private _auth: AuthService) { }
-
-  logout() {
-    this._auth.logout();
-    this._router.navigate(['/login']);
-  }
-
-  get site_name(): string {
-    if(SETTINGS.CAOS_SITE_NAME) {
-      return SETTINGS.CAOS_SITE_NAME;
-    } else {
-      return "Home";
-    }
-  }
+export function b64EncodeUnicode(str: string): string {
+  // first we use encodeURIComponent to get percent-encoded UTF-8,
+  // then we convert the percent encodings into raw bytes which can be
+  // fed into btoa.
+  return btoa(encodeURIComponent(str).replace(
+    /%([0-9A-F]{2})/g,
+    (match: string, p1: number) => String.fromCharCode(p1)));
 }

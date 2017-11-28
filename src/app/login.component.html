@@ -1,8 +1,10 @@
 <div class="container-fluid login-page">
-  <div class="row">
-    <div class="col-md-4"></div>
-    <div class="col-md-4">
-      <h1>CAOS</h1>
+  <div class="row justify-content-center">
+    <div class="col-4">
+      <h1>CAOS {{ site_name ? '-- ' + site_name : '' }}</h1>
+      <h5>Control Application for OpenStack</h5>
+      <h3 style="margin-top: 3em;">Authentication required</h3>
+
       <div class="alert alert-danger" role="alert" *ngIf="error_message">{{ error_message }}</div>
       <form role="form" (ngSubmit)="login()">
         <div class="form-content">
