@@ -1,5 +1,5 @@
 <div class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" type="button" [popover]="daterange_popover" placement="bottom" container="body" #pop="bs-popover"><i class="fa fa-fw fa-calendar"></i>{{ describe_daterange(range) }}</button>
+  <button class="btn btn-outline-dark dropdown-toggle" type="button" [popover]="daterange_popover" placement="bottom" container="body" #pop="bs-popover"><i class="fa fa-fw fa-calendar"></i>{{ describe_daterange(range) }}</button>
 </div>
 <ng-template #daterange_popover>
   <div class="container-fluid" id="daterange">
@@ -9,7 +9,7 @@
         <!-- button.btn.btn-sm(type="button", *ngFor="let p of presets", [class.btn-primary]="is_selected(p, range)", [class.btn-secondary]="!is_selected(p, range)", [class.active]="is_selected(p, range) || is_selected(p, daterange)", (click)="select_preset(p)") {{ p.label }}-->
         <div class="btn-group pull-right">
           <button class="btn btn-primary" type="button" (click)="ok_clicked(); pop.hide()">Apply</button>
-          <button class="btn btn-secondary" type="button" (click)="cancel_clicked(); pop.hide()">Cancel</button>
+          <button class="btn btn-outline-dark" type="button" (click)="cancel_clicked(); pop.hide()">Cancel</button>
         </div>
       </div>
     </div>
@@ -22,7 +22,7 @@
       <div class="col-md-auto">
         <h5>Quick Ranges</h5>
         <div class="btn-group-vertical">
-          <button class="btn btn-sm" type="button" *ngFor="let p of presets" [class.btn-primary]="is_selected(p, range)" [class.btn-secondary]="!is_selected(p, range)" [class.active]="is_selected(p, range) || is_selected(p, daterange)" (click)="select_preset(p)">{{ p.label }}</button>
+          <button class="btn btn-sm" type="button" *ngFor="let p of presets" [class.btn-primary]="is_selected(p, range)" [class.btn-outline-dark]="!is_selected(p, range)" [class.active]="is_selected(p, range) || is_selected(p, daterange)" (click)="select_preset(p)">{{ p.label }}</button>
         </div>
       </div>
       <div class="col">

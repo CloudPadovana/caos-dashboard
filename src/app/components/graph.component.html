@@ -11,12 +11,12 @@
         <p-dropdown [options]="granularities" (onChange)="selected_granularity=$event.value"></p-dropdown>
       </div>
       <div class="p-2 dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" [popover]="settings_popover" placement="bottom" container="body" #pop="bs-popover"><i class="fa fa-fw fa-wrench"></i>Settings</button>
+        <button class="btn btn-outline-dark dropdown-toggle" type="button" [popover]="settings_popover" placement="bottom" container="body" #pop="bs-popover"><i class="fa fa-fw fa-wrench"></i>Settings</button>
       </div>
     </div>
   </div>
   <div class="card-block">
-    <div *ngIf="fetching&gt;=0">
+    <div *ngIf="fetching>=0">
       <div class="progress">
         <div class="progress-bar" [style.width.%]="fetching_percent"></div>
       </div>
@@ -25,8 +25,8 @@
     <nvd3 [options]="options" [data]="data"></nvd3>
     <div class="btn-toolbar" role="toolbar">
       <div class="btn-group mr-2" role="group">
-        <button class="btn btn-secondary" type="button" (click)="select_all()" tooltip="Click here to select all all series.">Select all</button>
-        <button class="btn btn-secondary" type="button" (click)="deselect_all()" tooltip="Click here to deselect all series.">Deselect all</button>
+        <button class="btn btn-outline-dark" type="button" (click)="select_all()" tooltip="Click here to select all all series.">Select all</button>
+        <button class="btn btn-outline-dark" type="button" (click)="deselect_all()" tooltip="Click here to deselect all series.">Deselect all</button>
       </div>
       <!-- .btn-group(role="group")-->
       <!--   button.btn.btn-secondary(type="button", (click)="downloader.download_CSV('data.csv')", tooltip="Download raw data in CSV format.")-->
