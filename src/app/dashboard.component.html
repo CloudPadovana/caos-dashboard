@@ -1,0 +1,20 @@
+<nav class="navbar navbar-dark bg-dark navbar-expand-sm fixed-top">
+  <a class="navbar-brand" routerLink="/">Home</a>
+  <button class="navbar-toggler" type="button" (click)="navbarCollapsed = !navbarCollapsed">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" [collapse]="navbarCollapsed">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item"><a class="nav-link" routerLink="projects" routerLinkActive="active"><i class="fa fa-fw fa-users"></i>Projects</a></li>
+      <li class="nav-item" routerLinkActive="active"><a class="nav-link" routerLink="hypervisors"><i class="fa fa-fw fa-microchip"></i>Hypervisors</a></li>
+      <li class="nav-item" routerLinkActive="active"><a class="nav-link" routerLink="accounting"><i class="fa fa-fw fa-area-chart"></i>Accounting</a></li>
+    </ul>
+    <ul class="nav navbar-nav pull-right">
+      <li class="nav-item"><a class="nav-link" (click)="logout()"><i class="fa fa-fw fa-power-off"></i>Log out</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="container-fluid main-container">
+  <router-outlet></router-outlet>
+</div>

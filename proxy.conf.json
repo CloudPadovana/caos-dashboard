@@ -1,0 +1,7 @@
+{
+  "/api": {
+    "logLevel": "debug",
+    "target": "https://172.17.0.1:4000",
+    "secure": false
+  }
+}

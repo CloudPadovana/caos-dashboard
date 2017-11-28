@@ -21,38 +21,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-$topnav-background-color: #222;
+$fa-font-path: '../node_modules/font-awesome/fonts';
+$icon-font-path: '../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
+$brand-primary: red;
 
-@import "primeng/resources/primeng";
-@import "primeng/resources/themes/bootstrap/theme";
-
-@import "bootstrap/scss/bootstrap";
-@import "font-awesome/scss/font-awesome";
-@import "nvd3/build/nv.d3";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/font-awesome/scss/font-awesome";
 
 @import "./loader";
-/* @import "./topnav"; */
-/* @import "./sidebar"; */
 @import "./login";
 @import "./range";
 
 .main-container {
   margin: 25px 0 0 0;
-  //padding: 50px;
-  /* position: relative; */
-  /* z-index: 1; */
   padding: 3rem 1.5rem;
-  /*   padding-top: 3rem; */
-  /*   padding-right: 1.5rem; */
-  /*   padding-bottom: 3rem; */
-  /*   padding-left: 1.5rem; */
-  //text-align: center;
 }
 
 .btn:focus {
   outline: 3px auto #FFF;
 }
-
 
 a:hover {
   text-decoration: none;
@@ -67,9 +54,11 @@ a:hover {
   $btn-padding-y-xs: .15rem !default;
   $font-size-xs: .475rem !default;
   $border-radius-xs: .1rem !default;
+  $line-height-xs: .5 !default;
   $btn-border-radius-xs: $border-radius-xs !default;
+  $input-btn-line-height-xs: $line-height-xs !default;
 
-  @include button-size($btn-padding-y-xs, $btn-padding-x-xs, $font-size-xs, $btn-border-radius-xs);
+  @include button-size($btn-padding-y-xs, $btn-padding-x-xs, $font-size-xs, $input-btn-line-height-xs, $btn-border-radius-xs);
 }
 
 .progress {
@@ -135,33 +124,7 @@ a:hover {
   /* } */
 }
 
-
 .popover {
   z-index: $zindex-popover;
   max-width: none;
 }
-
-/* project-selector { */
-/*   .project-tag { */
-/*     //    @import "bootstrap/scss/mixins/border-radius"; */
-/*     border: $border-width solid; */
-/*     border-color: $brand-primary; */
-/*     @include border-radius($border-radius-sm); */
-
-/*     display: inline-block; */
-/*     padding: .25em .4em; */
-/*     font-size: 75%; */
-/*     text-align: center; */
-/*     white-space: nowrap; */
-/*   } */
-
-/*   .dropdown { */
-/*     width: 200px; */
-/*   } */
-
-/*   .scrollable-menu { */
-/*      height: auto; */
-/*      max-height: 200px; */
-/*      overflow-x: hidden; */
-/*   } */
-/* } */

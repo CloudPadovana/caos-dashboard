@@ -1,0 +1,156 @@
+<h3>Global Overview</h3>
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-block">
+        <h4 class="card-title">Instances</h4>
+        <p class="card-text">{{ total.running_vms }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-block">
+        <h4 class="card-title">Allocated VCPUs</h4>
+        <div class="progress">
+          <div class="progress-bar" [style.width.%]="total.vcpus_used_percent" [ngClass]="usage_class(total.vcpus_used_percent)">{{ total.vcpus_used_percent | number:'1.2-2' }}%</div>
+        </div>{{ total.vcpus_used }} of {{ total.vcpus_total }}
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-block">
+        <h4 class="card-title">Allocated VRAM [GB]</h4>
+        <div class="progress">
+          <div class="progress-bar" [style.width.%]="total.memory_used_percent" [ngClass]="usage_class(total.memory_used_percent)">{{ total.memory_used_percent | number:'1.2-2' }}%</div>
+        </div>{{ total.memory_used / 1e9 | number:'1.2-2' }} of {{ total.memory_total / 1e9 | number:'1.2-2' }}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-block">
+        <h3 class="card-title">Average Load</h3>
+        <div class="row">
+          <div class="col-2">5min</div>
+          <div class="col">
+            <div class="progress">
+              <div class="progress-bar" [style.width.%]="total.load_5m" [ngClass]="usage_class(total.load_5m)">{{ total.load_5m | number:'1.2-2' }}%</div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-2">10min</div>
+          <div class="col">
+            <div class="progress">
+              <div class="progress-bar" [style.width.%]="total.load_10m" [ngClass]="usage_class(total.load_10m)">{{ total.load_10m | number:'1.2-2' }}%</div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-2">15min</div>
+          <div class="col">
+            <div class="progress">
+              <div class="progress-bar" [style.width.%]="total.load_15m" [ngClass]="usage_class(total.load_15m)">{{ total.load_15m | number:'1.2-2' }}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-block">
+        <h4 class="card-title">Allocated VCPUs (w.r.t bare)</h4>
+        <div class="progress">
+          <div class="progress-bar" [style.width.%]="total.cpus_used_percent" [ngClass]="usage_class(total.cpus_used_percent)">{{ total.cpus_used_percent | number:'1.2-2' }}%</div>
+        </div>{{ total.vcpus_used }} of {{ total.cpus_total }}
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-block">
+        <h4 class="card-title">Allocated VRAM [GB] (w.r.t bare)</h4>
+        <div class="progress">
+          <div class="progress-bar" [style.width.%]="total.ram_used_percent" [ngClass]="usage_class(total.ram_used_percent)">{{ total.ram_used_percent | number:'1.2-2' }}%</div>
+        </div>{{ total.memory_used / 1e9 | number:'1.2-2' }} of {{ total.ram_total / 1e9 | number:'1.2-2' }}
+      </div>
+    </div>
+  </div>
+</div>
+<graph [config]="graph_config" [show_daterange_selector]="true" [show_set_selector]="true"></graph>
+<hr>
+<h3>Hypervisors</h3>
+<p-dataTable #dt [value]="hypervisors" tableStyleClass="table" expandableRows="true">
+  <p-column expander="true" [style]="{'width':'32px'}"></p-column>
+  <p-column header="Name" field="hostname" [sortable]="true"></p-column>
+  <p-column header="Last Updated" field="last_updated" [sortable]="true"></p-column>
+  <p-column header="State / Status">
+    <ng-template let-col let-rd="rowData" pTemplate="body">{{ rd.metadata.state }} / {{ rd.metadata.status }}</ng-template>
+  </p-column>
+  <p-column header="Running VMs" field="running_vms" [sortable]="true"></p-column>
+  <p-column header="Workload" field="workload" [sortable]="true"></p-column>
+  <p-column header="Allocated VCPUs">
+    <ng-template let-col let-rd="rowData" pTemplate="body">
+      <div class="progress">
+        <div class="progress-bar" [style.width.%]="rd.vcpus_used_percent" [ngClass]="usage_class(rd.vcpus_used_percent)">{{ rd.vcpus_used_percent | number:'1.2-2' }}%</div>
+      </div>{{ rd.vcpus_used }} of {{ rd.vcpus_total }}
+    </ng-template>
+  </p-column>
+  <p-column header="Allocated VRAMs">
+    <ng-template let-col let-rd="rowData" pTemplate="body">
+      <div class="progress">
+        <div class="progress-bar" [style.width.%]="rd.memory_used_percent" [ngClass]="usage_class(rd.memory_used_percent)">{{ rd.memory_used_percent | number:'1.2-2' }}%</div>
+      </div>{{ rd.memory_used / 1e9 | number:'1.2-2' }}GB of {{ rd.memory_total / 1e9 | number:'1.2-2' }}GB
+    </ng-template>
+  </p-column>
+  <p-column header="Allocated VCPUs (w.r.t bare)">
+    <ng-template let-col let-rd="rowData" pTemplate="body">
+      <div class="progress">
+        <div class="progress-bar" [style.width.%]="rd.cpus_used_percent" [ngClass]="usage_class(rd.cpus_used_percent)">{{ rd.cpus_used_percent | number:'1.2-2' }}%</div>
+      </div>{{ rd.vcpus_used }} of {{ rd.cpus_total }}
+    </ng-template>
+  </p-column>
+  <p-column header="Allocated VRAMs (w.r.t bare)">
+    <ng-template let-col let-rd="rowData" pTemplate="body">
+      <div class="progress">
+        <div class="progress-bar" [style.width.%]="rd.ram_used_percent" [ngClass]="usage_class(rd.ram_used_percent)">{{ rd.ram_used_percent | number:'1.2-2' }}%</div>
+      </div>{{ rd.memory_used / 1e9 | number:'1.2-2' }}GB of {{ rd.ram_total / 1e9 | number:'1.2-2' }}GB
+    </ng-template>
+  </p-column>
+  <p-column header="Load">
+    <ng-template let-col let-rd="rowData" pTemplate="body">
+      <div class="row">
+        <div class="col-2"><small>5m</small></div>
+        <div class="col">
+          <div class="progress">
+            <div class="progress-bar" [style.width.%]="rd.load_5m" [ngClass]="usage_class(rd.load_5m)">{{ rd.load_5m | number:'1.2-2' }}%</div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2"><small>10m</small></div>
+        <div class="col">
+          <div class="progress">
+            <div class="progress-bar" [style.width.%]="rd.load_10m" [ngClass]="usage_class(rd.load_10m)">{{ rd.load_10m | number:'1.2-2' }}%</div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-3"><small>15m</small></div>
+        <div class="col">
+          <div class="progress">
+            <div class="progress-bar" [style.width.%]="rd.load_15m" [ngClass]="usage_class(rd.load_15m)">{{ rd.load_15m | number:'1.2-2' }}%</div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-column>
+  <ng-template let-hypervisor pTemplate="rowexpansion">
+    <graph [config]="graph_config_for_hypervisor[hypervisor.hostname]"></graph>
+  </ng-template>
+</p-dataTable>

@@ -31,7 +31,7 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/of';
 
 import * as d3 from 'd3';
-import moment from 'moment';
+import * as moment from 'moment';
 
 import { SETTINGS } from './settings';
 

@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, AfterViewChecked } from '@angular/core';
-import moment from 'moment';
+import * as moment from 'moment';
 
 export interface DateRange {
   start: Date;
@@ -91,7 +91,7 @@ const PRESETS: DateRangePreset[] = [
 
 @Component({
   selector: 'daterange',
-  templateUrl: 'components/daterange.component.html'
+  templateUrl: 'daterange.component.html'
 })
 export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewChecked {
   private start_date: Date;
@@ -134,7 +134,7 @@ export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewCheck
     return this.is_daterange_same(d, r);
   }
 
-  private describe_daterange(d: DateRange): string {
+  describe_daterange(d: DateRange): string {
     if(!d) { return "" }
 
     // Check for presets

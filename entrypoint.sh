@@ -38,7 +38,7 @@ echo "OK"
 
 # generate /caos-dashboard/js/env.js
 echo "Generating /caos-dashboard/js/env.js"
-envsubst '\${CAOS_DASHBOARD_BASE_TSDB_API}' < /env.js.template > /caos-dashboard/js/env.js
+envsubst '\${CAOS_DASHBOARD_BASE_TSDB_API}' < /env.js.template > /caos-dashboard/env.js
 echo "OK"
 
 # rewrite base href

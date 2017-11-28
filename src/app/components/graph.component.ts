@@ -28,8 +28,8 @@ import 'rxjs/add/operator/map';
 import { SelectItem } from 'primeng/primeng';
 
 import * as d3 from 'd3';
-import { nvD3 } from 'ng2-nvd3';
-import moment from 'moment';
+import { NvD3Component } from 'ng2-nvd3';
+import * as moment from 'moment';
 
 import { DateRange, DateRangeComponent } from './daterange.component';
 //import { AggregateDownloader } from '../aggregate-downloader';
@@ -111,10 +111,10 @@ export interface GraphConfig {
 
 @Component({
   selector: 'graph',
-  templateUrl: 'components/graph.component.html'
+  templateUrl: 'graph.component.html'
 })
 export class GraphComponent implements AfterViewInit {
-  @ViewChild(nvD3) nvD3: nvD3;
+  @ViewChild(NvD3Component) nvD3: NvD3Component;
   //downloader: AggregateDownloader;
 
   private _config: GraphConfig;

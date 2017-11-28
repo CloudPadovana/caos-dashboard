@@ -41,17 +41,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       d.create_args = [ ]
 
       d.ports = [
-        # static HTTP server
-        '3333:3333',
-
-        # WebSocket for live reload
-        '35729:35729'
+        # ng serve
+        '4200:4200',
       ]
     end
 
     $script = <<~SCRIPT
       curl -sS https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
-        echo "deb https://deb.nodesource.com/node_7.x jessie main" > /etc/apt/sources.list.d/nodesource.list
+        echo "deb https://deb.nodesource.com/node_8.x jessie main" > /etc/apt/sources.list.d/nodesource.list
 
       curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
         echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
@@ -59,13 +56,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       DEBIAN_FRONTEND=noninteractive apt-get update && \
         apt-get install -y nodejs yarn
 
-      yarn global add gulp-cli
+      yarn global add @angular/cli
     SCRIPT
 
     dashboard.vm.provision :shell, privileged: true, inline: $script
 
     $script = <<~SCRIPT
-      yarn
+      ng set --global packageManager=yarn
     SCRIPT
 
     dashboard.vm.provision :shell, privileged: false, inline: $script

@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,26 +21,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-.topnav {
-  border-radius: 0;
-  background-color: $topnav-background-color;
-  padding: 6px;
+import { enableProdMode } from '@angular/core';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-  .text-center {
-    text-align: center;
-    padding-left: 0;
-    cursor: pointer;
-  }
+import { AppModule } from './app/app.module';
+import { environment } from './environments/environment';
 
-  .top-right-nav {
-    .dropdown-menu {
-      top: 40px;
-      right: -5px;
-      left: auto;
-      hr {
-        margin-top: 1px;
-        margin-bottom: 4px;
-      }
-    }
-  }
+if (environment.production) {
+  enableProdMode();
 }
+
+platformBrowserDynamic().bootstrapModule(AppModule)
+  .catch(err => console.log(err));

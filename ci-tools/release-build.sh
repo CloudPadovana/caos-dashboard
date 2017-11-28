@@ -39,13 +39,8 @@ if [ ! -d "${RELEASES_DIR}" ] ; then
     mkdir ${RELEASES_DIR}
 fi
 
-if [ "${DO_PROD_BUILD}" == true ] ; then
-    say_yellow "Building production release"
-    gulp production build
-else
-    say_yellow "Building release"
-    gulp build
-fi
+say_yellow "Building ${BUILD_TARGET} release"
+ng build --verbose --target=${BUILD_TARGET} --output-path dist
 
-say_yellow  "Creating release file"
-tar cvfz ${RELEASES_DIR}/caos_dashboard-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz -C output .
+say_yellow  "Creating ${BUILD_TARGET} release file"
+tar cvfz ${RELEASES_DIR}/caos_dashboard-${BUILD_TARGET}-${CAOS_DASHBOARD_RELEASE_VERSION}.tar.gz -C dist .

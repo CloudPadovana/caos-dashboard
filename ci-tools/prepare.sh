@@ -33,8 +33,8 @@ if [ -z "${CAOS_DASHBOARD_RELEASE_VERSION}" ] ; then
     die "CAOS_DASHBOARD_RELEASE_VERSION not set."
 fi
 
-say_yellow  "Installing gulp"
-yarn global add gulp-cli
+say_yellow  "Installing Angular CLI"
+yarn global add @angular/cli
 
 say_yellow  "Installing deps"
 yarn install

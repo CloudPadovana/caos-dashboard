@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import moment from 'moment';
+import * as moment from 'moment';
 
 export const CAOS_HYPERVISOR_TAG_KEY = "hypervisor";
 

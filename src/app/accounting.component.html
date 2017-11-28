@@ -1,0 +1,21 @@
+<h3>Accounting</h3>
+<graph [config]="graph_config" (on_set_selected)="selected_set=$event; update_stats()" (on_date_range_selected)="date_range=$event; update_stats()"></graph>
+<h3>Aggregated data</h3>
+<h5>from {{ date_range?.start | date: 'y-MM-dd HH:mm Z' }} to {{ date_range?.end | date: 'y-MM-dd HH:mm Z' }}</h5>
+<div *ngIf="fetching_stats&gt;=0">
+  <div class="progress">
+    <div class="progress-bar" [style.width.%]="fetching_stats_percent"></div>
+  </div>
+  <div class="row justify-content-center">Loading data: {{ fetching_stats_percent | number:'1.2-2' }}%</div>
+</div>
+<p-dataTable #dt [value]="stats" tableStyleClass="table table-bordered table-hover">
+  <p-column header="Name" field="name" [sortable]="true">
+    <ng-template let-col let-rd="rowData" pTemplate="body">{{ rd.name }}</ng-template>
+  </p-column>
+  <p-column [header]="selected_set?.y_axis_label" field="value" [sortable]="true">
+    <ng-template let-col let-rd="rowData" pTemplate="body">{{ rd.value | number:'1.2-2' }}</ng-template>
+  </p-column>
+  <p-column header="Percentage w.r.t overall" field="overall_percent" [sortable]="true">
+    <ng-template let-col let-rd="rowData" pTemplate="body">{{ rd.overall_percent | percent:'1.2-2' }}</ng-template>
+  </p-column>
+</p-dataTable>
