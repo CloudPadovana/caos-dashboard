@@ -115,8 +115,6 @@ docker-build:dev:
   variables:
     <<: *docker_build_template_variables
     BUILD_TARGET: development
-  except:
-    - master
 
 docker-build:master:
   <<: *docker_build_template
@@ -125,12 +123,22 @@ docker-build:master:
   variables:
     <<: *docker_build_template_variables
     BUILD_TARGET: production
-  only:
-    - master
 
-docker-test:
+docker-test:dev:
   <<: *docker_template
   stage: docker-test
+  variables:
+    <<: *docker_template_variables
+    BUILD_TARGET: development
+  script:
+    - ci-tools/docker-test.sh
+
+docker-test:master:
+  <<: *docker_template
+  stage: docker-test
+  variables:
+    <<: *docker_template_variables
+    BUILD_TARGET: production
   script:
     - ci-tools/docker-test.sh
 
@@ -140,6 +148,7 @@ docker-release:
   variables:
     <<: *docker_template_variables
     DO_DOCKER_PUSH: "true"
+    BUILD_TARGET: production
   script:
     - ci-tools/docker-release.sh
   only:
