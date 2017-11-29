@@ -42,7 +42,6 @@ import { GraphComponent } from './graph.component';
 import {
   CalendarModule,
   DataTableModule,
-  DropdownModule,
   MultiSelectModule,
   SelectButtonModule,
   TooltipModule,
@@ -68,7 +67,6 @@ import {
 
     CalendarModule,
     DataTableModule,
-    DropdownModule,
     MultiSelectModule,
     SelectButtonModule,
     TooltipModule,
@@ -85,7 +83,6 @@ import {
 
     CalendarModule,
     DataTableModule,
-    DropdownModule,
     MultiSelectModule,
     SelectButtonModule,
     TooltipModule,

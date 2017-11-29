@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2017, 2018 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, OnDestro
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { SelectItem } from 'primeng/primeng';
-
 import * as d3 from 'd3';
 import { NvD3Component } from 'ng2-nvd3';
 import * as moment from 'moment';
@@ -34,6 +32,7 @@ import * as moment from 'moment';
 //import { AggregateDownloader } from '../aggregate-downloader';
 
 import { DateRange, DateRangeService } from '../daterange.service';
+import { Item } from './dropdown.component';
 
 import {
   SeriesService,
@@ -110,12 +109,16 @@ export interface GraphConfig {
   sets: GraphSetConfig[];
 }
 
+type Granularity = moment.MomentInputObject;
+
 @Component({
   selector: 'graph',
   templateUrl: 'graph.component.html'
 })
 export class GraphComponent implements AfterViewInit {
-  @ViewChild(NvD3Component) nvD3: NvD3Component;
+  help_collapsed: Boolean = true;
+
+  @ViewChild('nvd3') nvD3: NvD3Component;
   //downloader: AggregateDownloader;
 
   private _config: GraphConfig;
@@ -125,20 +128,12 @@ export class GraphComponent implements AfterViewInit {
     this.sets = [];
     this.selected_set = undefined;
 
-    if(c && c.sets.length > 0) {
-      setTimeout(
-        () => {
-          this.sets = c.sets.map((s: GraphSetConfig) => <SelectItem>({
-            label: s.label,
-            value: s
-          }));
-
-          this.selected_set = c.sets[0];
-        }
-      );
-    }
-
-    this.update();
+    if(c && c.sets) {
+      this.sets = c.sets.map((s: GraphSetConfig) => <Item<GraphSetConfig>>({
+        label: s.label,
+        value: s
+      }));
+    };
   }
   get config(): GraphConfig {
     return this._config;
@@ -148,7 +143,7 @@ export class GraphComponent implements AfterViewInit {
 
   @Input() show_granularity_selector: boolean = true;
 
-  sets: SelectItem[];
+  sets: Item<GraphSetConfig>[] = [];
   private _selected_set: GraphSetConfig;
   @Output() on_set_selected = new EventEmitter<GraphSetConfig>();
   @Input()
@@ -161,20 +156,20 @@ export class GraphComponent implements AfterViewInit {
     return this._selected_set;
   }
 
-  granularities: SelectItem[] = [];
-  private _selected_granularity: moment.MomentInputObject;
-  @Output() on_granularity_selected = new EventEmitter<moment.MomentInputObject>();
+  granularities: Item<Granularity>[] = [];
+  private _selected_granularity: Granularity;
+  @Output() on_granularity_selected = new EventEmitter<Granularity>();
   @Input()
-  set selected_granularity(g: moment.MomentInputObject) {
+  set selected_granularity(g: Granularity) {
     this._selected_granularity = g;
     this.on_granularity_selected.emit(this._selected_granularity);
     this.update();
   }
-  get selected_granularity(): moment.MomentInputObject {
+  get selected_granularity(): Granularity {
     return this._selected_granularity;
   }
 
-  linewidths: SelectItem[] = [];
+  linewidths: Item<number>[] = [];
   private _selected_linewidth: number;
   set selected_linewidth(n: number) {
     this._selected_linewidth = n;
@@ -202,25 +197,16 @@ export class GraphComponent implements AfterViewInit {
     //this.downloader = new AggregateDownloader();
 
     this.linewidths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-      .map((n: number) => {return { label: `${n}`, value: n} });
+      .map((n: number) => <Item<number>>({
+        label: `${n}`,
+        value: n
+      }));
 
-    this.granularities = [
-      {
-        label: "1 hour",
-        value: {hours: 1}
-      },
-
-      {
-        label: "1 day",
-        value: {days: 1}
-      },
-
-      {
-        label: "1 week",
-        value: {days: 7}
-      },
-    ];
-    this.selected_granularity = this.granularities[0].value;
+    this.granularities = [1, 2, 3, 6, 12, 24, 48, 72, 24*7]
+      .map((n: number) => <Item<Granularity>>({
+        label: moment.duration(n, "hours").humanize(),
+        value: <Granularity>({hours: n})
+      }));
   }
 
   ngAfterViewInit() {
