@@ -28,13 +28,20 @@ http {
     listen 80;
     server_name localhost;
 
-    location ${CAOS_DASHBOARD_BASE_TSDB_API}/ {
-      # proxy_set_header X-Real-IP $remote_addr;
-      # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      # proxy_set_header X-NginX-Proxy true;
-      # proxy_set_header Host $http_host;
+    # Docker's DNS resolver
+    resolver 127.0.0.11;
 
-      proxy_pass http://${CAOS_DASHBOARD_TSDB_HOST}:${CAOS_DASHBOARD_TSDB_PORT}/api/;
+    # Storing the proxied upstream in a variable forces nginx to always resolve it through the resolver
+    set $backend_upstream "http://${CAOS_DASHBOARD_TSDB_HOST}:${CAOS_DASHBOARD_TSDB_PORT}";
+
+    location ${CAOS_DASHBOARD_BASE_TSDB_API}/ {
+      rewrite ^/${CAOS_DASHBOARD_BASE_NAME}/(.*) /$1 break;
+      proxy_pass $backend_upstream;
+
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
     location /${CAOS_DASHBOARD_BASE_NAME} {
