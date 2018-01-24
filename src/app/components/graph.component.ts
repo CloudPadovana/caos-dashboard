@@ -31,8 +31,9 @@ import * as d3 from 'd3';
 import { NvD3Component } from 'ng2-nvd3';
 import * as moment from 'moment';
 
-import { DateRange, DateRangeComponent } from './daterange.component';
 //import { AggregateDownloader } from '../aggregate-downloader';
+
+import { DateRange, DateRangeService } from '../daterange.service';
 
 import {
   SeriesService,
@@ -193,19 +194,13 @@ export class GraphComponent implements AfterViewInit {
     return this.fetching * 100;
   }
 
-  private _date_range: DateRange;
-  @Output() on_date_range_selected = new EventEmitter<DateRange>();
-  @Input()
-  set date_range(d: DateRange) {
-    this._date_range = d;
-    this.on_date_range_selected.emit(this._date_range);
-    this.update();
-  }
   get date_range(): DateRange {
-    return this._date_range;
+    return this._daterange.range;
   }
 
-  constructor(private _series: SeriesService) {
+  constructor(private _series: SeriesService, private _daterange: DateRangeService) {
+    _daterange.range_changed.subscribe(() => this.update());
+
     //this.downloader = new AggregateDownloader();
 
     this.linewidths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

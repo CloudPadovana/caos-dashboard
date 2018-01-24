@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2016, 2017, 2018 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2018 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,32 +21,27 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Injectable, EventEmitter } from '@angular/core';
 
-import { SETTINGS } from './settings';
-import { AuthService } from './auth.service';
-import { DateRangeService } from './daterange.service';
+export interface DateRange {
+  start: Date;
+  end: Date;
+}
 
-@Component({
-  templateUrl: 'dashboard.component.html',
-  providers: [ DateRangeService ]
-})
-export class DashboardComponent {
-  navbarCollapsed: boolean = false;
+@Injectable()
+export class DateRangeService {
+  private _range: DateRange;
+  range_changed: EventEmitter<DateRange> = new EventEmitter<DateRange>(null);
 
-  constructor(private _router: Router, private _auth: AuthService) { }
-
-  logout() {
-    this._auth.logout();
-    this._router.navigate(['/login']);
+  get range(): DateRange {
+    return this._range;
   }
 
-  get site_name(): string {
-    if(SETTINGS.CAOS_SITE_NAME) {
-      return SETTINGS.CAOS_SITE_NAME;
-    } else {
-      return "Home";
-    }
+  set range(r: DateRange) {
+    this._range = r;
+    this.range_changed.next(r);
   }
+
+  constructor() { }
+
 }

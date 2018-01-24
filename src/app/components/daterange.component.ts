@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2017, 2018 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, AfterViewChecked } from '@angular/core';
 import * as moment from 'moment';
 
-export interface DateRange {
-  start: Date;
-  end: Date;
-}
+import { DateRange, DateRangeService } from '../daterange.service';
+export { DateRange };
 
 export interface DurationPreset {
   label: string;
@@ -93,32 +91,22 @@ const PRESETS: DateRangePreset[] = [
   selector: 'daterange',
   templateUrl: 'daterange.component.html'
 })
-export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewChecked {
+export class DateRangeComponent implements OnInit {
   private start_date: Date;
   private end_date: Date;
 
   readonly presets = PRESETS;
 
-  @Input('range')
-  range: DateRange;
+  get range(): DateRange {
+    return this._daterange.range;
+  }
 
-  @Output('rangeChange')
-  rangeChange: EventEmitter<DateRange> = new EventEmitter<DateRange>();
-
-  constructor() { }
+  constructor(private _daterange: DateRangeService) { }
 
   ngOnInit() {
     if(!this.range) {
-      this.select_preset(PRESETS[0]);
-      this.emit_range();
+      this._daterange.range = this.daterange_from_preset(PRESETS[0]);
     }
-  }
-
-  ngAfterViewInit() {
-  }
-
-  ngAfterViewChecked() {
-   // this.emit_range();
   }
 
   is_daterange_same(d1: DateRange, d2: DateRange): boolean {
@@ -154,12 +142,6 @@ export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewCheck
     if(!d) { return "" }
 
     return moment(d).format("YYYY/MM/DD HH:mm");
-  }
-
-  private emit_range(): void {
-    let r = this.daterange;
-    this.rangeChange.emit(r);
-    this.range = r;
   }
 
   private get daterange(): DateRange {
@@ -206,7 +188,7 @@ export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewCheck
   };
 
   ok_clicked() {
-    this.emit_range();
+    this._daterange.range = this.daterange;
   }
 
   cancel_clicked() {
