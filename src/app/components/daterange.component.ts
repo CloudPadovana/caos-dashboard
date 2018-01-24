@@ -92,8 +92,12 @@ const PRESETS: DateRangePreset[] = [
   templateUrl: 'daterange.component.html'
 })
 export class DateRangeComponent implements OnInit {
-  private start_date: Date;
-  private end_date: Date;
+  private _current_daterange: DateRange;
+
+  get start_date(): Date { return this._current_daterange.start; }
+  set start_date(d: Date) { this._current_daterange.start = d; }
+  get end_date(): Date { return this._current_daterange.end; }
+  set end_date(d: Date) { this._current_daterange.end = d; }
 
   readonly presets = PRESETS;
 
@@ -101,7 +105,9 @@ export class DateRangeComponent implements OnInit {
     return this._daterange.range;
   }
 
-  constructor(private _daterange: DateRangeService) { }
+  constructor(private _daterange: DateRangeService) {
+    this._current_daterange = this.daterange_from_preset(PRESETS[0]);
+  }
 
   ngOnInit() {
     if(!this.range) {

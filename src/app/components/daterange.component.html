@@ -1,9 +1,10 @@
-<div class="dropdown">
-  <button class="btn btn-outline-dark dropdown-toggle" type="button" [popover]="daterange_popover" placement="bottom" container="body" #pop="bs-popover"><i class="fa fa-fw fa-calendar"></i>{{ describe_daterange(range) }}</button>
-</div>
-<ng-template #daterange_popover>
-  <div class="container-fluid" id="daterange">
-    <div class="row">
+<li class="nav-item dropdown" dropdown [autoClose]="false" #pop="bs-dropdown">
+  <a class="nav-link dropdown-toggle" href dropdownToggle (click)="false">
+    <i class="fa fa-fw fa-calendar"></i>
+    {{ describe_daterange(range) }}
+  </a>
+  <div *dropdownMenu class="dropdown-menu">
+    <div class="container row">
       <div class="col-12">
         <!--h5 Quick Ranges-->
         <!-- button.btn.btn-sm(type="button", *ngFor="let p of presets", [class.btn-primary]="is_selected(p, range)", [class.btn-secondary]="!is_selected(p, range)", [class.active]="is_selected(p, range) || is_selected(p, daterange)", (click)="select_preset(p)") {{ p.label }}-->
@@ -41,4 +42,4 @@
       </div>
     </div>
   </div>
-</ng-template>
+</li>

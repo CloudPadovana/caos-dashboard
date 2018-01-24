@@ -146,8 +146,6 @@ export class GraphComponent implements AfterViewInit {
 
   @Input() show_set_selector: boolean = true;
 
-  @Input() show_daterange_selector: boolean = true;
-
   @Input() show_granularity_selector: boolean = true;
 
   sets: SelectItem[];

@@ -4,9 +4,6 @@
       <div class="p-2" *ngIf="show_set_selector">
         <p-dropdown [options]="sets" (onChange)="selected_set=$event.value" [autoWidth]="true" [style]="{'width': '100%'}"></p-dropdown>
       </div>
-      <div class="p-2" *ngIf="show_daterange_selector">
-        <daterange></daterange>
-      </div>
       <div class="p-2" *ngIf="show_granularity_selector">Granularity:
         <p-dropdown [options]="granularities" (onChange)="selected_granularity=$event.value"></p-dropdown>
       </div>
