@@ -30,7 +30,6 @@ $brand-primary: red;
 
 @import "./loader";
 @import "./login";
-@import "./range";
 
 .main-container {
   margin: 25px 0 0 0;
@@ -99,47 +98,4 @@ daterange {
     left: 0;
     right: 0;
   }
-}
-
-#daterange {
-  datepicker {
-    z-index: $zindex-popover;
-
-    datepicker-inner {
-      .card {
-        //min-width: 100%;
-        //max-width: none;
-      }
-    }
-
-    yearpicker,
-    monthpicker,
-    daypicker {
-      .btn {
-        //font-size: 70%;
-      }
-    }
-  }
-
-  /* .popover, .popover-content { */
-  /*   z-index: $zindex-popover; */
-  /*   max-width: none; */
-  /* } */
-
-
-  /* .popover .own-class { */
-  /*   max-width: none; */
-
-  /*   //overflow-y: auto; */
-  /*   //z-index:1000; */
-  /* } */
-
-  /* .row { */
-  /*   //max-width: 100%; */
-  /* } */
-}
-
-.popover {
-  z-index: $zindex-popover;
-  max-width: none;
 }
