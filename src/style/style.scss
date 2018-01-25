@@ -90,12 +90,12 @@ daterange {
   /* makes the dropdown full width  */
   .dropdown {
     position: static;
+    border: 2px;
   }
 
   .dropdown-menu {
-    border: none;
-    width: 100%;
-    left: 0;
-    right: 0;
+    max-width: 100%;
+    left: 5px;
+    right: 5px;
   }
 }

@@ -136,15 +136,15 @@ export function is_daterange_same_preset(r: DateRange, p: DateRangePreset): bool
 export function describe_daterange(d: DateRange): string {
   if(!d) { return "" }
 
+  let d1 = describe_date(d.start);
+  let d2 = describe_date(d.end);
+
   // Check for presets
   for(let p of DATE_RANGE_PRESETS) {
     if(is_daterange_same_preset(d, p)) {
-      return p.label;
+      return `${p.label} (from ${d1} to ${d2})`;
     }
   }
-
-  let d1 = describe_date(d.start);
-  let d2 = describe_date(d.end);
 
   return `From ${d1} to ${d2}`;
 }

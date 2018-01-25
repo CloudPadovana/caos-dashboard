@@ -3,40 +3,45 @@
     <i class="fa fa-fw fa-calendar"></i>
     {{ describe_daterange(range) }}
   </a>
-  <div *dropdownMenu class="dropdown-menu">
-    <div class="container row">
-      <div class="col-12">
-        <!--h5 Quick Ranges-->
-        <!-- button.btn.btn-sm(type="button", *ngFor="let p of presets", [class.btn-primary]="is_selected(p, range)", [class.btn-secondary]="!is_selected(p, range)", [class.active]="is_selected(p, range) || is_selected(p, daterange)", (click)="select_preset(p)") {{ p.label }}-->
-        <div class="btn-group pull-right">
-          <button class="btn btn-primary" type="button" (click)="ok_clicked(); pop.hide()">Apply</button>
-          <button class="btn btn-outline-dark" type="button" (click)="cancel_clicked(); pop.hide()">Cancel</button>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12">
-        <hr>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-auto">
-        <h5>Quick Ranges</h5>
-        <div class="btn-group-vertical">
-          <button class="btn btn-sm" type="button" *ngFor="let p of presets" [class.btn-primary]="is_selected(p, range)" [class.btn-outline-dark]="!is_selected(p, range)" [class.active]="is_selected(p, range) || is_selected(p, daterange)" (click)="select_preset(p)">{{ p.label }}</button>
-        </div>
-      </div>
-      <div class="col">
-        <div class="row">
-          <div class="col-6">
-            <label><b>From:</b> {{ start_date | date: 'dd/MM/yy HH:mm' }}</label>
-            <p-calendar [(ngModel)]="start_date" [inline]="true" [showTime]="true"
-[stepHour]="1" [stepMinute]="60" [locale]="locale"></p-calendar>
+  <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="row">
+            <div class="col-8">
+              {{ describe_daterange(daterange) }}
+            </div>
+            <div class="col"></div>
+            <div class="col form-group form-inline">
+              <div class="btn-group">
+                <button class="btn btn-primary" type="button" (click)="ok_clicked(); pop.hide()">Apply</button>
+                <button class="btn btn-outline-dark" type="button" (click)="cancel_clicked(); pop.hide()">Cancel</button>
+              </div>
+            </div>
           </div>
-          <div class="col-6">
-            <label><b>To:</b> {{ end_date | date: 'dd/MM/yy HH:mm' }}</label>
-            <p-calendar [(ngModel)]="end_date" [inline]="true" [showTime]="true"
-[stepHour]="1" [stepMinute]="60" [locale]="locale"></p-calendar>
+          <div class="form-row">
+            <div class="form-group col-5">
+              <label><b>From:</b></label>
+              <p-calendar [(ngModel)]="start_date" dateFormat="dd/mm/yy"
+                          [showTime]="true" [stepHour]="1" [stepMinute]="60"
+                          [locale]="locale"></p-calendar>
+            </div>
+            <div class="form-group col-5">
+              <label><b>To:</b></label>
+              <p-calendar [(ngModel)]="end_date" dateFormat="dd/mm/yy"
+                          [showTime]="true" [stepHour]="1" [stepMinute]="60"
+                          [locale]="locale"></p-calendar>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-10">
+              <label><b>Quick Ranges</b></label>
+              <button class="btn btn-sm" type="button" *ngFor="let p of presets"
+                      [class.btn-primary]="is_selected(p, range)"
+                      [class.btn-secondary]="!is_selected(p, range) && is_selected(p, daterange)"
+                      [class.btn-link]="!is_selected(p, range) && !is_selected(p, daterange)"
+                      (click)="select_preset(p)">{{ p.label }}</button>
+            </div>
           </div>
         </div>
       </div>
