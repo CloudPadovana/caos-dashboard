@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, Output, ElementRef, EventEmitter, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
@@ -110,6 +110,8 @@ export interface GraphConfig {
 }
 
 type Granularity = moment.MomentInputObject;
+
+const PPP_THRESHOLD = 2;
 
 @Component({
   selector: 'graph',
@@ -214,12 +216,47 @@ export class GraphComponent implements AfterViewInit {
     this.fetching = undefined;
   }
 
+  private ppp_ratio(granularity: Granularity): number {
+    let g = moment.duration(granularity).asSeconds();
+    let rect = this.nvD3.el.getBoundingClientRect();
+    let width = rect.width;
+    let range = moment(this.date_range.end).diff(this.date_range.start, 'seconds');
+    let points = range / g;
+    let ratio = points / width;
+    return ratio;
+  }
+
+  private find_good_granularity(): Granularity {
+    for(let g of this.granularities) {
+      let ratio = this.ppp_ratio(g.value);
+      if(ratio <= PPP_THRESHOLD) {
+        return g.value;
+      }
+    }
+
+    return null;
+  }
+
+  check_ppp(): boolean {
+    let granularity = this.selected_granularity;
+    let ratio = this.ppp_ratio(granularity);
+
+    if(ratio <= PPP_THRESHOLD) {
+      return true;
+    } else {
+      let good_granularity = this.find_good_granularity();
+      setTimeout(() => { this.selected_granularity = good_granularity; });
+      return false;
+    }
+  }
+
   update() {
     if(!this.config) { return };
     if(!this.selected_set) { return };
     if(!this.selected_granularity) { return };
     if(!this.date_range) { return };
 
+    if(!this.check_ppp()) { return };
     this.update_data();
   }
 
@@ -282,6 +319,8 @@ export class GraphComponent implements AfterViewInit {
   }
 
   private update_chart_options() {
+    if(!this.selected_set) { return };
+
     let s = this.selected_set;
     let chart = this.options.chart;
 
