@@ -30,13 +30,13 @@
         <div class="row">
           <div class="col-6">
             <label><b>From:</b> {{ start_date | date: 'dd/MM/yy HH:mm' }}</label>
-            <datepicker [(ngModel)]="start_date" [showWeeks]="false" [startingDay]="1"></datepicker>
-            <timepicker [(ngModel)]="start_date" [hourStep]="1" [minuteStep]="60" [showMeridian]="false"></timepicker>
+            <p-calendar [(ngModel)]="start_date" [inline]="true" [showTime]="true"
+[stepHour]="1" [stepMinute]="60" [locale]="locale"></p-calendar>
           </div>
           <div class="col-6">
             <label><b>To:</b> {{ end_date | date: 'dd/MM/yy HH:mm' }}</label>
-            <datepicker [(ngModel)]="end_date" [showWeeks]="false" [startingDay]="1"></datepicker>
-            <timepicker [(ngModel)]="end_date" [hourStep]="1" [minuteStep]="60" [showMeridian]="false"></timepicker>
+            <p-calendar [(ngModel)]="end_date" [inline]="true" [showTime]="true"
+[stepHour]="1" [stepMinute]="60" [locale]="locale"></p-calendar>
           </div>
         </div>
       </div>
