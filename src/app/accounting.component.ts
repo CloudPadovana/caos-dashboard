@@ -100,7 +100,12 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
   projects: Project[] = [];
 
-  selected_set: GraphSetConfig;
+  get selected_set(): GraphSetConfig {
+    if(!this.graph) { return null; }
+
+    return this.graph.selected_set;
+  }
+
   get date_range(): DateRange {
     return this._daterange.range;
   }
@@ -128,8 +133,6 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.fetch_projects();
-
-    this.selected_set = this.graph.selected_set;
     this.update_stats();
   }
 
@@ -148,8 +151,9 @@ export class AccountingComponent implements OnInit, AfterViewInit {
   }
 
   update_stats() {
+    if(this.fetching_stats != undefined) { return; }
+
     if(!this.selected_set) { return; }
-    if(!this.selected_set.series) { return; }
     if(!this.date_range) { return; }
 
     let series = this.selected_set.series;
@@ -186,7 +190,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
           // store new data
           this.stats = [...this.stats, s];
         },
-        () => { },
+        () => { this.fetching_stats = undefined; },
         () => {
           // compute overall percent
           this.stats.forEach(

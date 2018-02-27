@@ -5,7 +5,7 @@
 #
 # caos-dashboard - CAOS dashboard
 #
-# Copyright © 2016, 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+# Copyright © 2016, 2017, 2018 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       DEBIAN_FRONTEND=noninteractive apt-get update && \
         apt-get install -y nodejs yarn
 
-      yarn global add @angular/cli
+      yarn --network-concurrency 1 global add @angular/cli
     SCRIPT
 
     dashboard.vm.provision :shell, privileged: true, inline: $script

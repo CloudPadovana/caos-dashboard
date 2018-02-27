@@ -26,7 +26,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  OnInit,
 } from '@angular/core';
 
 export interface Item<T> {
@@ -38,10 +37,22 @@ export interface Item<T> {
   selector: 'dropdown',
   templateUrl: 'dropdown.component.html',
 })
-export class DropdownComponent<T> implements OnInit {
+export class DropdownComponent<T> {
   @Input() icon: string;
 
-  @Input() items: Item<T>[];
+  private _items: Item<T>[];
+  @Input()
+  set items(items: Item<T>[]) {
+    this._items = items;
+    if(!this._selected_item && this.items && this.items.length > 0) {
+      setTimeout(() => {
+        this.value = this.items[0].value;
+      });
+    }
+  }
+  get items(): Item<T>[] {
+    return this._items;
+  }
 
   private _selected_item: Item<T>;
   get selected_item(): Item<T> {
@@ -68,14 +79,6 @@ export class DropdownComponent<T> implements OnInit {
   };
 
   constructor() { }
-
-  ngOnInit() {
-    if(!this._selected_item && this.items) {
-      setTimeout(() => {
-        this.value = this.items[0].value;
-      });
-    }
-  }
 
   is_item_selected(item: Item<T>): boolean {
     return item == this._selected_item;

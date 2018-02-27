@@ -129,7 +129,7 @@ const PPP_ALERT = <IAlert>({
   templateUrl: 'graph.component.html'
 })
 export class GraphComponent implements AfterViewInit {
-  help_collapsed: Boolean = true;
+  help_collapsed: boolean = true;
 
   @ViewChild('nvd3') nvD3: NvD3Component;
   //downloader: AggregateDownloader;
