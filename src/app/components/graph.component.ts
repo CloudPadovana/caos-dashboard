@@ -174,6 +174,11 @@ export class GraphComponent implements AfterViewInit {
   linewidths: Item<number>[] = [];
   private _selected_linewidth: number;
   set selected_linewidth(n: number) {
+    if(n == this._selected_linewidth) { return; }
+
+    let data = this.data.splice(0);
+    data.forEach((s: GraphSeries) => s.strokeWidth = n);
+    this.data = data;
     this._selected_linewidth = n;
     this.refresh_graph();
   }
@@ -261,6 +266,8 @@ export class GraphComponent implements AfterViewInit {
   }
 
   update_data() {
+    if(this.fetching != undefined) { return; }
+
     let series = this.selected_set.series;
     let granularity = moment.duration(this.selected_granularity).asSeconds();
 
@@ -283,7 +290,7 @@ export class GraphComponent implements AfterViewInit {
           // store new data
           this.data.push(g);
         },
-        () => { },
+        () => { this.fetching = undefined; },
         () => {
           this.fetching = undefined;
           this.refresh_graph();
@@ -295,17 +302,9 @@ export class GraphComponent implements AfterViewInit {
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
 
-    this.data.forEach((cur: GraphSeries, index: number, array: GraphSeries[]) => {
-      array[index].strokeWidth = this.selected_linewidth;
-    });
-
     this.update_chart_options();
     this.nvD3.updateWithOptions(this.options);
-
-    // Without this timeout, the chart is not correctly setup
-    setTimeout(() => {
-      this.nvD3.chart.update();
-    }, 500);
+    this.nvD3.updateWithData(this.data);
   }
 
   select_all() {

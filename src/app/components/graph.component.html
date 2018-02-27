@@ -2,13 +2,13 @@
   <div class="card-header">
     <div class="d-flex justify-content-between">
       <div class="p-2" *ngIf="show_set_selector">
-        <dropdown [items]="sets" (valueChange)="selected_set=$event"></dropdown>
+        <dropdown [items]="sets" [(value)]="selected_set"></dropdown>
       </div>
       <div class="p-2" *ngIf="show_granularity_selector" pTooltip="Granularity">
         <dropdown [items]="granularities" [(value)]="selected_granularity"></dropdown>
       </div>
       <div class="p-2" pTooltip="Linewidth">
-        <dropdown [items]="linewidths" (valueChange)="selected_linewidth=$event" icon="pencil"></dropdown>
+        <dropdown [items]="linewidths" [(value)]="selected_linewidth" icon="pencil"></dropdown>
       </div>
     </div>
   </div>
