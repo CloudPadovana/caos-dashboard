@@ -1,0 +1,17 @@
+<div class="btn-group" dropdown>
+  <button dropdownToggle type="button" class="btn btn-outline-dark dropdown-toggle">
+    <i *ngIf="icon" class="fa fa-fw" [ngClass]="'fa-' + icon"></i>
+    {{ selected_item?.label }}
+  </button>
+  <ul *dropdownMenu class="dropdown-menu" role="menu">
+    <ng-container *ngFor="let item of items">
+      <li role="menuitem">
+        <button
+          class="btn dropdown-item"
+          type="button"
+          [class.active]="is_item_selected(item)"
+          (click)="value = item.value">{{ item.label }}</button>
+      </li>
+    </ng-container>
+  </ul>
+</div>

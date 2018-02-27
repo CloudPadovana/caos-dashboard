@@ -27,8 +27,9 @@ import { HttpModule  } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { AlertModule } from 'ngx-bootstrap/alert';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 
 import * as d3 from 'd3';
@@ -36,12 +37,12 @@ import 'nvd3';
 import { NvD3Module } from 'ng2-nvd3';
 
 import { DateRangeComponent } from './daterange.component';
+import { DropdownComponent } from './dropdown.component';
 import { GraphComponent } from './graph.component';
 
 import {
   CalendarModule,
   DataTableModule,
-  DropdownModule,
   MultiSelectModule,
   SelectButtonModule,
   TooltipModule,
@@ -50,6 +51,7 @@ import {
 @NgModule({
   declarations: [
     DateRangeComponent,
+    DropdownComponent,
     GraphComponent,
   ],
   imports: [
@@ -58,15 +60,15 @@ import {
     FormsModule,
     RouterModule,
 
-    CollapseModule.forRoot(),
+    AlertModule.forRoot(),
     BsDropdownModule.forRoot(),
+    CollapseModule.forRoot(),
     PopoverModule.forRoot(),
 
     NvD3Module,
 
     CalendarModule,
     DataTableModule,
-    DropdownModule,
     MultiSelectModule,
     SelectButtonModule,
     TooltipModule,
@@ -77,18 +79,19 @@ import {
     FormsModule,
     RouterModule,
 
-    CollapseModule,
+    AlertModule,
     BsDropdownModule,
+    CollapseModule,
     PopoverModule,
 
     CalendarModule,
     DataTableModule,
-    DropdownModule,
     MultiSelectModule,
     SelectButtonModule,
     TooltipModule,
 
     DateRangeComponent,
+    DropdownComponent,
     GraphComponent,
   ]
 })

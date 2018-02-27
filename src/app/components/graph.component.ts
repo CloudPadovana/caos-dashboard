@@ -21,11 +21,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, Output, ElementRef, EventEmitter, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-
-import { SelectItem } from 'primeng/primeng';
 
 import * as d3 from 'd3';
 import { NvD3Component } from 'ng2-nvd3';
@@ -34,6 +32,7 @@ import * as moment from 'moment';
 //import { AggregateDownloader } from '../aggregate-downloader';
 
 import { DateRange, DateRangeService } from '../daterange.service';
+import { Item } from './dropdown.component';
 
 import {
   SeriesService,
@@ -110,6 +109,21 @@ export interface GraphConfig {
   sets: GraphSetConfig[];
 }
 
+type Granularity = moment.MomentInputObject;
+
+interface IAlert {
+  type: string;
+  dismissible: boolean;
+  msg: string;
+}
+
+const PPP_THRESHOLD = 2;
+const PPP_ALERT = <IAlert>({
+  type: "warning",
+  dismissible: true,
+  msg: `Trying to plot more than ${PPP_THRESHOLD} points per pixel. Granularity has been automatically increased.`,
+});
+
 @Component({
   selector: 'graph',
   templateUrl: 'graph.component.html'
@@ -117,7 +131,7 @@ export interface GraphConfig {
 export class GraphComponent implements AfterViewInit {
   help_collapsed: Boolean = true;
 
-  @ViewChild(NvD3Component) nvD3: NvD3Component;
+  @ViewChild('nvd3') nvD3: NvD3Component;
   //downloader: AggregateDownloader;
 
   private _config: GraphConfig;
@@ -127,20 +141,12 @@ export class GraphComponent implements AfterViewInit {
     this.sets = [];
     this.selected_set = undefined;
 
-    if(c && c.sets.length > 0) {
-      setTimeout(
-        () => {
-          this.sets = c.sets.map((s: GraphSetConfig) => <SelectItem>({
-            label: s.label,
-            value: s
-          }));
-
-          this.selected_set = c.sets[0];
-        }
-      );
-    }
-
-    this.update();
+    if(c && c.sets) {
+      this.sets = c.sets.map((s: GraphSetConfig) => <Item<GraphSetConfig>>({
+        label: s.label,
+        value: s
+      }));
+    };
   }
   get config(): GraphConfig {
     return this._config;
@@ -150,7 +156,7 @@ export class GraphComponent implements AfterViewInit {
 
   @Input() show_granularity_selector: boolean = true;
 
-  sets: SelectItem[];
+  sets: Item<GraphSetConfig>[] = [];
   private _selected_set: GraphSetConfig;
   @Output() on_set_selected = new EventEmitter<GraphSetConfig>();
   @Input()
@@ -163,22 +169,27 @@ export class GraphComponent implements AfterViewInit {
     return this._selected_set;
   }
 
-  granularities: SelectItem[] = [];
-  private _selected_granularity: moment.MomentInputObject;
-  @Output() on_granularity_selected = new EventEmitter<moment.MomentInputObject>();
+  granularities: Item<Granularity>[] = [];
+  private _selected_granularity: Granularity;
+  @Output() on_granularity_selected = new EventEmitter<Granularity>();
   @Input()
-  set selected_granularity(g: moment.MomentInputObject) {
+  set selected_granularity(g: Granularity) {
     this._selected_granularity = g;
     this.on_granularity_selected.emit(this._selected_granularity);
     this.update();
   }
-  get selected_granularity(): moment.MomentInputObject {
+  get selected_granularity(): Granularity {
     return this._selected_granularity;
   }
 
-  linewidths: SelectItem[] = [];
+  linewidths: Item<number>[] = [];
   private _selected_linewidth: number;
   set selected_linewidth(n: number) {
+    if(n == this._selected_linewidth) { return; }
+
+    let data = this.data.splice(0);
+    data.forEach((s: GraphSeries) => s.strokeWidth = n);
+    this.data = data;
     this._selected_linewidth = n;
     this.refresh_graph();
   }
@@ -198,36 +209,80 @@ export class GraphComponent implements AfterViewInit {
     return this._daterange.range;
   }
 
+  alerts: IAlert[] = [];
+
   constructor(private _series: SeriesService, private _daterange: DateRangeService) {
     _daterange.range_changed.subscribe(() => this.update());
-
     //this.downloader = new AggregateDownloader();
 
     this.linewidths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-      .map((n: number) => {return { label: `${n}`, value: n} });
+      .map((n: number) => <Item<number>>({
+        label: `${n}`,
+        value: n
+      }));
 
-    this.granularities = [
-      {
-        label: "1 hour",
-        value: {hours: 1}
-      },
-
-      {
-        label: "1 day",
-        value: {days: 1}
-      },
-
-      {
-        label: "1 week",
-        value: {days: 7}
-      },
-    ];
-    this.selected_granularity = this.granularities[0].value;
+    this.granularities = [1, 2, 3, 6, 12, 24, 48, 72, 24*7]
+      .map((n: number) => <Item<Granularity>>({
+        label: moment.duration(n, "hours").humanize(),
+        value: <Granularity>({hours: n})
+      }));
   }
 
   ngAfterViewInit() {
     // done here to avoid ExpressionChangedAfterItHasBeenCheckedError
     this.fetching = undefined;
+  }
+
+  add_alert(alert: IAlert) {
+    if(!this.alerts) { return; }
+    if(!alert) { return; }
+    if(this.alerts.indexOf(alert) > -1) { return; }
+
+    this.alerts.push(alert);
+  }
+
+  dismiss_alert(alert: any) {
+    if(!this.alerts) { return; }
+    if(!alert) { return; }
+
+    this.alerts = this.alerts.filter((a: IAlert) => a !== alert);
+  }
+
+  private ppp_ratio(granularity: Granularity): number {
+    let g = moment.duration(granularity).asSeconds();
+    let rect = this.nvD3.el.getBoundingClientRect();
+    let width = rect.width;
+    let range = moment(this.date_range.end).diff(this.date_range.start, 'seconds');
+    let points = range / g;
+    let ratio = points / width;
+    return ratio;
+  }
+
+  private find_good_granularity(): Granularity {
+    for(let g of this.granularities) {
+      let ratio = this.ppp_ratio(g.value);
+      if(ratio <= PPP_THRESHOLD) {
+        return g.value;
+      }
+    }
+
+    return null;
+  }
+
+  check_ppp(): boolean {
+    let granularity = this.selected_granularity;
+    let ratio = this.ppp_ratio(granularity);
+
+    if(ratio <= PPP_THRESHOLD) {
+      return true;
+    } else {
+      let good_granularity = this.find_good_granularity();
+      setTimeout(() => {
+        this.selected_granularity = good_granularity;
+        this.add_alert(PPP_ALERT);
+      });
+      return false;
+    }
   }
 
   update() {
@@ -236,10 +291,13 @@ export class GraphComponent implements AfterViewInit {
     if(!this.selected_granularity) { return };
     if(!this.date_range) { return };
 
+    if(!this.check_ppp()) { return };
     this.update_data();
   }
 
   update_data() {
+    if(this.fetching != undefined) { return; }
+
     let series = this.selected_set.series;
     let granularity = moment.duration(this.selected_granularity).asSeconds();
 
@@ -262,7 +320,7 @@ export class GraphComponent implements AfterViewInit {
           // store new data
           this.data.push(g);
         },
-        () => { },
+        () => { this.fetching = undefined; },
         () => {
           this.fetching = undefined;
           this.refresh_graph();
@@ -274,17 +332,9 @@ export class GraphComponent implements AfterViewInit {
     if (!this.nvD3) { return };
     if (!this.nvD3.chart) { return };
 
-    this.data.forEach((cur: GraphSeries, index: number, array: GraphSeries[]) => {
-      array[index].strokeWidth = this.selected_linewidth;
-    });
-
     this.update_chart_options();
     this.nvD3.updateWithOptions(this.options);
-
-    // Without this timeout, the chart is not correctly setup
-    setTimeout(() => {
-      this.nvD3.chart.update();
-    }, 500);
+    this.nvD3.updateWithData(this.data);
   }
 
   select_all() {
@@ -298,6 +348,8 @@ export class GraphComponent implements AfterViewInit {
   }
 
   private update_chart_options() {
+    if(!this.selected_set) { return };
+
     let s = this.selected_set;
     let chart = this.options.chart;
 

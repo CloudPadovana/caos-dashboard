@@ -25,6 +25,8 @@ $fa-font-path: '../node_modules/font-awesome/fonts';
 $icon-font-path: '../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
 $brand-primary: red;
 
+$dropdown-link-hover-bg: #dee2e6;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 @import "../node_modules/font-awesome/scss/font-awesome";
 
@@ -85,6 +87,13 @@ a:hover {
   }
 }
 
+dropdown {
+  .dropdown-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+  }
+}
 
 daterange {
   /* makes the dropdown full width  */

@@ -2,24 +2,28 @@
   <div class="card-header">
     <div class="d-flex justify-content-between">
       <div class="p-2" *ngIf="show_set_selector">
-        <p-dropdown [options]="sets" (onChange)="selected_set=$event.value" [autoWidth]="true" [style]="{'width': '100%'}"></p-dropdown>
+        <dropdown [items]="sets" [(value)]="selected_set"></dropdown>
       </div>
-      <div class="p-2" *ngIf="show_granularity_selector">Granularity:
-        <p-dropdown [options]="granularities" (onChange)="selected_granularity=$event.value"></p-dropdown>
+      <div class="p-2" *ngIf="show_granularity_selector" pTooltip="Granularity">
+        <dropdown [items]="granularities" [(value)]="selected_granularity"></dropdown>
       </div>
-      <div class="p-2 dropdown">
-        <button class="btn btn-outline-dark dropdown-toggle" type="button" [popover]="settings_popover" placement="bottom" container="body" #pop="bs-popover"><i class="fa fa-fw fa-wrench"></i>Settings</button>
+      <div class="p-2" pTooltip="Linewidth">
+        <dropdown [items]="linewidths" [(value)]="selected_linewidth" icon="pencil"></dropdown>
       </div>
     </div>
   </div>
   <div class="card-block">
+    <alert *ngFor="let alert of alerts"
+           [type]="alert.type"
+           [dismissible]="alert.dismissible"
+           (onClosed)="dismiss_alert(alert)">{{ alert.msg }}</alert>
     <div *ngIf="fetching>=0">
       <div class="progress">
         <div class="progress-bar" [style.width.%]="fetching_percent"></div>
       </div>
       <div class="row justify-content-center">Loading data: {{ fetching_percent | number:'1.2-2' }}%</div>
     </div>
-    <nvd3 [options]="options" [data]="data"></nvd3>
+    <nvd3 #nvd3 [options]="options" [data]="data"></nvd3>
   </div>
   <div class="card-footer">
     <div class="btn-toolbar" role="toolbar">
@@ -44,13 +48,3 @@
     </div>
   </div>
 </div>
-<ng-template #settings_popover>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-12">
-        <label for="linewidth_selector">Linewidth:</label>
-        <p-dropdown id="linewidth_selector" [options]="linewidths" (onChange)="selected_linewidth=$event.value"></p-dropdown>
-      </div>
-    </div>
-  </div>
-</ng-template>
