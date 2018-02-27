@@ -23,17 +23,28 @@
       <div class="row justify-content-center">Loading data: {{ fetching_percent | number:'1.2-2' }}%</div>
     </div>
     <nvd3 [options]="options" [data]="data"></nvd3>
+  </div>
+  <div class="card-footer">
     <div class="btn-toolbar" role="toolbar">
-      <div class="btn-group mr-2" role="group">
-        <button class="btn btn-outline-dark" type="button" (click)="select_all()" tooltip="Click here to select all all series.">Select all</button>
-        <button class="btn btn-outline-dark" type="button" (click)="deselect_all()" tooltip="Click here to deselect all series.">Deselect all</button>
-      </div>
+      <button class="btn btn-link" type="button" (click)="select_all()" tooltip="Click here to select all all series.">Select all</button>
+      <button class="btn btn-link" type="button" (click)="deselect_all()" tooltip="Click here to deselect all series.">Deselect all</button>
+
       <!-- .btn-group(role="group")-->
       <!--   button.btn.btn-secondary(type="button", (click)="downloader.download_CSV('data.csv')", tooltip="Download raw data in CSV format.")-->
       <!--     | Download data-->
       <!--     i.fa.fa-fw.fa-download-->
+      <button type="button" class="btn btn-link" (click)="help_collapsed = !help_collapsed">{{ help_collapsed ? 'Show' : 'Hide' }} help</button>
     </div>
-    <p>Click on legend entries to cycle their visibility. To select a single series, double click on the legend entry.</p>
+    <div [collapse]="help_collapsed">
+      <p>Click on legend entries to cycle their visibility. To select a single series, double click on the legend entry.</p>
+      <p>Series descriptions:</p>
+      <dl class="row" *ngIf="selected_set && selected_set.series">
+        <ng-container *ngFor="let s of selected_set.series">
+          <dt class="col-sm-3">{{ s.label }}</dt>
+          <dd class="col-sm-9">{{ s.description }}</dd>
+        </ng-container>
+      </dl>
+    </div>
   </div>
 </div>
 <ng-template #settings_popover>
