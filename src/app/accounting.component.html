@@ -1,5 +1,5 @@
 <h3>Accounting</h3>
-<graph [config]="graph_config" (on_set_selected)="selected_set=$event; update_stats()" (on_date_range_selected)="date_range=$event; update_stats()"></graph>
+<graph [config]="graph_config" (on_set_selected)="selected_set=$event; update_stats()"></graph>
 <h3>Aggregated data</h3>
 <h5>from {{ date_range?.start | date: 'y-MM-dd HH:mm Z' }} to {{ date_range?.end | date: 'y-MM-dd HH:mm Z' }}</h5>
 <div *ngIf="fetching_stats&gt;=0">

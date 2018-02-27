@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2017, 2018 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,8 @@ import {
 
 import { CAOS_HYPERVISOR_TAG_KEY } from './hypervisor';
 
-import { DateRange } from './components/daterange.component';
+import { DateRange, DateRangeService } from './daterange.service';
+
 import {
   GraphComponent,
   GraphConfig,
@@ -100,7 +101,9 @@ export class AccountingComponent implements OnInit, AfterViewInit {
   projects: Project[] = [];
 
   selected_set: GraphSetConfig;
-  date_range: DateRange;
+  get date_range(): DateRange {
+    return this._daterange.range;
+  }
 
   stats: StatsSeries[] = [];
   fetching_stats: number;
@@ -113,16 +116,17 @@ export class AccountingComponent implements OnInit, AfterViewInit {
   graph_config: GraphConfig;
 
   constructor(private _api: ApiService,
-              private _series: SeriesService) { }
+              private _series: SeriesService,
+              private _daterange: DateRangeService) {
+
+    _daterange.range_changed.subscribe(() => this.update_stats());
+  }
 
   ngOnInit() {
     this.fetching_stats = undefined;
   }
 
   ngAfterViewInit() {
-    // done here to avoid ExpressionChangedAfterItHasBeenCheckedError
-    this.date_range = this.graph.date_range;
-
     this.fetch_projects();
 
     this.selected_set = this.graph.selected_set;

@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2017, 2018 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,145 +21,65 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, AfterViewChecked } from '@angular/core';
+import { Component } from '@angular/core';
 import * as moment from 'moment';
 
-export interface DateRange {
-  start: Date;
-  end: Date;
-}
+import {
+  DateRange,
+  DateRangeService,
 
-export interface DurationPreset {
-  label: string;
-  duration: moment.DurationInputObject;
-}
+  DateRangePreset,
+  DATE_RANGE_PRESETS,
 
-interface DateRangePreset extends DurationPreset {
-  // aurgument to moment.startOf()
-  starting: moment.unitOfTime.StartOf;
+  daterange_from_preset,
+  describe_daterange,
+  is_daterange_same,
+  is_daterange_same_preset,
+} from '../daterange.service';
+export { DateRange };
 
-  // how much to go back in time
-  backward: moment.DurationInputObject;
-}
-
-const PRESETS: DateRangePreset[] = [
-    <DateRangePreset>({label: "today",
-                       starting: 'day',
-                       backward: {days: 0},
-                       duration: {days: 1}}),
-
-    <DateRangePreset>({label: "past 24h",
-                       starting: 'hour',
-                       backward: {days: 1},
-                       duration: {days: 1}}),
-
-    <DateRangePreset>({label: "yesterday",
-                       starting: 'day',
-                       backward: {days: 1},
-                       duration: {days: 1}}),
-
-    <DateRangePreset>({label: "current week",
-                       starting: 'week',
-                       backward: {weeks: 0},
-                       duration: {weeks: 1}}),
-
-    <DateRangePreset>({label: "last week",
-                       starting: 'day',
-                       backward: {weeks: 1},
-                       duration: {weeks: 1}}),
-
-    <DateRangePreset>({label: "current month",
-                       starting: 'month',
-                       backward: {months: 0},
-                       duration: {months: 1}}),
-
-    <DateRangePreset>({label: "last month",
-                       starting: 'day',
-                       backward: {months: 1},
-                       duration: {months: 1}}),
-
-    <DateRangePreset>({label: "last 3 months",
-                       starting: 'day',
-                       backward: {months: 3},
-                       duration: {months: 3}}),
-
-    <DateRangePreset>({label: "current year",
-                       starting: 'year',
-                       backward: {years: 0},
-                       duration: {years: 1}}),
-]
+import { LocaleSettings } from 'primeng/primeng';
 
 @Component({
   selector: 'daterange',
   templateUrl: 'daterange.component.html'
 })
-export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewChecked {
-  private start_date: Date;
-  private end_date: Date;
+export class DateRangeComponent {
+  locale: LocaleSettings = {
+    firstDayOfWeek: 1,
+    dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    dayNamesMin: ["Su","Mo","Tu","We","Th","Fr","Sa"],
+    monthNames: [ "January","February","March","April","May","June","July","August","September","October","November","December" ],
+    monthNamesShort: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
+    today: 'Today',
+    clear: 'Clear'
+  };
 
-  readonly presets = PRESETS;
+  private _current_daterange: DateRange = daterange_from_preset(DATE_RANGE_PRESETS[0]);
 
-  @Input('range')
-  range: DateRange;
+  get start_date(): Date { return this._current_daterange.start; }
+  set start_date(d: Date) { this._current_daterange.start = d; }
+  get end_date(): Date { return this._current_daterange.end; }
+  set end_date(d: Date) { this._current_daterange.end = d; }
 
-  @Output('rangeChange')
-  rangeChange: EventEmitter<DateRange> = new EventEmitter<DateRange>();
+  readonly presets = DATE_RANGE_PRESETS;
 
-  constructor() { }
-
-  ngOnInit() {
-    if(!this.range) {
-      this.select_preset(PRESETS[0]);
-      this.emit_range();
-    }
+  get range(): DateRange {
+    return this._daterange.range;
   }
 
-  ngAfterViewInit() {
-  }
-
-  ngAfterViewChecked() {
-   // this.emit_range();
-  }
-
-  is_daterange_same(d1: DateRange, d2: DateRange): boolean {
-    return ((moment(d1.start).isSame(d2.start)) &&
-            (moment(d1.end).isSame(d2.end)));
+  constructor(private _daterange: DateRangeService) {
+    _daterange.range_changed.subscribe(
+      (d: DateRange) => this._current_daterange = d);
   }
 
   is_selected(p: DateRangePreset, r: DateRange): boolean {
-    if(!r) { return false };
-
-    let d = this.daterange_from_preset(p);
-
-    return this.is_daterange_same(d, r);
+    return is_daterange_same_preset(r, p);
   }
 
   describe_daterange(d: DateRange): string {
-    if(!d) { return "" }
-
-    // Check for presets
-    for(let p of this.presets) {
-      if(this.is_selected(p, d)) {
-        return p.label;
-      }
-    }
-
-    let d1 = this.describe_date(d.start);
-    let d2 = this.describe_date(d.end);
-
-    return `From ${d1} to ${d2}`;
-  }
-
-  private describe_date(d: Date): string {
-    if(!d) { return "" }
-
-    return moment(d).format("YYYY/MM/DD HH:mm");
-  }
-
-  private emit_range(): void {
-    let r = this.daterange;
-    this.rangeChange.emit(r);
-    this.range = r;
+    return describe_daterange(d);
   }
 
   private get daterange(): DateRange {
@@ -174,39 +94,12 @@ export class DateRangeComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.end_date = moment(r.end).toDate();
   }
 
-  private daterange_from_preset(r: DateRangePreset): DateRange {
-    let now = moment()
-      .minute(0)
-      .second(0)
-      .millisecond(0);
-
-    let backward = r.backward;
-    let starting = r.starting;
-
-    // Week starts on Monday!!!
-    if(r.starting == 'week') {
-      starting = 'isoWeek';
-    }
-
-    let start = now.clone()
-      .subtract(backward)
-      .startOf(starting);
-
-    let end = start.clone()
-      .add(r.duration);
-
-    return <DateRange>({
-      start: start.toDate(),
-      end: end.toDate()
-    });
-  }
-
   select_preset(r: DateRangePreset): void {
-    this.daterange = this.daterange_from_preset(r);
+    this.daterange = daterange_from_preset(r);
   };
 
   ok_clicked() {
-    this.emit_range();
+    this._daterange.range = this.daterange;
   }
 
   cancel_clicked() {

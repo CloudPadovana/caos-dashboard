@@ -28,9 +28,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { CollapseModule } from 'ngx-bootstrap/collapse';
-import { DatepickerModule } from 'ngx-bootstrap/datepicker';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { PopoverModule } from 'ngx-bootstrap/popover';
-import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 
 import * as d3 from 'd3';
 import 'nvd3';
@@ -40,6 +39,7 @@ import { DateRangeComponent } from './daterange.component';
 import { GraphComponent } from './graph.component';
 
 import {
+  CalendarModule,
   DataTableModule,
   DropdownModule,
   MultiSelectModule,
@@ -59,12 +59,12 @@ import {
     RouterModule,
 
     CollapseModule.forRoot(),
-    DatepickerModule.forRoot(),
+    BsDropdownModule.forRoot(),
     PopoverModule.forRoot(),
-    TimepickerModule.forRoot(),
 
     NvD3Module,
 
+    CalendarModule,
     DataTableModule,
     DropdownModule,
     MultiSelectModule,
@@ -78,10 +78,10 @@ import {
     RouterModule,
 
     CollapseModule,
-    DatepickerModule,
+    BsDropdownModule,
     PopoverModule,
-    TimepickerModule,
 
+    CalendarModule,
     DataTableModule,
     DropdownModule,
     MultiSelectModule,
