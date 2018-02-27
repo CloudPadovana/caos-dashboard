@@ -38,7 +38,7 @@
           <div class="col-2">5min</div>
           <div class="col">
             <div class="progress">
-              <div class="progress-bar" [style.width.%]="total.load_5m" [ngClass]="usage_class(total.load_5m)">{{ total.load_5m | number:'1.2-2' }}%</div>
+              <div class="progress-bar" [style.width.%]="total.load_5m * 100" [ngClass]="usage_class(total.load_5m * 100)">{{ total.load_5m | percent:'1.2-2' }}</div>
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@
           <div class="col-2">10min</div>
           <div class="col">
             <div class="progress">
-              <div class="progress-bar" [style.width.%]="total.load_10m" [ngClass]="usage_class(total.load_10m)">{{ total.load_10m | number:'1.2-2' }}%</div>
+              <div class="progress-bar" [style.width.%]="total.load_10m * 100" [ngClass]="usage_class(total.load_10m * 100)">{{ total.load_10m | percent:'1.2-2' }}</div>
             </div>
           </div>
         </div>
@@ -54,7 +54,7 @@
           <div class="col-2">15min</div>
           <div class="col">
             <div class="progress">
-              <div class="progress-bar" [style.width.%]="total.load_15m" [ngClass]="usage_class(total.load_15m)">{{ total.load_15m | number:'1.2-2' }}%</div>
+              <div class="progress-bar" [style.width.%]="total.load_15m * 100" [ngClass]="usage_class(total.load_15m * 100)">{{ total.load_15m | percent:'1.2-2' }}</div>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@
         <div class="col-2"><small>5m</small></div>
         <div class="col">
           <div class="progress">
-            <div class="progress-bar" [style.width.%]="rd.load_5m" [ngClass]="usage_class(rd.load_5m)">{{ rd.load_5m | number:'1.2-2' }}%</div>
+            <div class="progress-bar" [style.width.%]="rd.load_5m * 100" [ngClass]="usage_class(rd.load_5m * 100)">{{ rd.load_5m | percent:'1.2-2' }}</div>
           </div>
         </div>
       </div>
@@ -136,7 +136,7 @@
         <div class="col-2"><small>10m</small></div>
         <div class="col">
           <div class="progress">
-            <div class="progress-bar" [style.width.%]="rd.load_10m" [ngClass]="usage_class(rd.load_10m)">{{ rd.load_10m | number:'1.2-2' }}%</div>
+            <div class="progress-bar" [style.width.%]="rd.load_10m * 100" [ngClass]="usage_class(rd.load_10m * 100)">{{ rd.load_10m | percent:'1.2-2' }}</div>
           </div>
         </div>
       </div>
@@ -144,7 +144,7 @@
         <div class="col-3"><small>15m</small></div>
         <div class="col">
           <div class="progress">
-            <div class="progress-bar" [style.width.%]="rd.load_15m" [ngClass]="usage_class(rd.load_15m)">{{ rd.load_15m | number:'1.2-2' }}%</div>
+            <div class="progress-bar" [style.width.%]="rd.load_15m * 100" [ngClass]="usage_class(rd.load_15m * 100)">{{ rd.load_15m | percent:'1.2-2' }}</div>
           </div>
         </div>
       </div>
