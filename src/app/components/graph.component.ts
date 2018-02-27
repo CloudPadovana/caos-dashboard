@@ -197,6 +197,16 @@ export class GraphComponent implements AfterViewInit {
     return this._selected_linewidth;
   }
 
+  heights: Item<number>[] = [];
+  private _selected_height: number;
+  set selected_height(n: number) {
+    this._selected_height = n;
+    this.refresh_graph();
+  }
+  get selected_height(): number {
+    return this._selected_height;
+  }
+
   data: GraphSeries[] = [];
   fetching: number;
   get fetching_percent(): number {
@@ -225,6 +235,12 @@ export class GraphComponent implements AfterViewInit {
       .map((n: number) => <Item<Granularity>>({
         label: moment.duration(n, "hours").humanize(),
         value: <Granularity>({hours: n})
+      }));
+
+    this.heights = [0, 1, 2, 3]
+      .map((n: number) => <Item<number>>({
+        label: `${350 + n*150}px`,
+        value: 350 + n*150
       }));
   }
 
@@ -353,6 +369,7 @@ export class GraphComponent implements AfterViewInit {
     let s = this.selected_set;
     let chart = this.options.chart;
 
+    chart.height = this.selected_height;
     chart.yAxis.axisLabel = s.y_axis_label;
 
     if (s.y_axis_tick_formatter) {
