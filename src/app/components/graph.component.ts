@@ -111,7 +111,18 @@ export interface GraphConfig {
 
 type Granularity = moment.MomentInputObject;
 
+interface IAlert {
+  type: string;
+  dismissible: boolean;
+  msg: string;
+}
+
 const PPP_THRESHOLD = 2;
+const PPP_ALERT = <IAlert>({
+  type: "warning",
+  dismissible: true,
+  msg: `Trying to plot more than ${PPP_THRESHOLD} points per pixel. Granularity has been automatically increased.`,
+});
 
 @Component({
   selector: 'graph',
@@ -198,9 +209,10 @@ export class GraphComponent implements AfterViewInit {
     return this._daterange.range;
   }
 
+  alerts: IAlert[] = [];
+
   constructor(private _series: SeriesService, private _daterange: DateRangeService) {
     _daterange.range_changed.subscribe(() => this.update());
-
     //this.downloader = new AggregateDownloader();
 
     this.linewidths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -219,6 +231,21 @@ export class GraphComponent implements AfterViewInit {
   ngAfterViewInit() {
     // done here to avoid ExpressionChangedAfterItHasBeenCheckedError
     this.fetching = undefined;
+  }
+
+  add_alert(alert: IAlert) {
+    if(!this.alerts) { return; }
+    if(!alert) { return; }
+    if(this.alerts.indexOf(alert) > -1) { return; }
+
+    this.alerts.push(alert);
+  }
+
+  dismiss_alert(alert: any) {
+    if(!this.alerts) { return; }
+    if(!alert) { return; }
+
+    this.alerts = this.alerts.filter((a: IAlert) => a !== alert);
   }
 
   private ppp_ratio(granularity: Granularity): number {
@@ -250,7 +277,10 @@ export class GraphComponent implements AfterViewInit {
       return true;
     } else {
       let good_granularity = this.find_good_granularity();
-      setTimeout(() => { this.selected_granularity = good_granularity; });
+      setTimeout(() => {
+        this.selected_granularity = good_granularity;
+        this.add_alert(PPP_ALERT);
+      });
       return false;
     }
   }

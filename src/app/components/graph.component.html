@@ -13,6 +13,10 @@
     </div>
   </div>
   <div class="card-block">
+    <alert *ngFor="let alert of alerts"
+           [type]="alert.type"
+           [dismissible]="alert.dismissible"
+           (onClosed)="dismiss_alert(alert)">{{ alert.msg }}</alert>
     <div *ngIf="fetching>=0">
       <div class="progress">
         <div class="progress-bar" [style.width.%]="fetching_percent"></div>

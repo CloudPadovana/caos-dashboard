@@ -27,6 +27,7 @@ import { HttpModule  } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
+import { AlertModule } from 'ngx-bootstrap/alert';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { PopoverModule } from 'ngx-bootstrap/popover';
@@ -59,6 +60,7 @@ import {
     FormsModule,
     RouterModule,
 
+    AlertModule.forRoot(),
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     PopoverModule.forRoot(),
@@ -77,6 +79,7 @@ import {
     FormsModule,
     RouterModule,
 
+    AlertModule,
     BsDropdownModule,
     CollapseModule,
     PopoverModule,
