@@ -2,7 +2,7 @@
 //
 // caos-dashboard - CAOS dashboard
 //
-// Copyright © 2017 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
+// Copyright © 2017, 2018 INFN - Istituto Nazionale di Fisica Nucleare (Italy)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -227,18 +227,21 @@ export class HypervisorsComponent implements OnInit {
         series: [
           new GraphAggregateSeriesConfig({
             label: "Used VCPUs",
+            description: "Number of used VCPUs",
             ...Series.HYPERVISOR_VCPUS_USED,
             tag: {key: CAOS_HYPERVISOR_TAG_KEY},
             aggregate: "SUM"
           }),
           new GraphAggregateSeriesConfig({
             label: "VCPUs",
+            description: "Total VCPUs available (taking overcommitment into account).",
             ...Series.HYPERVISOR_VCPUS_TOTAL,
             tag: {key: CAOS_HYPERVISOR_TAG_KEY},
             aggregate: "SUM"
           }),
           new GraphAggregateSeriesConfig({
             label: "CPUs",
+            description: "Total CPUs available.",
             ...Series.HYPERVISOR_CPUS_TOTAL,
             tag: {key: CAOS_HYPERVISOR_TAG_KEY},
             aggregate: "SUM"
@@ -252,18 +255,21 @@ export class HypervisorsComponent implements OnInit {
         series: [
           new GraphAggregateSeriesConfig({
             label: "Used VRAM",
+            description: "Allocated VRAM.",
             ...Series.HYPERVISOR_MEMORY_USED,
             tag: {key: CAOS_HYPERVISOR_TAG_KEY},
             aggregate: "SUM"
           }),
           new GraphAggregateSeriesConfig({
             label: "VRAM",
+            description: "Total VRAM available (taking overcommitment into account).",
             ...Series.HYPERVISOR_MEMORY_TOTAL,
             tag: {key: CAOS_HYPERVISOR_TAG_KEY},
             aggregate: "SUM"
           }),
           new GraphAggregateSeriesConfig({
             label: "RAM",
+            description: "Total RAM available.",
             ...Series.HYPERVISOR_RAM_TOTAL,
             tag: {key: CAOS_HYPERVISOR_TAG_KEY},
             aggregate: "SUM"
@@ -277,6 +283,7 @@ export class HypervisorsComponent implements OnInit {
         series: [
           new GraphAggregateSeriesConfig({
             label: "Running",
+            description: "Number of active VMs",
             ...Series.HYPERVISOR_RUNNING_VMS,
             tag: {key: CAOS_HYPERVISOR_TAG_KEY},
             aggregate: "SUM"
@@ -329,18 +336,21 @@ export class HypervisorsComponent implements OnInit {
             series: [
               new GraphAggregateSeriesConfig({
                 label: "Used VCPUs",
+                description: "Number of used VCPUs",
                 ...Series.HYPERVISOR_VCPUS_USED,
                 tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
                 aggregate: "SUM"
               }),
               new GraphAggregateSeriesConfig({
                 label: "VCPUs",
+                description: "Total VCPUs available (taking overcommitment into account).",
                 ...Series.HYPERVISOR_VCPUS_TOTAL,
                 tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
                 aggregate: "SUM"
               }),
               new GraphAggregateSeriesConfig({
                 label: "CPUs",
+                description: "Total CPUs available.",
                 ...Series.HYPERVISOR_CPUS_TOTAL,
                 tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
                 aggregate: "SUM"
@@ -354,18 +364,21 @@ export class HypervisorsComponent implements OnInit {
             series: [
               new GraphAggregateSeriesConfig({
                 label: "Used VRAM",
+                description: "Allocated VRAM.",
                 ...Series.HYPERVISOR_MEMORY_USED,
                 tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
                 aggregate: "SUM"
               }),
               new GraphAggregateSeriesConfig({
                 label: "VRAM",
+                description: "Total VRAM available (taking overcommitment into account).",
                 ...Series.HYPERVISOR_MEMORY_TOTAL,
                 tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
                 aggregate: "SUM"
               }),
               new GraphAggregateSeriesConfig({
                 label: "RAM",
+                description: "Total RAM available.",
                 ...Series.HYPERVISOR_RAM_TOTAL,
                 tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
                 aggregate: "SUM"
@@ -379,6 +392,7 @@ export class HypervisorsComponent implements OnInit {
             series: [
               new GraphAggregateSeriesConfig({
                 label: "Running",
+                description: "Number of active VMs",
                 ...Series.HYPERVISOR_RUNNING_VMS,
                 tags: [{key: CAOS_HYPERVISOR_TAG_KEY, value: h.hostname}],
                 aggregate: "SUM"
