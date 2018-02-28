@@ -220,6 +220,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphAggregateSeriesConfig({
       label: "OVERALL",
+      description: "Overall CPU time consumed over the specified granularity.",
       metric: Metrics.VM_CPU_TIME_USAGE,
       period: 3600,
       tag: {key: CAOS_PROJECT_TAG_KEY},
@@ -229,6 +230,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "BARE",
+      description: "Total CPU time available (physical cores).",
       metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
@@ -244,6 +246,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "VCPU",
+      description: "Total VCPU time available (taking overcommitment into account).",
       metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
@@ -259,6 +262,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "QUOTA",
+      description: "Total VCPU time available as given by quota.",
       metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
@@ -275,6 +279,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
     for(let p of this.projects) {
       cfg.sets[idx].series.push(new GraphAggregateSeriesConfig({
         label: p.name,
+        description: `CPU time consumed by project ${p.name} (${p.id}).`,
         metric: Metrics.VM_CPU_TIME_USAGE,
         period: 3600,
         tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
@@ -292,6 +297,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphAggregateSeriesConfig({
       label: "OVERALL",
+      description: "Overall Wall clock time consumed over the specified granularity.",
       metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
       period: 3600,
       tag: {key: CAOS_PROJECT_TAG_KEY},
@@ -301,6 +307,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "BARE",
+      description: "Total CPU time available (physical cores).",
       metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
@@ -316,6 +323,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "VCPU",
+      description: "Total VCPU time available (taking overcommitment into account).",
       metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
@@ -331,6 +339,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "QUOTA",
+      description: "Total VCPU time available as given by quota.",
       metric: Metrics.IDENTITY,
       expression: "x * GRANULARITY/3600",
       terms: {
@@ -347,6 +356,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
     for(let p of this.projects) {
       cfg.sets[idx].series.push(new GraphAggregateSeriesConfig({
         label: p.name,
+        description: `Wall clock time consumed by project ${p.name} (${p.id}).`,
         metric: Metrics.VM_WALLCLOCK_TIME_USAGE,
         period: 3600,
         tags: [{key: CAOS_PROJECT_TAG_KEY, value: p.id}]
@@ -364,6 +374,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
 
     cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
       label: "OVERALL",
+      description: "Overall efficiency, given by the ratio between overall CPU Time and overall Wall Clock Time.",
       metric: Metrics.IDENTITY,
       expression: "x / y * 100",
       terms: {
@@ -387,6 +398,7 @@ export class AccountingComponent implements OnInit, AfterViewInit {
     for(let p of this.projects) {
       cfg.sets[idx].series.push(new GraphExpressionSeriesConfig({
         label: p.name,
+        description: `Efficiency of project ${p.name} (${p.id}).`,
         metric: Metrics.IDENTITY,
         expression: "x / y * 100",
         terms: {
